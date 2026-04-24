@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
-import { cn } from '../../../../../lib/utils';
+import { todayISO } from '../../../../../lib/dates';
 import type { ContactInfo, ContactFormData } from '../types';
 
 interface ContactModalProps {
@@ -27,13 +27,13 @@ export const ContactModal: React.FC<ContactModalProps> = ({ contact, onClose, on
   const [name, setName] = useState(contact?.name ?? '');
   const [title, setTitle] = useState(contact?.title ?? '');
   const [company, setCompany] = useState(contact?.company ?? '');
+  const [type, setType] = useState<ContactInfo['type']>(contact?.type ?? 'customer');
   const [email, setEmail] = useState(contact?.email ?? '');
   const [phone, setPhone] = useState(contact?.phone ?? '');
-  const [type, setType] = useState<ContactInfo['type']>(contact?.type ?? 'customer');
-  const [tags, setTags] = useState<string[]>(contact?.tags ?? []);
-  const [tagInput, setTagInput] = useState('');
+  const [neredeTanistiniz, setNeredeTanistiniz] = useState(contact?.neredeTanistiniz ?? '');
+  const [tarih, setTarih] = useState(contact?.tarih ?? todayISO());
+  const [not, setNot] = useState(contact?.not ?? '');
   const [error, setError] = useState<string | null>(null);
-  const tagRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const esc = (e: KeyboardEvent) => {
@@ -43,27 +43,24 @@ export const ContactModal: React.FC<ContactModalProps> = ({ contact, onClose, on
     return () => document.removeEventListener('keydown', esc);
   }, [onClose]);
 
-  const addTag = () => {
-    const t = tagInput.trim();
-    if (t && !tags.includes(t)) setTags((prev) => [...prev, t]);
-    setTagInput('');
-  };
-
-  const handleTagKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      addTag();
-    }
-  };
-
-  const removeTag = (tag: string) => setTags((prev) => prev.filter((t) => t !== tag));
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) { setError('İsim zorunlu.'); return; }
-    if (!title.trim()) { setError('Ünvan zorunlu.'); return; }
-    if (!company.trim()) { setError('Şirket zorunlu.'); return; }
-    onSave({ name: name.trim(), title: title.trim(), company: company.trim(), email: email.trim(), phone: phone.trim(), type, tags });
+    if (!name.trim()) {
+      setError('İsim zorunlu.');
+      return;
+    }
+    onSave({
+      name: name.trim(),
+      title: title.trim(),
+      company: company.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      type,
+      tags: contact?.tags ?? [],
+      neredeTanistiniz: neredeTanistiniz.trim() || undefined,
+      tarih: tarih || undefined,
+      not: not.trim() || undefined,
+    });
   };
 
   const handleDelete = () => {
@@ -87,12 +84,12 @@ export const ContactModal: React.FC<ContactModalProps> = ({ contact, onClose, on
           exit={{ opacity: 0, y: 10, scale: 0.98 }}
           transition={{ duration: 0.18, ease: 'easeOut' }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white rounded-2xl shadow-2xl border border-border w-full max-w-md mt-20 overflow-hidden"
+          className="bg-white rounded-2xl shadow-2xl border border-border w-full max-w-2xl mt-16 mb-8 overflow-hidden"
         >
           <form onSubmit={handleSubmit}>
             <div className="px-6 py-4 border-b border-border/40 flex items-center justify-between">
-              <h3 className="text-[15px] font-bold text-text">
-                {isEdit ? 'Kartı düzenle' : 'Yeni kart ekle'}
+              <h3 className="text-[15px] font-semibold text-text">
+                {isEdit ? 'Kartviziti düzenle' : 'Yeni kartvizit'}
               </h3>
               <button
                 type="button"
@@ -105,50 +102,59 @@ export const ContactModal: React.FC<ContactModalProps> = ({ contact, onClose, on
 
             <div className="p-6 space-y-4">
               {error && (
-                <div className="px-3 py-2 bg-red-bg text-red-text border border-red-border/30 rounded-lg text-[13px] font-bold">
+                <div className="px-3 py-2 bg-red-bg text-red-text border border-red-border/30 rounded-lg text-[13px] font-semibold">
                   {error}
                 </div>
               )}
 
-              <Field label="İsim" required>
-                <input
-                  autoFocus
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Ad Soyad"
-                  className={cn(
-                    'w-full p-3 bg-white border rounded-lg text-[14px] outline-none transition-colors font-medium',
-                    'border-[#0C447C]/30 focus:border-[#0C447C] ring-2 ring-[#0C447C]/10'
-                  )}
-                />
-              </Field>
-
-              <Field label="Ünvan / Rol" required>
-                <input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Örn: Yatırım Direktörü"
-                  className="w-full p-3 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-text transition-colors font-medium"
-                />
-              </Field>
-
-              <Field label="Şirket" required>
-                <input
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  placeholder="Örn: Global Ventures"
-                  className="w-full p-3 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-text transition-colors font-medium"
-                />
-              </Field>
-
               <div className="grid grid-cols-2 gap-3">
+                <Field label="İsim" required>
+                  <input
+                    autoFocus
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full p-3 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-text transition-colors font-medium"
+                  />
+                </Field>
+                <Field label="Ünvan">
+                  <input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full p-3 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-text transition-colors"
+                  />
+                </Field>
+
+                <Field label="Şirket">
+                  <input
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    className="w-full p-3 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-text transition-colors"
+                  />
+                </Field>
+                <Field label="Kategori">
+                  <select
+                    value={type}
+                    onChange={(e) => setType(e.target.value as ContactInfo['type'])}
+                    className="w-full p-3 bg-white border border-border rounded-lg text-[14px] font-medium outline-none focus:border-text transition-colors appearance-none"
+                    style={{
+                      backgroundImage: SELECT_BG,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 1rem center',
+                      backgroundSize: '1rem',
+                    }}
+                  >
+                    {TYPE_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                </Field>
+
                 <Field label="E-posta">
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="ornek@sirket.com"
-                    className="w-full p-3 bg-white border border-border rounded-lg text-[13px] outline-none focus:border-text transition-colors"
+                    className="w-full p-3 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-text transition-colors"
                   />
                 </Field>
                 <Field label="Telefon">
@@ -156,66 +162,37 @@ export const ContactModal: React.FC<ContactModalProps> = ({ contact, onClose, on
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+90 5xx ..."
-                    className="w-full p-3 bg-white border border-border rounded-lg text-[13px] outline-none focus:border-text transition-colors font-mono"
+                    className="w-full p-3 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-text transition-colors font-mono"
                   />
                 </Field>
-              </div>
 
-              <Field label="Tür" required>
-                <select
-                  value={type}
-                  onChange={(e) => setType(e.target.value as ContactInfo['type'])}
-                  className="w-full p-3 bg-white border border-border rounded-lg text-[14px] font-medium outline-none focus:border-text transition-colors appearance-none"
-                  style={{
-                    backgroundImage: SELECT_BG,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 1rem center',
-                    backgroundSize: '1rem',
-                  }}
-                >
-                  {TYPE_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
-                  ))}
-                </select>
-              </Field>
-
-              <Field label="Etiketler">
-                <div className="flex flex-wrap gap-1.5 mb-2">
-                  {tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-flex items-center gap-1 text-[11px] bg-surface-2 text-text-2 px-2 py-0.5 rounded-md font-bold"
-                    >
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => removeTag(tag)}
-                        className="hover:text-red-text ml-0.5"
-                      >
-                        <X size={10} />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
+                <Field label="Nerede tanıştınız">
                   <input
-                    ref={tagRef}
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={handleTagKeyDown}
-                    placeholder="Etiket yaz, Enter'a bas"
-                    className="flex-1 p-2.5 bg-white border border-border rounded-lg text-[13px] outline-none focus:border-text transition-colors"
+                    value={neredeTanistiniz}
+                    onChange={(e) => setNeredeTanistiniz(e.target.value)}
+                    className="w-full p-3 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-text transition-colors"
                   />
-                  <button
-                    type="button"
-                    onClick={addTag}
-                    className="px-3 py-2 border border-border rounded-lg text-[12px] font-bold text-text-2 hover:bg-surface-2 transition-colors"
-                  >
-                    Ekle
-                  </button>
+                </Field>
+                <Field label="Tarih">
+                  <input
+                    type="date"
+                    value={tarih}
+                    onChange={(e) => setTarih(e.target.value)}
+                    className="w-full p-3 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-text transition-colors font-mono"
+                  />
+                </Field>
+
+                <div className="col-span-2">
+                  <Field label="Not">
+                    <textarea
+                      value={not}
+                      onChange={(e) => setNot(e.target.value)}
+                      rows={3}
+                      className="w-full p-3 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-text transition-colors resize-none"
+                    />
+                  </Field>
                 </div>
-              </Field>
+              </div>
             </div>
 
             <div className="px-6 py-4 border-t border-border/40 bg-surface-2/30 flex items-center justify-between gap-2">
@@ -223,7 +200,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ contact, onClose, on
                 <button
                   type="button"
                   onClick={handleDelete}
-                  className="px-4 py-2 bg-red-bg text-red-text border border-red-border/30 rounded-lg text-[13px] font-bold hover:bg-red-border/20 transition-colors"
+                  className="px-4 py-2 bg-red-bg text-red-text border border-red-border/30 rounded-lg text-[13px] font-semibold hover:bg-red-border/20 transition-colors"
                 >
                   Sil
                 </button>
@@ -234,15 +211,15 @@ export const ContactModal: React.FC<ContactModalProps> = ({ contact, onClose, on
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 border border-border rounded-lg text-[13px] font-bold text-text-2 hover:bg-surface-2 transition-colors"
+                  className="px-4 py-2 border border-border rounded-lg text-[13px] font-semibold text-text-2 hover:bg-surface-2 transition-colors"
                 >
                   Vazgeç
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#0C447C] text-white rounded-lg text-[13px] font-bold shadow-sm hover:bg-[#0a3a6e] transition-colors"
+                  className="px-5 py-2 bg-[#0C447C] text-white rounded-lg text-[13px] font-semibold shadow-sm hover:bg-[#0a3a6e] transition-colors"
                 >
-                  Kaydet
+                  {isEdit ? 'Kaydet' : 'Ekle'}
                 </button>
               </div>
             </div>
@@ -259,7 +236,7 @@ const Field: React.FC<{ label: string; required?: boolean; children: React.React
   children,
 }) => (
   <div className="space-y-1.5">
-    <label className="text-[12px] font-bold uppercase tracking-widest text-text-3">
+    <label className="text-[12.5px] font-semibold uppercase tracking-widest text-text-3">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     {children}

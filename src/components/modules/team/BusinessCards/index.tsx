@@ -58,7 +58,7 @@ export const BusinessCards: React.FC<ModuleProps> = () => {
   return (
     <div className="max-w-7xl mx-auto p-8 md:p-10">
       <div className="mb-10">
-        <h2 className="text-2xl font-bold text-text tracking-tight mb-2">Kartvizit Rehberi</h2>
+        <h2 className="text-[17px] font-semibold text-text tracking-tight mb-2">Kartvizit Rehberi</h2>
         <p className="text-text-3 text-[14px]">Dış paydaşlar ve kurumsal iletişim rehberi.</p>
       </div>
 
@@ -79,7 +79,7 @@ export const BusinessCards: React.FC<ModuleProps> = () => {
               key={tab.id}
               onClick={() => setActiveType(tab.id)}
               className={cn(
-                'px-4 py-1.5 rounded-lg text-[13px] font-bold whitespace-nowrap transition-all',
+                'px-4 py-1.5 rounded-lg text-[13px] font-semibold whitespace-nowrap transition-all',
                 activeType === tab.id ? 'bg-white shadow-sm text-[#0C447C]' : 'text-text-3 hover:text-text'
               )}
             >
@@ -105,12 +105,12 @@ export const BusinessCards: React.FC<ModuleProps> = () => {
           <div className="w-12 h-12 rounded-full border border-dashed border-border flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
             <UserPlus size={18} />
           </div>
-          <span className="text-[13px] font-bold">Yeni Kart Ekle</span>
+          <span className="text-[13px] font-semibold">Yeni Kart Ekle</span>
         </button>
       </div>
 
       <div className="text-center pt-12 opacity-50">
-        <p className="text-[11px] text-text-3 font-bold uppercase tracking-widest">
+        <p className="text-[11px] text-text-3 font-semibold uppercase tracking-widest">
           Helios Kurumsal Sistemler • 2026
         </p>
       </div>
