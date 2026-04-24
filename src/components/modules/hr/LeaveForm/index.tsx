@@ -76,6 +76,8 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
       reason: form.reason,
       reasonDetail: form.reasonDetail,
       belge: form.belge,
+      belgeFileName: form.belgeFileName,
+      belgeFileDataUrl: form.belgeFileDataUrl,
       telafiNotu: form.telafiNotu,
       telafiGunleri: form.telafiGunleri,
       submittedAt: Date.now(),
@@ -190,11 +192,16 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
             reason={form.reason}
             reasonDetail={form.reasonDetail}
             belge={form.belge}
+            belgeFileName={form.belgeFileName}
+            belgeFileDataUrl={form.belgeFileDataUrl}
             onToggleRange={handleToggleRange}
             onClearRange={() => setForm({ ...form, rangeStart: 0, rangeEnd: 0 })}
             onReasonChange={(r) => setForm({ ...form, reason: r })}
             onReasonDetailChange={(v) => setForm({ ...form, reasonDetail: v })}
             onBelgeChange={(v) => setForm({ ...form, belge: v })}
+            onBelgeFileChange={(name, dataUrl) =>
+              setForm({ ...form, belgeFileName: name, belgeFileDataUrl: dataUrl })
+            }
           />
         )}
 

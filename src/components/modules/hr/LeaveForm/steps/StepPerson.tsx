@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '../../../../../lib/utils';
-import { PORTAL_USERS } from '../../../../../types/users';
+import { usePortalUsers } from '../../../../../lib/users';
 import type { User } from '../../../../../types/portal';
 import { DEPARTMENTS } from '../types';
 
@@ -26,6 +26,11 @@ export const StepPerson: React.FC<StepPersonProps> = ({
   onManagerChange,
   onEmailChange,
 }) => {
+  const { users } = usePortalUsers();
+  const managers = users.filter(
+    (u) => u.userRole === 'yonetici' && u.id !== employee.id
+  );
+
   return (
     <div className="bg-white border border-border/40 rounded-2xl p-10 shadow-sm space-y-10">
       <h2 className="text-[11px] font-black text-text-3 uppercase tracking-widest flex items-center gap-2">
@@ -83,11 +88,15 @@ export const StepPerson: React.FC<StepPersonProps> = ({
             }}
           >
             <option value="">Seçiniz...</option>
-            {PORTAL_USERS.filter((u) => u.id !== employee.id).map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.name}
-              </option>
-            ))}
+            {managers.length === 0 ? (
+              <option disabled>Kayıtlı yönetici yok</option>
+            ) : (
+              managers.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.name}
+                </option>
+              ))
+            )}
           </select>
         </div>
       </div>

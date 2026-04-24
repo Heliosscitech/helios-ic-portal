@@ -41,6 +41,8 @@ export interface LeaveFormState {
   reason: LeaveReasonId;
   reasonDetail: string;
   belge: BelgeDurumu;
+  belgeFileName?: string;
+  belgeFileDataUrl?: string;
   telafiNotu: string;
   telafiGunleri: number[];
 }
@@ -56,8 +58,12 @@ export interface LeaveRequest {
   reason: LeaveReasonId;
   reasonDetail: string;
   belge: BelgeDurumu;
+  belgeFileName?: string;
+  belgeFileDataUrl?: string;
   telafiNotu: string;
   telafiGunleri: number[];
   submittedAt: number;
   status: 'pending' | 'approved' | 'rejected';
+  reviewerNote?: string;
+  reviewedAt?: number;
 }

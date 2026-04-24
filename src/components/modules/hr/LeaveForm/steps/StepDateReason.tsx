@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Upload, FileText } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
 import { REASONS } from '../types';
 import type { BelgeDurumu, LeaveReasonId } from '../types';
@@ -10,12 +10,17 @@ interface StepDateReasonProps {
   reason: LeaveReasonId;
   reasonDetail: string;
   belge: BelgeDurumu;
+  belgeFileName?: string;
+  belgeFileDataUrl?: string;
   onToggleRange: (day: number) => void;
   onClearRange: () => void;
   onReasonChange: (r: LeaveReasonId) => void;
   onReasonDetailChange: (v: string) => void;
   onBelgeChange: (v: BelgeDurumu) => void;
+  onBelgeFileChange: (name: string | undefined, dataUrl: string | undefined) => void;
 }
+
+const MAX_INLINE_FILE_BYTES = 1_000_000; // ~1MB raw; data URL ~1.3MB
 
 const WEEK_DAYS = ['PZT', 'SAL', 'ÇAR', 'PER', 'CUM', 'CMT', 'PAZ'];
 const CALENDAR_DAYS = Array.from({ length: 30 }, (_, i) => i + 1);
@@ -29,12 +34,35 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
   reason,
   reasonDetail,
   belge,
+  belgeFileName,
+  belgeFileDataUrl,
   onToggleRange,
   onClearRange,
   onReasonChange,
   onReasonDetailChange,
   onBelgeChange,
+  onBelgeFileChange,
 }) => {
+  const [fileError, setFileError] = React.useState<string | null>(null);
+
+  const handleFile = (file: File | null) => {
+    if (!file) return;
+    setFileError(null);
+    if (file.size > MAX_INLINE_FILE_BYTES) {
+      onBelgeFileChange(file.name, undefined);
+      setFileError(`Dosya büyük (${(file.size / 1024 / 1024).toFixed(1)} MB) — sadece adı kaydedildi, önizleme olmayacak.`);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      onBelgeFileChange(file.name, typeof reader.result === 'string' ? reader.result : undefined);
+    };
+    reader.onerror = () => {
+      onBelgeFileChange(file.name, undefined);
+      setFileError('Dosya okunamadı — sadece adı kaydedildi.');
+    };
+    reader.readAsDataURL(file);
+  };
   const isInRange = (day: number): boolean => {
     if (!rangeStart || !rangeEnd) return day === rangeStart;
     return day >= rangeStart && day <= rangeEnd;
@@ -145,11 +173,18 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
           />
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
           <label className="text-[13px] font-bold text-text-2 whitespace-nowrap">Belge durumu</label>
           <select
             value={belge}
-            onChange={(e) => onBelgeChange(e.target.value as BelgeDurumu)}
+            onChange={(e) => {
+              const v = e.target.value as BelgeDurumu;
+              onBelgeChange(v);
+              if (v !== 'Ekledim') {
+                onBelgeFileChange(undefined, undefined);
+                setFileError(null);
+              }
+            }}
             className="p-3 pr-10 border border-border rounded-xl text-[13px] outline-none appearance-none bg-white font-bold text-text-3"
             style={{
               backgroundImage: SELECT_BG,
@@ -162,6 +197,52 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
             <option value="Ekledim">Ekledim</option>
             <option value="Gerekli değil">Gerekli değil</option>
           </select>
+
+          {belge === 'Ekledim' && (
+            <div className="flex-1 min-w-60">
+              {belgeFileName ? (
+                <div className="flex items-center gap-3 px-3 py-2 border border-teal-border/40 bg-teal-bg/30 rounded-xl">
+                  <FileText size={16} className="text-teal-text shrink-0" />
+                  <span className="flex-1 min-w-0 text-[13px] font-bold text-text truncate">
+                    {belgeFileName}
+                  </span>
+                  {belgeFileDataUrl && (
+                    <a
+                      href={belgeFileDataUrl}
+                      download={belgeFileName}
+                      className="text-[11px] font-bold text-info-text hover:underline"
+                    >
+                      İndir
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onBelgeFileChange(undefined, undefined);
+                      setFileError(null);
+                    }}
+                    className="p-1 text-text-3 hover:text-red-text hover:bg-red-bg rounded transition-colors"
+                    title="Kaldır"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex items-center gap-2 px-3 py-2 border border-dashed border-border rounded-xl cursor-pointer hover:bg-surface-2/40 transition-colors">
+                  <Upload size={15} className="text-text-3" />
+                  <span className="text-[13px] font-bold text-text-3">Belge yükle...</span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+                  />
+                </label>
+              )}
+              {fileError && (
+                <p className="mt-1.5 text-[11px] text-amber-text">{fileError}</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
