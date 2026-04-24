@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Clock, MessageSquare, Plus, MoreVertical, GripVertical } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
+import { formatTRCompact, isToday } from '../../../../../lib/dates';
 import { PORTAL_USERS } from '../../../../../types/users';
 import { UNITS } from '../types';
 import type { BoardTask, TaskStatus } from '../types';
@@ -136,11 +137,11 @@ export const BoardView: React.FC<BoardViewProps> = ({ tasks, onTaskClick, onStat
                         <div
                           className={cn(
                             'flex items-center gap-1',
-                            task.dueDate === 'Bugün' && 'text-red-border font-bold'
+                            isToday(task.dueDate) && 'text-red-border font-bold'
                           )}
                         >
                           <Clock size={12} />
-                          <span className="font-mono">{task.dueDate}</span>
+                          <span className="font-mono">{isToday(task.dueDate) ? 'Bugün' : formatTRCompact(task.dueDate)}</span>
                         </div>
                         {task.comments > 0 && (
                           <div className="flex items-center gap-1">

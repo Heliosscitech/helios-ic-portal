@@ -21,7 +21,7 @@ import type {
 import { usePersistentState } from '../../../../lib/persistence';
 import { useNotifications } from '../../../../lib/notifications';
 
-const TASKS_STORAGE_KEY = 'helios:board:tasks';
+const TASKS_STORAGE_KEY = 'helios:board:tasks:v2';
 
 const DEFAULT_FILTER: BoardFilter = {
   scope: 'all',

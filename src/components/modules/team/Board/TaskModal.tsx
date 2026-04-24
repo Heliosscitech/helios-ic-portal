@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trash2, Tag as TagIcon, Plus, MessageSquare, Clock, User as UserIcon } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
+import { formatTR } from '../../../../lib/dates';
 import { PORTAL_USERS } from '../../../../types/users';
 import {
   UNITS,
@@ -45,29 +46,23 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   onSave,
   onDelete,
 }) => {
-  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [form, setForm] = useState<FormState>(() =>
+    mode === 'detail' && task
+      ? {
+          title: task.title,
+          description: task.description ?? '',
+          unitId: task.unitId,
+          status: task.status,
+          priority: task.priority,
+          dueDate: task.dueDate,
+          assigneeIds: [...task.assigneeIds],
+          tags: [...task.tags],
+          comments: task.comments,
+        }
+      : EMPTY_FORM
+  );
   const [tagDraft, setTagDraft] = useState('');
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (mode === 'detail' && task) {
-      setForm({
-        title: task.title,
-        description: task.description ?? '',
-        unitId: task.unitId,
-        status: task.status,
-        priority: task.priority,
-        dueDate: task.dueDate,
-        assigneeIds: [...task.assigneeIds],
-        tags: [...task.tags],
-        comments: task.comments,
-      });
-    } else {
-      setForm(EMPTY_FORM);
-    }
-    setTagDraft('');
-    setError(null);
-  }, [mode, task]);
 
   const toggleAssignee = (id: string) => {
     setForm((prev) => ({
@@ -111,7 +106,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
       unitId: form.unitId,
       status: form.status,
       priority: form.priority,
-      dueDate: form.dueDate.trim() || '—',
+      dueDate: form.dueDate,
       assigneeIds: form.assigneeIds,
       creatorId: task?.creatorId ?? currentUserId,
       tags: form.tags,
@@ -250,9 +245,9 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                     Son Tarih
                   </label>
                   <input
+                    type="date"
                     value={form.dueDate}
                     onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
-                    placeholder="Bugün / 26 Nis"
                     className="w-full p-3 bg-white border border-border rounded-lg text-[13px] font-mono outline-none focus:border-text transition-colors"
                   />
                 </div>
@@ -343,7 +338,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                     <UserIcon size={12} /> Atayan: <span className="font-bold text-text-2">{creator.name}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <Clock size={12} /> {task.dueDate}
+                    <Clock size={12} /> {formatTR(task.dueDate)}
                   </div>
                   <div className="flex items-center gap-1.5">
                     <MessageSquare size={12} /> {task.comments} yorum

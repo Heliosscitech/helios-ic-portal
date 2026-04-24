@@ -8,9 +8,10 @@ import { cn } from '../../../../lib/utils';
 import { usePersistentState } from '../../../../lib/persistence';
 import { PORTAL_USERS } from '../../../../types/users';
 import { INITIAL_PROJECTS } from './data';
-import type { Project, WPStatus, NewProjectFormData } from './types';
+import type { Project, ReportPeriod, WPStatus, NewProjectFormData } from './types';
+import { formatTR, daysUntil } from '../../../../lib/dates';
 
-const PROJECTS_KEY = 'helios:projeler:projects';
+const PROJECTS_KEY = 'helios:projeler:projects:v2';
 
 const SELECT_BG =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")";
@@ -104,12 +105,41 @@ export const Projects: React.FC = () => {
       )
     );
 
-  // ── Period handler ────────────────────────────────────────
-  const updatePeriodStatus = (periodId: string, status: WPStatus) =>
+  // ── Report period handlers ───────────────────────────────
+  const updateReportPeriod = (periodId: string, patch: Partial<ReportPeriod>) =>
     setProjects((prev) =>
       prev.map((p) =>
         p.id === activeId
-          ? { ...p, reportPeriods: p.reportPeriods.map((r) => (r.id === periodId ? { ...r, status } : r)) }
+          ? { ...p, reportPeriods: p.reportPeriods.map((r) => (r.id === periodId ? { ...r, ...patch } : r)) }
+          : p
+      )
+    );
+
+  const addReportPeriod = () =>
+    setProjects((prev) =>
+      prev.map((p) =>
+        p.id === activeId
+          ? {
+              ...p,
+              reportPeriods: [
+                ...p.reportPeriods,
+                {
+                  id: `R${p.reportPeriods.length + 1}-${Date.now().toString(36).slice(-4)}`,
+                  title: '',
+                  date: '',
+                  status: 'bekliyor' as WPStatus,
+                },
+              ],
+            }
+          : p
+      )
+    );
+
+  const deleteReportPeriod = (periodId: string) =>
+    setProjects((prev) =>
+      prev.map((p) =>
+        p.id === activeId
+          ? { ...p, reportPeriods: p.reportPeriods.filter((r) => r.id !== periodId) }
           : p
       )
     );
@@ -134,9 +164,8 @@ export const Projects: React.FC = () => {
       name: data.name,
       subtitle: data.subtitle || data.code,
       color: 'bg-info-border',
-      startDate: data.startDate || '—',
-      endDate: data.endDate || '—',
-      daysLeft: 365,
+      startDate: data.startDate,
+      endDate: data.endDate,
       leaderId: data.leaderId,
       memberIds: data.memberIds,
       budgetK: data.budgetK,
@@ -188,6 +217,7 @@ export const Projects: React.FC = () => {
   const members = active.memberIds.map(getUser).filter(Boolean) as (typeof PORTAL_USERS)[number][];
   const leader = getUser(active.leaderId);
   const spentPct = active.budgetK === 0 ? 0 : Math.round((active.spentK / active.budgetK) * 100);
+  const projectDaysLeft = daysUntil(active.endDate);
 
   return (
     <div className="max-w-7xl mx-auto p-8 md:p-10">
@@ -288,7 +318,7 @@ export const Projects: React.FC = () => {
                   {active.name} — {active.subtitle ?? active.code}
                 </h2>
                 <p className="text-[13px] text-text-3">
-                  {active.startDate} → {active.endDate}
+                  {formatTR(active.startDate)} → {formatTR(active.endDate)}
                   {leader && (
                     <> · Lider: <span className="font-medium text-text-2">{leader.name}</span></>
                   )}
@@ -330,8 +360,14 @@ export const Projects: React.FC = () => {
                 <Clock size={12} />
                 <span className="text-[9px] font-bold uppercase tracking-wider">Kalan Süre</span>
               </div>
-              <p className="text-[18px] font-bold text-text mb-2">{active.daysLeft} gün</p>
-              <p className="text-[10px] text-text-3">Son: {active.endDate}</p>
+              <p className="text-[18px] font-bold text-text mb-2">
+                {projectDaysLeft === null
+                  ? '—'
+                  : projectDaysLeft >= 0
+                    ? `${projectDaysLeft} gün`
+                    : `${Math.abs(projectDaysLeft)} gün geçti`}
+              </p>
+              <p className="text-[10px] text-text-3">Son: {formatTR(active.endDate)}</p>
             </div>
 
             <div className="bg-white border-[0.5px] border-border rounded-2xl p-5 shadow-sm">
@@ -388,10 +424,10 @@ export const Projects: React.FC = () => {
                         {WP_STATUS_LABELS[wp.status]}
                       </span>
                       <input
+                        type="date"
                         value={wp.deadline}
                         onChange={(e) => updateWP(wp.id, { deadline: e.target.value })}
-                        placeholder="Tarih"
-                        className="text-[11px] text-text-3 font-mono bg-transparent outline-none border-b border-transparent focus:border-border w-16 shrink-0 py-0.5 transition-colors text-center"
+                        className="text-[11px] text-text-3 font-mono bg-transparent outline-none border-b border-transparent focus:border-border shrink-0 py-0.5 transition-colors"
                       />
                       <select
                         value={wp.status}
@@ -425,34 +461,77 @@ export const Projects: React.FC = () => {
           </div>
 
           {/* Rapor Dönemleri */}
-          {active.reportPeriods.length > 0 && (
-            <div className="bg-white border-[0.5px] border-border rounded-2xl p-6 shadow-sm">
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-text-3 mb-4">Rapor Dönemleri</h3>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                {active.reportPeriods.map((r) => (
-                  <div key={r.id} className="border-[0.5px] border-border rounded-xl p-4">
-                    <p className="text-[10px] font-bold text-text-3 uppercase tracking-wide mb-1">{r.title}</p>
-                    <p className="text-[17px] font-bold text-text mb-3">{r.date}</p>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <select
-                        value={r.status}
-                        onChange={(e) => updatePeriodStatus(r.id, e.target.value as WPStatus)}
-                        className="text-[11px] font-medium border border-border rounded-md px-1.5 py-0.5 bg-white outline-none cursor-pointer appearance-none pr-5 text-text-2"
-                        style={{ ...selectStyle, backgroundSize: '0.65rem' }}
-                      >
-                        {(Object.keys(WP_STATUS_LABELS) as WPStatus[]).map((s) => (
-                          <option key={s} value={s}>{WP_STATUS_LABELS[s]}</option>
-                        ))}
-                      </select>
-                      {r.daysLeft > 0 && (
-                        <span className="text-[10px] text-text-3">{r.daysLeft} gün kaldı</span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+          <div className="bg-white border-[0.5px] border-border rounded-2xl shadow-sm overflow-hidden">
+            <div className="px-6 pt-5 pb-4 border-b border-border/30 flex items-center justify-between">
+              <h3 className="text-[10px] font-bold uppercase tracking-widest text-text-3">Rapor Dönemleri</h3>
+              <button
+                onClick={addReportPeriod}
+                className="flex items-center gap-1 text-[11px] font-bold text-text-3 hover:text-info-text transition-colors"
+              >
+                <Plus size={13} /> Ekle
+              </button>
             </div>
-          )}
+            {active.reportPeriods.length === 0 ? (
+              <div className="px-6 py-10 text-center">
+                <p className="text-[13px] text-text-3 mb-3">Henüz rapor dönemi yok.</p>
+                <button
+                  onClick={addReportPeriod}
+                  className="inline-flex items-center gap-1.5 text-[12px] font-bold text-info-text hover:underline"
+                >
+                  <Plus size={13} /> İlk rapor dönemini ekle
+                </button>
+              </div>
+            ) : (
+              <div className="p-6 grid grid-cols-2 lg:grid-cols-4 gap-3">
+                {active.reportPeriods.map((r) => {
+                  const left = daysUntil(r.date);
+                  return (
+                    <div key={r.id} className="border-[0.5px] border-border rounded-xl p-4 relative group">
+                      <button
+                        onClick={() => deleteReportPeriod(r.id)}
+                        className="absolute top-2 right-2 p-1 text-text-3 hover:text-red-text hover:bg-red-bg rounded transition-colors opacity-0 group-hover:opacity-100"
+                        title="Dönemi sil"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                      <input
+                        value={r.title}
+                        onChange={(e) => updateReportPeriod(r.id, { title: e.target.value })}
+                        placeholder="Başlık..."
+                        className="w-full text-[10px] font-bold text-text-3 uppercase tracking-wide mb-1 bg-transparent outline-none border-b border-transparent focus:border-border placeholder:text-text-3/50 placeholder:normal-case"
+                      />
+                      <div className="mb-3">
+                        <input
+                          type="date"
+                          value={r.date}
+                          onChange={(e) => updateReportPeriod(r.id, { date: e.target.value })}
+                          className="text-[15px] font-bold text-text bg-transparent outline-none border-b border-transparent focus:border-border w-full"
+                        />
+                        <p className="text-[11px] text-text-3 mt-0.5">{formatTR(r.date)}</p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <select
+                          value={r.status}
+                          onChange={(e) => updateReportPeriod(r.id, { status: e.target.value as WPStatus })}
+                          className="text-[11px] font-medium border border-border rounded-md px-1.5 py-0.5 bg-white outline-none cursor-pointer appearance-none pr-5 text-text-2"
+                          style={{ ...selectStyle, backgroundSize: '0.65rem' }}
+                        >
+                          {(Object.keys(WP_STATUS_LABELS) as WPStatus[]).map((s) => (
+                            <option key={s} value={s}>{WP_STATUS_LABELS[s]}</option>
+                          ))}
+                        </select>
+                        {left !== null && (
+                          <span className="text-[10px] text-text-3">
+                            {left >= 0 ? `${left} gün kaldı` : `${Math.abs(left)} gün geçti`}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           {/* Notlar */}
           <div className="bg-white border-[0.5px] border-border rounded-2xl p-6 shadow-sm">
@@ -634,18 +713,18 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
                 </MField>
                 <MField label="Başlangıç">
                   <input
+                    type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    placeholder="01 Oca 2025"
-                    className="w-full p-2.5 bg-white border border-border rounded-lg text-[12px] outline-none focus:border-info-border transition-colors font-mono"
+                    className="w-full p-2.5 bg-white border border-border rounded-lg text-[13px] outline-none focus:border-info-border transition-colors font-mono"
                   />
                 </MField>
                 <MField label="Bitiş">
                   <input
+                    type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    placeholder="31 Ara 2027"
-                    className="w-full p-2.5 bg-white border border-border rounded-lg text-[12px] outline-none focus:border-info-border transition-colors font-mono"
+                    className="w-full p-2.5 bg-white border border-border rounded-lg text-[13px] outline-none focus:border-info-border transition-colors font-mono"
                   />
                 </MField>
               </div>

@@ -13,7 +13,6 @@ export interface ReportPeriod {
   id: string;
   title: string;
   date: string;
-  daysLeft: number;
   status: WPStatus;
 }
 
@@ -25,7 +24,6 @@ export interface Project {
   color: string;
   startDate: string;
   endDate: string;
-  daysLeft: number;
   leaderId: string;
   memberIds: string[];
   budgetK: number;

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock, MessageSquare } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
+import { formatTRCompact, isToday } from '../../../../../lib/dates';
 import { PORTAL_USERS } from '../../../../../types/users';
 import { UNITS } from '../types';
 import type { BoardTask, TaskStatus } from '../types';
@@ -127,10 +128,10 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, onTaskClick }) => {
                     <div
                       className={cn(
                         'flex items-center gap-1 text-[12px] font-mono',
-                        task.dueDate === 'Bugün' ? 'text-red-border font-bold' : 'text-text-2'
+                        isToday(task.dueDate) ? 'text-red-border font-bold' : 'text-text-2'
                       )}
                     >
-                      <Clock size={12} /> {task.dueDate}
+                      <Clock size={12} /> {isToday(task.dueDate) ? 'Bugün' : formatTRCompact(task.dueDate)}
                     </div>
                   </td>
                   <td className="px-4 py-3 text-center">
