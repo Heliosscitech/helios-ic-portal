@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-text-2: var(--text-2);
+  --color-text-3: var(--text-3);
+  --color-info-bg: var(--info-bg);
+  --color-info-text: var(--info-text);
+  --color-info-border: var(--info-border);
+  --color-amber-bg: var(--amber-bg);
+  --color-amber-text: var(--amber-text);
+  --color-amber-border: var(--amber-border);
+  --color-teal-bg: var(--teal-bg);
+  --color-teal-text: var(--teal-text);
+  --color-purple-bg: var(--purple-bg);
+  --color-purple-text: var(--purple-text);
+  --color-pink-bg: var(--pink-bg);
+  --color-pink-text: var(--pink-text);
+  --color-red-bg: var(--red-bg);
+  --color-red-text: var(--red-text);
+  --color-red-border: var(--red-border);
+  
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  
+  --font-sans: "Outfit", -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+}
+
+:root {
+  --bg: #fafaf7;
+  --surface: #ffffff;
+  --surface-2: #f1efe8;
+  --border: rgba(0,0,0,0.08);
+  --border-strong: rgba(0,0,0,0.15);
+  --text: #1a1a19;
+  --text-2: #5f5e5a;
+  --text-3: #8a8983;
+  --info-bg: #E6F1FB;
+  --info-text: #0C447C;
+  --info-border: #378ADD;
+  --amber-bg: #FAEEDA;
+  --amber-text: #633806;
+  --amber-border: #BA7517;
+  --teal-bg: #E1F5EE;
+  --teal-text: #0F6E56;
+  --purple-bg: #EEEDFE;
+  --purple-text: #3C3489;
+  --pink-bg: #FBEAF0;
+  --pink-text: #72243E;
+  --red-bg: #FCEBEB;
+  --red-text: #791F1F;
+  --red-border: #A32D2D;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+@layer base {
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+/* Custom animations and utilities */
+@keyframes jiggle {
+  0%, 100% { transform: rotate(-0.8deg); }
+  50% { transform: rotate(0.8deg); }
+}
+
+.jiggle-active {
+  animation: jiggle 0.22s ease-in-out infinite;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.scale-in {
+  animation: scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Fix for icons */
+button svg {
+  display: inline-block;
+  vertical-align: middle;
+}
