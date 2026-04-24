@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FolderOpen, ChevronRight, Trash2, Plus, X,
-  TrendingUp, Clock, Wallet, Activity, Pencil,
+  TrendingUp, Clock, Activity, Pencil,
 } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import { usePersistentState } from '../../../../lib/persistence';
@@ -51,11 +51,6 @@ const getUser = (id: string) => PORTAL_USERS.find((u) => u.id === id);
 
 const completionPct = (wps: Project['workPackages']) =>
   wps.length === 0 ? 0 : Math.round((wps.filter((wp) => wp.status === 'tamam').length / wps.length) * 100);
-
-const formatBudget = (k: number) => {
-  if (k >= 1000) return (k / 1000).toFixed(2) + 'M ₺';
-  return k + ' K₺';
-};
 
 export const Projects: React.FC = () => {
   const [projects, setProjects] = usePersistentState<Project[]>(PROJECTS_KEY, INITIAL_PROJECTS);
@@ -168,8 +163,6 @@ export const Projects: React.FC = () => {
       endDate: data.endDate,
       leaderId: data.leaderId,
       memberIds: data.memberIds,
-      budgetK: data.budgetK,
-      spentK: 0,
       status: 'aktif',
       workPackages: [],
       reportPeriods: [],
@@ -190,7 +183,6 @@ export const Projects: React.FC = () => {
               name: data.name,
               subtitle: data.subtitle,
               code: data.code,
-              budgetK: data.budgetK,
               leaderId: data.leaderId,
               memberIds: data.memberIds,
               startDate: data.startDate,
@@ -206,7 +198,7 @@ export const Projects: React.FC = () => {
     return (
       <div className="max-w-7xl mx-auto p-8 text-center text-text-3 text-[14px]">
         Henüz proje yok.{' '}
-        <button onClick={() => setShowNewModal(true)} className="text-info-text font-bold underline">
+        <button onClick={() => setShowNewModal(true)} className="text-info-text font-semibold underline">
           Yeni proje ekle
         </button>
       </div>
@@ -216,7 +208,6 @@ export const Projects: React.FC = () => {
   const completion = completionPct(active.workPackages);
   const members = active.memberIds.map(getUser).filter(Boolean) as (typeof PORTAL_USERS)[number][];
   const leader = getUser(active.leaderId);
-  const spentPct = active.budgetK === 0 ? 0 : Math.round((active.spentK / active.budgetK) * 100);
   const projectDaysLeft = daysUntil(active.endDate);
 
   return (
@@ -228,7 +219,7 @@ export const Projects: React.FC = () => {
           <div className="bg-white border-[0.5px] border-border rounded-2xl shadow-sm overflow-hidden mb-3">
             <div className="px-4 pt-4 pb-3 flex items-center gap-2 border-b border-border/40">
               <FolderOpen size={14} className="text-text-3" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-text-3">Projeler</span>
+              <span className="text-[10.5px] font-semibold uppercase tracking-widest text-text-3">Projeler</span>
             </div>
             <div className="py-2">
               {projects.map((p) => (
@@ -241,9 +232,9 @@ export const Projects: React.FC = () => {
                   )}
                 >
                   <span className={cn('w-2 h-2 rounded-full shrink-0', p.color)} />
-                  <span className="flex-1 text-[13px] font-bold truncate">{p.name}</span>
+                  <span className="flex-1 text-[13px] font-semibold truncate">{p.name}</span>
                   <span className={cn(
-                    'text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0',
+                    'text-[10.5px] font-semibold px-1.5 py-0.5 rounded shrink-0',
                     activeId === p.id ? 'bg-[#d8c9f5] text-[#4a2e85]' : 'bg-surface-2 text-text-3'
                   )}>
                     {p.reportPeriods.length}
@@ -258,7 +249,7 @@ export const Projects: React.FC = () => {
           </div>
           <button
             onClick={() => setShowNewModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-bold text-text-3 hover:text-info-text transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-[12.5px] font-semibold text-text-3 hover:text-info-text transition-colors"
           >
             <Plus size={13} /> Yeni proje
           </button>
@@ -274,7 +265,7 @@ export const Projects: React.FC = () => {
               <div className="flex-1 p-6">
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide bg-amber-bg text-amber-text border border-amber-border/30">
+                    <span className="text-[10.5px] font-semibold px-2 py-0.5 rounded uppercase tracking-wide bg-amber-bg text-amber-text border border-amber-border/30">
                       {active.name.split(' ')[0]}
                     </span>
                     <span className="font-mono text-[11px] text-text-3 bg-surface-2 px-2 py-0.5 rounded">
@@ -287,13 +278,13 @@ export const Projects: React.FC = () => {
                         <span
                           key={u.id}
                           title={u.name}
-                          className={cn('w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold', u.color)}
+                          className={cn('w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-[10.5px] font-semibold', u.color)}
                         >
                           {u.initials}
                         </span>
                       ))}
                       {members.length > 4 && (
-                        <span className="w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold bg-surface-2 text-text-3">
+                        <span className="w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-[10.5px] font-semibold bg-surface-2 text-text-3">
                           +{members.length - 4}
                         </span>
                       )}
@@ -314,7 +305,7 @@ export const Projects: React.FC = () => {
                     </button>
                   </div>
                 </div>
-                <h2 className="text-2xl font-bold text-text tracking-tight mb-1">
+                <h2 className="text-[17px] font-semibold text-text tracking-tight mb-1">
                   {active.name} — {active.subtitle ?? active.code}
                 </h2>
                 <p className="text-[13px] text-text-3">
@@ -328,29 +319,17 @@ export const Projects: React.FC = () => {
           </div>
 
           {/* Stat cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="bg-white border-[0.5px] border-border rounded-2xl p-5 shadow-sm">
-              <div className="flex items-center gap-1.5 text-text-3 mb-3">
-                <Wallet size={12} />
-                <span className="text-[9px] font-bold uppercase tracking-wider">Bütçe</span>
-              </div>
-              <p className="text-[18px] font-bold text-text mb-2">{formatBudget(active.budgetK)}</p>
-              <div className="h-1 bg-surface-2 rounded-full overflow-hidden mb-1.5">
-                <div className="h-full bg-amber-400 rounded-full" style={{ width: `${Math.min(spentPct, 100)}%` }} />
-              </div>
-              <p className="text-[10px] text-text-3">%{spentPct} harcandı ({active.spentK > 0 ? active.spentK + ' K₺' : '0'})</p>
-            </div>
-
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-white border-[0.5px] border-border rounded-2xl p-5 shadow-sm">
               <div className="flex items-center gap-1.5 text-text-3 mb-3">
                 <TrendingUp size={12} />
-                <span className="text-[9px] font-bold uppercase tracking-wider">İlerleme</span>
+                <span className="text-[10.5px] font-semibold uppercase tracking-wider">İlerleme</span>
               </div>
-              <p className="text-[18px] font-bold text-text mb-2">%{completion}</p>
+              <p className="text-[17px] font-semibold text-text mb-2">%{completion}</p>
               <div className="h-1 bg-surface-2 rounded-full overflow-hidden mb-1.5">
                 <div className="h-full bg-purple-500 rounded-full" style={{ width: `${completion}%` }} />
               </div>
-              <p className="text-[10px] text-text-3">
+              <p className="text-[10.5px] text-text-3">
                 {active.workPackages.filter((w) => w.status === 'tamam').length}/{active.workPackages.length} paket tamam
               </p>
             </div>
@@ -358,37 +337,37 @@ export const Projects: React.FC = () => {
             <div className="bg-white border-[0.5px] border-border rounded-2xl p-5 shadow-sm">
               <div className="flex items-center gap-1.5 text-text-3 mb-3">
                 <Clock size={12} />
-                <span className="text-[9px] font-bold uppercase tracking-wider">Kalan Süre</span>
+                <span className="text-[10.5px] font-semibold uppercase tracking-wider">Kalan Süre</span>
               </div>
-              <p className="text-[18px] font-bold text-text mb-2">
+              <p className="text-[17px] font-semibold text-text mb-2">
                 {projectDaysLeft === null
                   ? '—'
                   : projectDaysLeft >= 0
                     ? `${projectDaysLeft} gün`
                     : `${Math.abs(projectDaysLeft)} gün geçti`}
               </p>
-              <p className="text-[10px] text-text-3">Son: {formatTR(active.endDate)}</p>
+              <p className="text-[10.5px] text-text-3">Son: {formatTR(active.endDate)}</p>
             </div>
 
             <div className="bg-white border-[0.5px] border-border rounded-2xl p-5 shadow-sm">
               <div className="flex items-center gap-1.5 text-text-3 mb-3">
                 <Activity size={12} />
-                <span className="text-[9px] font-bold uppercase tracking-wider">Durum</span>
+                <span className="text-[10.5px] font-semibold uppercase tracking-wider">Durum</span>
               </div>
-              <span className={cn('inline-block text-[12px] font-bold px-2.5 py-1 rounded-lg mb-2', PROJECT_STATUS_STYLES[active.status])}>
+              <span className={cn('inline-block text-[12.5px] font-semibold px-2.5 py-1 rounded-lg mb-2', PROJECT_STATUS_STYLES[active.status])}>
                 {PROJECT_STATUS_LABELS[active.status]}
               </span>
-              <p className="text-[10px] text-text-3">{members.length} kişi</p>
+              <p className="text-[10.5px] text-text-3">{members.length} kişi</p>
             </div>
           </div>
 
           {/* İş Paketleri */}
           <div className="bg-white border-[0.5px] border-border rounded-2xl shadow-sm overflow-hidden">
             <div className="px-6 pt-5 pb-4 border-b border-border/30 flex items-center justify-between">
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-text-3">İş Paketleri</h3>
+              <h3 className="text-[10.5px] font-semibold uppercase tracking-widest text-text-3">İş Paketleri</h3>
               <button
                 onClick={addWP}
-                className="flex items-center gap-1 text-[11px] font-bold text-text-3 hover:text-info-text transition-colors"
+                className="flex items-center gap-1 text-[11px] font-semibold text-text-3 hover:text-info-text transition-colors"
               >
                 <Plus size={13} /> Ekle
               </button>
@@ -398,7 +377,7 @@ export const Projects: React.FC = () => {
                 <p className="text-[13px] text-text-3 mb-3">Henüz iş paketi yok.</p>
                 <button
                   onClick={addWP}
-                  className="inline-flex items-center gap-1.5 text-[12px] font-bold text-info-text hover:underline"
+                  className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-info-text hover:underline"
                 >
                   <Plus size={13} /> İlk iş paketini ekle
                 </button>
@@ -411,7 +390,7 @@ export const Projects: React.FC = () => {
                     className={cn('px-6 py-4', idx < active.workPackages.length - 1 && 'border-b border-border/25')}
                   >
                     <div className="flex items-center gap-2 mb-3 flex-wrap">
-                      <span className="font-mono text-[10px] text-text-3 bg-surface-2 px-1.5 py-0.5 rounded shrink-0 min-w-[2.2rem] text-center">
+                      <span className="font-mono text-[10.5px] text-text-3 bg-surface-2 px-1.5 py-0.5 rounded shrink-0 min-w-[2.2rem] text-center">
                         {wp.id}
                       </span>
                       <input
@@ -420,7 +399,7 @@ export const Projects: React.FC = () => {
                         placeholder="İş paketi başlığı..."
                         className="flex-1 text-[14px] font-semibold text-text bg-transparent outline-none border-b border-transparent focus:border-border min-w-0 py-0.5 transition-colors placeholder:text-text-3/50 placeholder:font-normal"
                       />
-                      <span className={cn('text-[11px] font-bold px-2 py-0.5 rounded shrink-0', WP_STATUS_STYLES[wp.status])}>
+                      <span className={cn('text-[11px] font-semibold px-2 py-0.5 rounded shrink-0', WP_STATUS_STYLES[wp.status])}>
                         {WP_STATUS_LABELS[wp.status]}
                       </span>
                       <input
@@ -432,7 +411,7 @@ export const Projects: React.FC = () => {
                       <select
                         value={wp.status}
                         onChange={(e) => updateWP(wp.id, { status: e.target.value as WPStatus })}
-                        className="text-[12px] font-medium border border-border rounded-lg px-2 py-1 bg-white outline-none cursor-pointer appearance-none pr-6 shrink-0 text-text-2"
+                        className="text-[12.5px] font-medium border border-border rounded-lg px-2 py-1 bg-white outline-none cursor-pointer appearance-none pr-6 shrink-0 text-text-2"
                         style={selectStyle}
                       >
                         {(Object.keys(WP_STATUS_LABELS) as WPStatus[]).map((s) => (
@@ -463,10 +442,10 @@ export const Projects: React.FC = () => {
           {/* Rapor Dönemleri */}
           <div className="bg-white border-[0.5px] border-border rounded-2xl shadow-sm overflow-hidden">
             <div className="px-6 pt-5 pb-4 border-b border-border/30 flex items-center justify-between">
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-text-3">Rapor Dönemleri</h3>
+              <h3 className="text-[10.5px] font-semibold uppercase tracking-widest text-text-3">Rapor Dönemleri</h3>
               <button
                 onClick={addReportPeriod}
-                className="flex items-center gap-1 text-[11px] font-bold text-text-3 hover:text-info-text transition-colors"
+                className="flex items-center gap-1 text-[11px] font-semibold text-text-3 hover:text-info-text transition-colors"
               >
                 <Plus size={13} /> Ekle
               </button>
@@ -476,7 +455,7 @@ export const Projects: React.FC = () => {
                 <p className="text-[13px] text-text-3 mb-3">Henüz rapor dönemi yok.</p>
                 <button
                   onClick={addReportPeriod}
-                  className="inline-flex items-center gap-1.5 text-[12px] font-bold text-info-text hover:underline"
+                  className="inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-info-text hover:underline"
                 >
                   <Plus size={13} /> İlk rapor dönemini ekle
                 </button>
@@ -498,14 +477,14 @@ export const Projects: React.FC = () => {
                         value={r.title}
                         onChange={(e) => updateReportPeriod(r.id, { title: e.target.value })}
                         placeholder="Başlık..."
-                        className="w-full text-[10px] font-bold text-text-3 uppercase tracking-wide mb-1 bg-transparent outline-none border-b border-transparent focus:border-border placeholder:text-text-3/50 placeholder:normal-case"
+                        className="w-full text-[10.5px] font-semibold text-text-3 uppercase tracking-wide mb-1 bg-transparent outline-none border-b border-transparent focus:border-border placeholder:text-text-3/50 placeholder:normal-case"
                       />
                       <div className="mb-3">
                         <input
                           type="date"
                           value={r.date}
                           onChange={(e) => updateReportPeriod(r.id, { date: e.target.value })}
-                          className="text-[15px] font-bold text-text bg-transparent outline-none border-b border-transparent focus:border-border w-full"
+                          className="text-[15px] font-semibold text-text bg-transparent outline-none border-b border-transparent focus:border-border w-full"
                         />
                         <p className="text-[11px] text-text-3 mt-0.5">{formatTR(r.date)}</p>
                       </div>
@@ -521,7 +500,7 @@ export const Projects: React.FC = () => {
                           ))}
                         </select>
                         {left !== null && (
-                          <span className="text-[10px] text-text-3">
+                          <span className="text-[10.5px] text-text-3">
                             {left >= 0 ? `${left} gün kaldı` : `${Math.abs(left)} gün geçti`}
                           </span>
                         )}
@@ -535,7 +514,7 @@ export const Projects: React.FC = () => {
 
           {/* Notlar */}
           <div className="bg-white border-[0.5px] border-border rounded-2xl p-6 shadow-sm">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-text-3 mb-3">Notlar</h3>
+            <h3 className="text-[10.5px] font-semibold uppercase tracking-widest text-text-3 mb-3">Notlar</h3>
             <textarea
               value={active.notes}
               onChange={(e) => updateProjectNotes(e.target.value)}
@@ -591,7 +570,6 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
   const [name, setName] = useState(initial?.name ?? '');
   const [subtitle, setSubtitle] = useState(initial?.subtitle ?? '');
   const [code, setCode] = useState(initial?.code ?? '');
-  const [budgetK, setBudgetK] = useState(initial?.budgetK ?? 0);
   const [startDate, setStartDate] = useState(initial?.startDate ?? '');
   const [endDate, setEndDate] = useState(initial?.endDate ?? '');
   const [leaderId, setLeaderId] = useState(initial?.leaderId ?? PORTAL_USERS[0].id);
@@ -625,7 +603,6 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
       name: name.trim(),
       subtitle: subtitle.trim(),
       code: code.trim(),
-      budgetK,
       leaderId,
       memberIds: finalMembers,
       startDate: startDate.trim(),
@@ -652,7 +629,7 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
         >
           <form onSubmit={handleSubmit}>
             <div className="px-6 py-4 border-b border-border/40 flex items-center justify-between">
-              <h3 className="text-[15px] font-bold text-text">
+              <h3 className="text-[15px] font-semibold text-text">
                 {isEdit ? 'Projeyi Düzenle' : 'Yeni Proje Ekle'}
               </h3>
               <button
@@ -666,7 +643,7 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
 
             <div className="p-6 space-y-4">
               {error && (
-                <div className="px-3 py-2 bg-red-bg text-red-text border border-red-border/30 rounded-lg text-[13px] font-bold">
+                <div className="px-3 py-2 bg-red-bg text-red-text border border-red-border/30 rounded-lg text-[13px] font-semibold">
                   {error}
                 </div>
               )}
@@ -700,17 +677,7 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
                 />
               </MField>
 
-              <div className="grid grid-cols-3 gap-3">
-                <MField label="Bütçe (K₺)">
-                  <input
-                    type="number"
-                    min={0}
-                    value={budgetK || ''}
-                    onChange={(e) => setBudgetK(Number(e.target.value))}
-                    placeholder="Örn: 2400"
-                    className="w-full p-2.5 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-info-border transition-colors"
-                  />
-                </MField>
+              <div className="grid grid-cols-2 gap-3">
                 <MField label="Başlangıç">
                   <input
                     type="date"
@@ -766,7 +733,7 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
                         />
                         <span
                           className={cn(
-                            'w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0',
+                            'w-6 h-6 rounded-full flex items-center justify-center text-[10.5px] font-semibold shrink-0',
                             u.color
                           )}
                         >
@@ -774,7 +741,7 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
                         </span>
                         <span className="text-[13px] font-medium text-text flex-1">{u.name}</span>
                         {isLeader && (
-                          <span className="text-[10px] font-bold text-info-text">Lider</span>
+                          <span className="text-[10.5px] font-semibold text-info-text">Lider</span>
                         )}
                       </label>
                     );
@@ -787,13 +754,13 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 border border-border rounded-lg text-[13px] font-bold text-text-2 hover:bg-surface-2 transition-colors"
+                className="px-4 py-2 border border-border rounded-lg text-[13px] font-semibold text-text-2 hover:bg-surface-2 transition-colors"
               >
                 Vazgeç
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 bg-[#0C447C] text-white rounded-lg text-[13px] font-bold shadow-sm hover:bg-[#0a3a6e] transition-colors"
+                className="px-5 py-2 bg-[#0C447C] text-white rounded-lg text-[13px] font-semibold shadow-sm hover:bg-[#0a3a6e] transition-colors"
               >
                 {isEdit ? 'Kaydet' : 'Oluştur'}
               </button>
@@ -809,7 +776,7 @@ const MField: React.FC<{ label: string; required?: boolean; children: React.Reac
   label, required, children,
 }) => (
   <div className="space-y-1.5">
-    <label className="text-[11px] font-bold uppercase tracking-widest text-text-3">
+    <label className="text-[11px] font-semibold uppercase tracking-widest text-text-3">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     {children}

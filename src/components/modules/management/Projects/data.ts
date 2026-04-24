@@ -11,8 +11,6 @@ export const INITIAL_PROJECTS: Project[] = [
     endDate: '2027-12-31',
     leaderId: 'u1',
     memberIds: ['u1', 'u3', 'u4'],
-    budgetK: 2400,
-    spentK: 320,
     status: 'aktif',
     workPackages: [
       {
@@ -69,8 +67,6 @@ export const INITIAL_PROJECTS: Project[] = [
     endDate: '2026-09-28',
     leaderId: 'u3',
     memberIds: ['u3', 'u6'],
-    budgetK: 800,
-    spentK: 210,
     status: 'aktif',
     workPackages: [
       {
@@ -120,8 +116,6 @@ export const INITIAL_PROJECTS: Project[] = [
     endDate: '2027-03-31',
     leaderId: 'u4',
     memberIds: ['u4', 'u1', 'u7'],
-    budgetK: 1800,
-    spentK: 540,
     status: 'aktif',
     workPackages: [
       {
@@ -163,8 +157,6 @@ export const INITIAL_PROJECTS: Project[] = [
     endDate: '2027-12-31',
     leaderId: 'u6',
     memberIds: ['u6', 'u3'],
-    budgetK: 600,
-    spentK: 0,
     status: 'aktif',
     workPackages: [
       {

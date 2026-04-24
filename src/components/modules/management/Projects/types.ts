@@ -26,8 +26,6 @@ export interface Project {
   endDate: string;
   leaderId: string;
   memberIds: string[];
-  budgetK: number;
-  spentK: number;
   status: ProjectStatus;
   workPackages: WorkPackage[];
   reportPeriods: ReportPeriod[];
@@ -38,7 +36,6 @@ export interface NewProjectFormData {
   name: string;
   subtitle: string;
   code: string;
-  budgetK: number;
   leaderId: string;
   memberIds: string[];
   startDate: string;
