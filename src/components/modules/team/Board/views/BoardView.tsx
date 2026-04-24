@@ -1,24 +1,25 @@
 import React, { useState } from 'react';
-import { Clock, MessageSquare, Plus, MoreVertical, GripVertical } from 'lucide-react';
+import { Clock, MessageSquare, Plus, MoreVertical, GripVertical, Trash2, Check, X } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
 import { formatTRCompact, isToday } from '../../../../../lib/dates';
 import { PORTAL_USERS } from '../../../../../types/users';
 import { UNITS } from '../types';
-import type { BoardTask, TaskStatus } from '../types';
+import type { BoardColumn, BoardTask, TaskStatus } from '../types';
 
 interface BoardViewProps {
   tasks: BoardTask[];
+  columns: BoardColumn[];
   onTaskClick: (id: string) => void;
   onStatusChange: (id: string, status: TaskStatus) => void;
+  onDeleteTask: (id: string) => void;
+  onAddColumn: (title: string) => void;
+  onRenameColumn: (id: string, title: string) => void;
+  onDeleteColumn: (id: string) => void;
+  onReorderColumns: (fromId: string, toId: string) => void;
 }
 
-const COLUMNS: { id: TaskStatus; title: string; dot: string }[] = [
-  { id: 'todo', title: 'Yapılacak', dot: 'bg-gray-400' },
-  { id: 'doing', title: 'Devam Ediyor', dot: 'bg-amber-500' },
-  { id: 'done', title: 'Tamamlandı', dot: 'bg-teal-500' },
-];
-
-const DRAG_MIME = 'application/x-helios-task-id';
+const TASK_DRAG_MIME = 'application/x-helios-task-id';
+const COLUMN_DRAG_MIME = 'application/x-helios-column-id';
 
 const getUserInitials = (id: string) => PORTAL_USERS.find((u) => u.id === id)?.initials ?? '??';
 const getUserColor = (id: string) =>
@@ -26,43 +27,97 @@ const getUserColor = (id: string) =>
 const getUnitLabel = (id: string) => UNITS.find((u) => u.id === id)?.label ?? '';
 const getUnitDot = (id: string) => UNITS.find((u) => u.id === id)?.dotColor ?? 'bg-text-3';
 
-export const BoardView: React.FC<BoardViewProps> = ({ tasks, onTaskClick, onStatusChange }) => {
-  const [draggingId, setDraggingId] = useState<string | null>(null);
-  const [dragOverCol, setDragOverCol] = useState<TaskStatus | null>(null);
+export const BoardView: React.FC<BoardViewProps> = ({
+  tasks,
+  columns,
+  onTaskClick,
+  onStatusChange,
+  onDeleteTask,
+  onAddColumn,
+  onRenameColumn,
+  onDeleteColumn,
+  onReorderColumns,
+}) => {
+  const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
+  const [draggingColId, setDraggingColId] = useState<string | null>(null);
+  const [dragOverCol, setDragOverCol] = useState<string | null>(null);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameDraft, setRenameDraft] = useState('');
+  const [adding, setAdding] = useState(false);
+  const [addDraft, setAddDraft] = useState('');
 
-  const handleDragStart = (e: React.DragEvent, id: string) => {
-    e.dataTransfer.setData(DRAG_MIME, id);
+  // ── Task drag ─────────────────────────────────────────────
+  const handleTaskDragStart = (e: React.DragEvent, id: string) => {
+    e.dataTransfer.setData(TASK_DRAG_MIME, id);
     e.dataTransfer.setData('text/plain', id);
     e.dataTransfer.effectAllowed = 'move';
-    setDraggingId(id);
+    setDraggingTaskId(id);
   };
 
-  const handleDragEnd = () => {
-    setDraggingId(null);
+  const handleTaskDragEnd = () => {
+    setDraggingTaskId(null);
     setDragOverCol(null);
   };
 
-  const handleColumnDragOver = (e: React.DragEvent, col: TaskStatus) => {
-    if (!draggingId) return;
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    if (dragOverCol !== col) setDragOverCol(col);
+  // ── Column drag ───────────────────────────────────────────
+  const handleColDragStart = (e: React.DragEvent, id: string) => {
+    e.dataTransfer.setData(COLUMN_DRAG_MIME, id);
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggingColId(id);
   };
 
-  const handleDrop = (e: React.DragEvent, col: TaskStatus) => {
+  const handleColDragEnd = () => setDraggingColId(null);
+
+  // ── Drop target (column body) ─────────────────────────────
+  const handleColumnDragOver = (e: React.DragEvent, col: string) => {
+    if (draggingTaskId) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (dragOverCol !== col) setDragOverCol(col);
+    } else if (draggingColId && draggingColId !== col) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent, col: string) => {
     e.preventDefault();
-    const id = e.dataTransfer.getData(DRAG_MIME) || e.dataTransfer.getData('text/plain');
-    if (id) onStatusChange(id, col);
-    setDraggingId(null);
+    const taskId = e.dataTransfer.getData(TASK_DRAG_MIME);
+    const colId = e.dataTransfer.getData(COLUMN_DRAG_MIME);
+    if (taskId) {
+      onStatusChange(taskId, col);
+    } else if (colId && colId !== col) {
+      onReorderColumns(colId, col);
+    }
+    setDraggingTaskId(null);
+    setDraggingColId(null);
     setDragOverCol(null);
+  };
+
+  const startRename = (col: BoardColumn) => {
+    setRenamingId(col.id);
+    setRenameDraft(col.title);
+  };
+
+  const commitRename = () => {
+    if (renamingId) onRenameColumn(renamingId, renameDraft);
+    setRenamingId(null);
+  };
+
+  const commitAdd = () => {
+    if (addDraft.trim()) onAddColumn(addDraft);
+    setAddDraft('');
+    setAdding(false);
   };
 
   return (
     <div className="flex-1 overflow-x-auto p-6">
       <div className="flex gap-5 h-full items-start min-w-max">
-        {COLUMNS.map((col) => {
+        {columns.map((col) => {
           const colTasks = tasks.filter((t) => t.status === col.id);
           const isOver = dragOverCol === col.id;
+          const isRenaming = renamingId === col.id;
+          const isDraggingThisCol = draggingColId === col.id;
           return (
             <div
               key={col.id}
@@ -73,22 +128,57 @@ export const BoardView: React.FC<BoardViewProps> = ({ tasks, onTaskClick, onStat
                 'w-[320px] flex flex-col rounded-xl border transition-colors',
                 isOver
                   ? 'bg-info-bg/40 border-info-border/50 ring-2 ring-info-border/30'
-                  : 'bg-surface-2/50 border-transparent hover:border-border/40'
+                  : 'bg-surface-2/50 border-transparent hover:border-border/40',
+                isDraggingThisCol && 'opacity-40',
+                draggingColId && draggingColId !== col.id && 'jiggle-active'
               )}
             >
-              <div className="p-4 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <div className={cn('w-2 h-2 rounded-full', col.dot)} />
-                  <h3 className="text-[11px] font-bold uppercase tracking-[1px] text-text-2">
-                    {col.title}
-                  </h3>
-                  <span className="text-[11px] bg-white px-2 py-0.5 rounded-full text-text-3 font-mono">
+              <div
+                className="p-4 flex items-center justify-between gap-2 cursor-grab active:cursor-grabbing"
+                draggable={!isRenaming}
+                onDragStart={(e) => handleColDragStart(e, col.id)}
+                onDragEnd={handleColDragEnd}
+              >
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <div className={cn('w-2 h-2 rounded-full shrink-0', col.dot)} />
+                  {isRenaming ? (
+                    <input
+                      autoFocus
+                      value={renameDraft}
+                      onChange={(e) => setRenameDraft(e.target.value)}
+                      onBlur={commitRename}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') commitRename();
+                        if (e.key === 'Escape') setRenamingId(null);
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex-1 min-w-0 text-[11px] font-bold uppercase tracking-[1px] text-text-2 bg-white border border-info-border/60 rounded px-1.5 py-0.5 outline-none"
+                    />
+                  ) : (
+                    <h3
+                      onDoubleClick={() => startRename(col)}
+                      title="Çift tıkla: adı değiştir"
+                      className="text-[11px] font-bold uppercase tracking-[1px] text-text-2 truncate cursor-text"
+                    >
+                      {col.title}
+                    </h3>
+                  )}
+                  <span className="text-[11px] bg-white px-2 py-0.5 rounded-full text-text-3 font-mono shrink-0">
                     {colTasks.length}
                   </span>
                 </div>
-                <button className="text-text-3 hover:text-text p-1 rounded-md hover:bg-white/50 transition-colors">
-                  <MoreVertical size={16} />
-                </button>
+                <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 [.group-hover\\:opacity-100]:opacity-100">
+                  <button
+                    onClick={() => onDeleteColumn(col.id)}
+                    title="Kolonu sil"
+                    className="text-text-3 hover:text-red-text hover:bg-red-bg p-1 rounded-md transition-colors"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                  <button className="text-text-3 hover:text-text p-1 rounded-md hover:bg-white/50 transition-colors">
+                    <MoreVertical size={16} />
+                  </button>
+                </div>
               </div>
 
               <div className="flex-1 px-2 pb-4 space-y-3">
@@ -96,17 +186,34 @@ export const BoardView: React.FC<BoardViewProps> = ({ tasks, onTaskClick, onStat
                   <div
                     key={task.id}
                     draggable
-                    onDragStart={(e) => handleDragStart(e, task.id)}
-                    onDragEnd={handleDragEnd}
+                    onDragStart={(e) => handleTaskDragStart(e, task.id)}
+                    onDragEnd={handleTaskDragEnd}
                     onClick={() => onTaskClick(task.id)}
                     className={cn(
                       'bg-white border border-border rounded-lg p-4 cursor-pointer shadow-sm group relative transition-all duration-150',
                       'hover:-translate-y-0.5 hover:shadow-md',
-                      draggingId === task.id && 'opacity-40 ring-2 ring-info-border'
+                      draggingTaskId === task.id
+                        ? 'opacity-40 ring-2 ring-info-border scale-95'
+                        : draggingTaskId !== null && 'jiggle-active'
                     )}
                   >
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-text-3">
-                      <GripVertical size={14} />
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm(`"${task.title}" işini silmek istediğine emin misin?`)) {
+                            onDeleteTask(task.id);
+                          }
+                        }}
+                        title="İşi sil"
+                        className="p-1 text-text-3 hover:text-red-text hover:bg-red-bg rounded transition-colors"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                      <span className="p-1 text-text-3">
+                        <GripVertical size={14} />
+                      </span>
                     </div>
 
                     <div className="flex flex-wrap gap-1.5 mb-3 pr-4">
@@ -191,6 +298,55 @@ export const BoardView: React.FC<BoardViewProps> = ({ tasks, onTaskClick, onStat
             </div>
           );
         })}
+
+        {/* Add column */}
+        <div className="w-[280px] shrink-0">
+          {adding ? (
+            <div className="bg-white border-2 border-info-border rounded-xl p-3 shadow-md flex items-center gap-2">
+              <input
+                autoFocus
+                value={addDraft}
+                onChange={(e) => setAddDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') commitAdd();
+                  if (e.key === 'Escape') {
+                    setAddDraft('');
+                    setAdding(false);
+                  }
+                }}
+                placeholder="Yeni kolon adı..."
+                className="flex-1 text-[13px] font-semibold bg-transparent outline-none"
+              />
+              <button
+                onClick={commitAdd}
+                className="p-1 text-teal-text hover:bg-teal-bg rounded transition-colors"
+                title="Ekle"
+              >
+                <Check size={15} />
+              </button>
+              <button
+                onClick={() => {
+                  setAddDraft('');
+                  setAdding(false);
+                }}
+                className="p-1 text-text-3 hover:bg-surface-2 rounded transition-colors"
+                title="Vazgeç"
+              >
+                <X size={15} />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setAdding(true)}
+              className="group w-full flex flex-col items-center justify-center gap-2 py-10 text-[13px] font-bold text-text-2 hover:text-info-text bg-surface-2/70 hover:bg-info-bg border-2 border-dashed border-border-strong hover:border-info-border rounded-xl transition-all"
+            >
+              <span className="w-9 h-9 rounded-full bg-white border-2 border-border-strong group-hover:border-info-border group-hover:bg-info-bg flex items-center justify-center transition-colors">
+                <Plus size={18} />
+              </span>
+              Kolon Ekle
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

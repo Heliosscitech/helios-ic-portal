@@ -6,10 +6,16 @@ export interface Unit {
   dotColor: string;
 }
 
-export type TaskStatus = 'todo' | 'doing' | 'done';
+export type TaskStatus = string; // column id — artık dinamik
 export type ViewMode = 'board' | 'list' | 'dashboard';
 export type FilterScope = 'all' | 'assigned-to-me' | 'created-by-me';
 export type Priority = 'low' | 'medium' | 'high';
+
+export interface BoardColumn {
+  id: string;
+  title: string;
+  dot: string; // tailwind bg-* class
+}
 
 export interface BoardTask {
   id: string;
@@ -41,11 +47,25 @@ export const UNITS: Unit[] = [
   { id: 'idari', label: 'İdari', dotColor: 'bg-gray-400' },
 ];
 
-export const STATUS_LABELS: Record<TaskStatus, string> = {
-  todo: 'Yapılacak',
-  doing: 'Devam Ediyor',
-  done: 'Tamamlandı',
-};
+export const DEFAULT_COLUMNS: BoardColumn[] = [
+  { id: 'todo', title: 'Yapılacak', dot: 'bg-gray-400' },
+  { id: 'doing', title: 'Devam Ediyor', dot: 'bg-amber-500' },
+  { id: 'done', title: 'Tamamlandı', dot: 'bg-teal-500' },
+];
+
+export const COLUMN_COLOR_PALETTE = [
+  'bg-gray-400',
+  'bg-amber-500',
+  'bg-teal-500',
+  'bg-info-border',
+  'bg-purple-500',
+  'bg-pink-500',
+  'bg-red-500',
+  'bg-emerald-500',
+];
+
+export const columnTitle = (columns: BoardColumn[], id: string): string =>
+  columns.find((c) => c.id === id)?.title ?? id;
 
 export const PRIORITY_LABELS: Record<Priority, string> = {
   low: 'Düşük',

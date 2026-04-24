@@ -6,16 +6,16 @@ import { formatTR } from '../../../../lib/dates';
 import { PORTAL_USERS } from '../../../../types/users';
 import {
   UNITS,
-  STATUS_LABELS,
   PRIORITY_LABELS,
 } from './types';
-import type { BoardTask, Priority, TaskStatus, UnitId } from './types';
+import type { BoardColumn, BoardTask, Priority, TaskStatus, UnitId } from './types';
 
 export type TaskModalMode = 'create' | 'detail';
 
 interface TaskModalProps {
   mode: TaskModalMode;
   task?: BoardTask;
+  columns: BoardColumn[];
   currentUserId: string;
   onClose: () => void;
   onSave: (task: BoardTask) => void;
@@ -41,11 +41,13 @@ const EMPTY_FORM: FormState = {
 export const TaskModal: React.FC<TaskModalProps> = ({
   mode,
   task,
+  columns,
   currentUserId,
   onClose,
   onSave,
   onDelete,
 }) => {
+  const defaultStatus = columns[0]?.id ?? 'todo';
   const [form, setForm] = useState<FormState>(() =>
     mode === 'detail' && task
       ? {
@@ -59,7 +61,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           tags: [...task.tags],
           comments: task.comments,
         }
-      : EMPTY_FORM
+      : { ...EMPTY_FORM, status: defaultStatus }
   );
   const [tagDraft, setTagDraft] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -217,9 +219,9 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                     onChange={(e) => setForm({ ...form, status: e.target.value as TaskStatus })}
                     className="w-full p-3 bg-white border border-border rounded-lg text-[13px] font-medium outline-none focus:border-text transition-colors"
                   >
-                    {(Object.keys(STATUS_LABELS) as TaskStatus[]).map((s) => (
-                      <option key={s} value={s}>
-                        {STATUS_LABELS[s]}
+                    {columns.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.title}
                       </option>
                     ))}
                   </select>

@@ -3,25 +3,14 @@ import { Clock, MessageSquare } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
 import { formatTRCompact, isToday } from '../../../../../lib/dates';
 import { PORTAL_USERS } from '../../../../../types/users';
-import { UNITS } from '../types';
-import type { BoardTask, TaskStatus } from '../types';
+import { UNITS, columnTitle } from '../types';
+import type { BoardColumn, BoardTask } from '../types';
 
 interface ListViewProps {
   tasks: BoardTask[];
+  columns: BoardColumn[];
   onTaskClick: (id: string) => void;
 }
-
-const STATUS_LABEL: Record<TaskStatus, string> = {
-  todo: 'Yapılacak',
-  doing: 'Devam',
-  done: 'Tamamlandı',
-};
-
-const STATUS_STYLE: Record<TaskStatus, string> = {
-  todo: 'bg-surface-2 text-text-3',
-  doing: 'bg-amber-bg text-amber-text',
-  done: 'bg-teal-bg text-teal-text',
-};
 
 const PRIORITY_STYLE: Record<BoardTask['priority'], string> = {
   low: 'text-text-3',
@@ -32,7 +21,7 @@ const PRIORITY_STYLE: Record<BoardTask['priority'], string> = {
 const getUnit = (id: string) => UNITS.find((u) => u.id === id);
 const getUser = (id: string) => PORTAL_USERS.find((u) => u.id === id);
 
-export const ListView: React.FC<ListViewProps> = ({ tasks, onTaskClick }) => {
+export const ListView: React.FC<ListViewProps> = ({ tasks, columns, onTaskClick }) => {
   return (
     <div className="flex-1 overflow-auto p-6">
       <div className="bg-white border border-border/40 rounded-xl overflow-hidden shadow-sm">
@@ -86,13 +75,14 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, onTaskClick }) => {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span
-                      className={cn(
-                        'inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider',
-                        STATUS_STYLE[task.status]
-                      )}
-                    >
-                      {STATUS_LABEL[task.status]}
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-2 text-text-2 text-[10px] font-bold uppercase tracking-wider">
+                      <span
+                        className={cn(
+                          'w-1.5 h-1.5 rounded-full',
+                          columns.find((c) => c.id === task.status)?.dot ?? 'bg-text-3'
+                        )}
+                      />
+                      {columnTitle(columns, task.status)}
                     </span>
                   </td>
                   <td className="px-4 py-3">

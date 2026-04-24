@@ -1,27 +1,26 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Clock, AlertTriangle, TrendingUp } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
 import { PORTAL_USERS } from '../../../../../types/users';
 import { UNITS } from '../types';
-import type { BoardTask, TaskStatus } from '../types';
+import type { BoardColumn, BoardTask } from '../types';
 
 interface DashboardViewProps {
   tasks: BoardTask[];
+  columns: BoardColumn[];
 }
 
-const STATUS_META: Record<TaskStatus, { label: string; color: string; icon: React.ReactNode }> = {
-  todo: { label: 'Yapılacak', color: 'bg-gray-400', icon: <Clock size={14} /> },
-  doing: { label: 'Devam', color: 'bg-amber-500', icon: <AlertTriangle size={14} /> },
-  done: { label: 'Tamamlandı', color: 'bg-teal-500', icon: <CheckCircle2 size={14} /> },
-};
-
-export const DashboardView: React.FC<DashboardViewProps> = ({ tasks }) => {
+export const DashboardView: React.FC<DashboardViewProps> = ({ tasks, columns }) => {
   const total = tasks.length;
-  const doneCount = tasks.filter((t) => t.status === 'done').length;
-  const doingCount = tasks.filter((t) => t.status === 'doing').length;
-  const todoCount = tasks.filter((t) => t.status === 'todo').length;
+  const doneCol = columns[columns.length - 1];
+  const doneCount = doneCol ? tasks.filter((t) => t.status === doneCol.id).length : 0;
   const completionRate = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+
+  const statusCounts = columns.map((c) => ({
+    ...c,
+    count: tasks.filter((t) => t.status === c.id).length,
+  }));
 
   const unitCounts = UNITS.map((u) => ({
     ...u,
@@ -38,11 +37,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ tasks }) => {
   return (
     <div className="flex-1 overflow-auto p-6 space-y-6">
       {/* Üst istatistik kartları */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div
+        className="grid gap-4"
+        style={{ gridTemplateColumns: `repeat(${statusCounts.length + 1}, minmax(0, 1fr))` }}
+      >
         <StatCard label="Toplam İş" value={total} tone="text-text" />
-        <StatCard label="Yapılacak" value={todoCount} tone="text-text-2" dot="bg-gray-400" />
-        <StatCard label="Devam" value={doingCount} tone="text-amber-text" dot="bg-amber-500" />
-        <StatCard label="Tamamlandı" value={doneCount} tone="text-teal-text" dot="bg-teal-500" />
+        {statusCounts.map((c) => (
+          <StatCard key={c.id} label={c.title} value={c.count} tone="text-text-2" dot={c.dot} />
+        ))}
       </div>
 
       {/* Tamamlanma oranı */}
@@ -139,27 +141,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ tasks }) => {
         <h3 className="text-[13px] font-bold uppercase tracking-widest text-text-3 mb-5">
           Durum Dağılımı
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {(Object.keys(STATUS_META) as TaskStatus[]).map((s) => {
-            const count = tasks.filter((t) => t.status === s).length;
-            const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-            const meta = STATUS_META[s];
+        <div
+          className="grid gap-4"
+          style={{ gridTemplateColumns: `repeat(${Math.max(statusCounts.length, 1)}, minmax(0, 1fr))` }}
+        >
+          {statusCounts.map((c) => {
+            const pct = total > 0 ? Math.round((c.count / total) * 100) : 0;
             return (
-              <div key={s} className="p-4 bg-surface-2/40 rounded-lg">
+              <div key={c.id} className="p-4 bg-surface-2/40 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2 text-[12px] font-bold text-text-2">
-                    {meta.icon}
-                    {meta.label}
+                    <span className={cn('w-2 h-2 rounded-full', c.dot)} />
+                    {c.title}
                   </div>
                   <span className="text-[11px] font-bold text-text-3">%{pct}</span>
                 </div>
-                <p className="text-[24px] font-black text-text">{count}</p>
+                <p className="text-[24px] font-black text-text">{c.count}</p>
                 <div className="h-1.5 bg-white mt-2 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${pct}%` }}
                     transition={{ duration: 0.5 }}
-                    className={cn('h-full', meta.color)}
+                    className={cn('h-full', c.dot)}
                   />
                 </div>
               </div>
