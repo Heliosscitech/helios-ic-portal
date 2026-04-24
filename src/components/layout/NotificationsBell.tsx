@@ -13,12 +13,15 @@ import {
   AlertTriangle,
   CalendarClock,
   BookUser,
+  Check,
+  XCircle,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useNotifications } from '../../lib/notifications';
+import { useActiveEntity } from '../../lib/active-entity';
 import { PORTAL_USERS } from '../../types/users';
 import { formatRelativeTime } from '../../types/notifications';
-import type { Notification, NotificationType } from '../../types/notifications';
+import type { Notification, NotificationSource, NotificationType } from '../../types/notifications';
 
 const TYPE_ICON: Record<NotificationType, React.ReactNode> = {
   'task-created': <PlusCircle size={10} />,
@@ -30,6 +33,8 @@ const TYPE_ICON: Record<NotificationType, React.ReactNode> = {
   'event-deleted': <CalendarX size={10} />,
   'lab-problem-reported': <AlertTriangle size={10} />,
   'leave-requested': <CalendarClock size={10} />,
+  'leave-approved': <Check size={10} />,
+  'leave-rejected': <XCircle size={10} />,
   'onboarding-person-added': <UserPlus size={10} />,
   'contact-created': <BookUser size={10} />,
 };
@@ -44,17 +49,30 @@ const TYPE_TONE: Record<NotificationType, string> = {
   'event-deleted': 'bg-red-bg text-red-text',
   'lab-problem-reported': 'bg-red-bg text-red-text',
   'leave-requested': 'bg-amber-bg text-amber-text',
+  'leave-approved': 'bg-teal-bg text-teal-text',
+  'leave-rejected': 'bg-red-bg text-red-text',
   'onboarding-person-added': 'bg-teal-bg text-teal-text',
   'contact-created': 'bg-info-bg text-info-text',
 };
+
+const ROUTABLE_SOURCES: NotificationSource[] = ['board', 'leave'];
 
 const getActor = (id: string) => PORTAL_USERS.find((u) => u.id === id);
 
 export const NotificationsBell: React.FC = () => {
   const { forMe, unreadCount, currentUserId, markRead, markAllRead, clearAll } =
     useNotifications();
+  const { open: openActiveEntity } = useActiveEntity();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  const handleActivate = (n: Notification) => {
+    markRead(n.id);
+    if (ROUTABLE_SOURCES.includes(n.source)) {
+      openActiveEntity({ source: n.source as 'board' | 'leave', entityId: n.entityId });
+      setOpen(false);
+    }
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -133,7 +151,7 @@ export const NotificationsBell: React.FC = () => {
                   key={n.id}
                   notification={n}
                   isUnread={!n.readBy.includes(currentUserId)}
-                  onRead={() => markRead(n.id)}
+                  onActivate={() => handleActivate(n)}
                 />
               ))
             )}
@@ -147,14 +165,14 @@ export const NotificationsBell: React.FC = () => {
 interface NotificationItemProps {
   notification: Notification;
   isUnread: boolean;
-  onRead: () => void;
+  onActivate: () => void;
 }
 
-const NotificationItem: React.FC<NotificationItemProps> = ({ notification: n, isUnread, onRead }) => {
+const NotificationItem: React.FC<NotificationItemProps> = ({ notification: n, isUnread, onActivate }) => {
   const actor = getActor(n.actorId);
   return (
     <button
-      onClick={onRead}
+      onClick={onActivate}
       className={cn(
         'w-full px-4 py-3 flex items-start gap-3 text-left border-b border-border/20 last:border-b-0 transition-colors',
         isUnread ? 'bg-info-bg/30 hover:bg-info-bg/50' : 'bg-white hover:bg-surface-2/40'

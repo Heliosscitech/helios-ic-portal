@@ -10,6 +10,8 @@ export type NotificationType =
   | 'event-deleted'
   | 'lab-problem-reported'
   | 'leave-requested'
+  | 'leave-approved'
+  | 'leave-rejected'
   | 'onboarding-person-added'
   | 'contact-created';
 

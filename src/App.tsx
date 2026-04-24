@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Login } from './components/Login';
 import { Layout } from './components/layout/Layout';
@@ -35,6 +35,8 @@ import { PORTAL_USERS } from './types/users';
 import { usePortalUsers } from './lib/users';
 import { ArrowLeft } from 'lucide-react';
 import { NotificationsProvider } from './lib/notifications';
+import { ActiveEntityProvider, useActiveEntity } from './lib/active-entity';
+import { LeaveReviewModal } from './components/modules/hr/LeaveForm/LeaveReviewModal';
 
 function App() {
   const { users } = usePortalUsers();
@@ -115,6 +117,11 @@ function App() {
 
   return (
     <NotificationsProvider currentUserId={currentUser.id}>
+    <ActiveEntityProvider>
+      <ActiveEntityBridge
+        currentUserId={currentUser.id}
+        onRequestBoard={() => setCurrentModule('board')}
+      />
     <Layout
       user={currentUser}
       onLogout={handleLogout}
@@ -149,8 +156,34 @@ function App() {
         </div>
       </div>
     </Layout>
+    </ActiveEntityProvider>
     </NotificationsProvider>
   );
 }
+
+interface BridgeProps {
+  currentUserId: string;
+  onRequestBoard: () => void;
+}
+
+const ActiveEntityBridge = ({ currentUserId, onRequestBoard }: BridgeProps) => {
+  const { active, clear } = useActiveEntity();
+
+  useEffect(() => {
+    if (active?.source === 'board') onRequestBoard();
+  }, [active, onRequestBoard]);
+
+  if (active?.source === 'leave') {
+    return (
+      <LeaveReviewModal
+        requestId={active.entityId}
+        currentUserId={currentUserId}
+        onClose={clear}
+      />
+    );
+  }
+
+  return null;
+};
 
 export default App;
