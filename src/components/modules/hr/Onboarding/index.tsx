@@ -147,7 +147,7 @@ export const Onboarding: React.FC<ModuleProps> = ({ user }) => {
       <div className="bg-white px-6 py-3 border border-border/40 rounded-xl flex items-center gap-2 text-[13px] text-text-3 font-medium">
         <span className="hover:text-text cursor-pointer">Uygulamalar</span>
         <span>/</span>
-        <span className="text-text font-bold">Onboarding</span>
+        <span className="text-text font-semibold">Onboarding</span>
       </div>
 
       <div className="flex items-start gap-6">
@@ -176,7 +176,7 @@ export const Onboarding: React.FC<ModuleProps> = ({ user }) => {
                 </p>
                 <button
                   onClick={() => setTemplateModalOpen(true)}
-                  className="px-4 py-2 bg-[#BA7517] text-white rounded-lg text-[12px] font-bold shadow-sm hover:bg-[#a46515] transition-colors whitespace-nowrap"
+                  className="px-4 py-2 bg-[#BA7517] text-white rounded-lg text-[12.5px] font-semibold shadow-sm hover:bg-[#a46515] transition-colors whitespace-nowrap"
                 >
                   Şablonu düzenle
                 </button>
@@ -194,7 +194,7 @@ export const Onboarding: React.FC<ModuleProps> = ({ user }) => {
             <TasksList phases={selected.phases} onToggleTask={handleToggleTask} />
 
             <div className="text-center pt-8 opacity-50">
-              <p className="text-[11px] text-text-3 font-bold uppercase tracking-widest">
+              <p className="text-[11px] text-text-3 font-semibold uppercase tracking-widest">
                 Prototip görünüm · Veriler tarayıcıda kalıcı tutulur · © Helios Bilim ve Teknoloji A.Ş.
               </p>
             </div>
@@ -236,13 +236,13 @@ const EmptyState: React.FC<EmptyStateProps> = ({ canManage, onAddPerson }) => {
         <div className="w-16 h-16 rounded-full bg-[#F7ECE4] text-[#8A4A1A] flex items-center justify-center mb-4">
           <AlertCircle size={28} />
         </div>
-        <h3 className="text-[16px] font-bold text-text mb-1">Henüz onboarding kaydı yok</h3>
+        <h3 className="text-[15px] font-semibold text-text mb-1">Henüz onboarding kaydı yok</h3>
         <p className="text-[13px] text-text-3 mb-6 max-w-sm">
           Sol panelden yeni bir kişi ekleyerek onboarding sürecini başlatabilirsiniz.
         </p>
         <button
           onClick={onAddPerson}
-          className="px-5 py-2 bg-[#BA7517] text-white rounded-lg text-[13px] font-bold shadow-sm hover:bg-[#a46515] transition-colors"
+          className="px-5 py-2 bg-[#BA7517] text-white rounded-lg text-[13px] font-semibold shadow-sm hover:bg-[#a46515] transition-colors"
         >
           Yeni kişi ekle
         </button>
@@ -256,7 +256,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({ canManage, onAddPerson }) => {
       <div className="w-16 h-16 rounded-full bg-surface-2 text-text-3 flex items-center justify-center mb-4">
         <Lock size={24} />
       </div>
-      <h3 className="text-[16px] font-bold text-text mb-1">Senin için bir onboarding kaydı yok</h3>
+      <h3 className="text-[15px] font-semibold text-text mb-1">Senin için bir onboarding kaydı yok</h3>
       <p className="text-[13px] text-text-3 max-w-sm leading-relaxed">
         Bu modül kişiseldir — başkalarının onboarding süreçlerini göremezsin.
         Kaydın açıldığında burada görünecek. Sorular için İK ile iletişime geç.

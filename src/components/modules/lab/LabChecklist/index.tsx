@@ -165,17 +165,17 @@ export const LabChecklist: React.FC<ModuleProps> = ({ user }) => {
       <div className="bg-white px-6 py-3 border border-border/40 rounded-xl flex items-center gap-2 text-[13px] text-text-3 font-medium">
         <span className="hover:text-text cursor-pointer">Uygulamalar</span>
         <span>/</span>
-        <span className="text-text font-bold uppercase tracking-tight">Lab checklist</span>
+        <span className="text-text font-semibold uppercase tracking-tight">Lab checklist</span>
       </div>
 
       <div className="bg-white border border-border/40 rounded-2xl shadow-sm p-10 space-y-8 min-h-175 relative">
         {isAdding && (
           <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-2xl border border-border w-full max-w-md p-8 animate-in zoom-in-95 duration-200">
-              <h3 className="text-[16px] font-bold text-text mb-6">Yeni Ekipman / Görev Ekle</h3>
+              <h3 className="text-[15px] font-semibold text-text mb-6">Yeni Ekipman / Görev Ekle</h3>
               <form onSubmit={handleAddCustomItem} className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[12px] font-bold text-text-3 uppercase tracking-wider">
+                  <label className="text-[12.5px] font-semibold text-text-3 uppercase tracking-wider">
                     Ekipman Adı
                   </label>
                   <input
@@ -187,7 +187,7 @@ export const LabChecklist: React.FC<ModuleProps> = ({ user }) => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[12px] font-bold text-text-3 uppercase tracking-wider">
+                  <label className="text-[12.5px] font-semibold text-text-3 uppercase tracking-wider">
                     Talimatlar
                   </label>
                   <textarea
@@ -201,13 +201,13 @@ export const LabChecklist: React.FC<ModuleProps> = ({ user }) => {
                   <button
                     type="button"
                     onClick={() => setIsAdding(false)}
-                    className="flex-1 py-3 border border-border rounded-xl text-[13px] font-bold text-text hover:bg-surface-2 transition-all"
+                    className="flex-1 py-3 border border-border rounded-xl text-[13px] font-semibold text-text hover:bg-surface-2 transition-all"
                   >
                     Vazgeç
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3 bg-[#1a1a19] text-white rounded-xl text-[13px] font-bold shadow-lg hover:bg-black transition-all"
+                    className="flex-1 py-3 bg-[#1a1a19] text-white rounded-xl text-[13px] font-semibold shadow-lg hover:bg-black transition-all"
                   >
                     Ekle
                   </button>
@@ -223,7 +223,7 @@ export const LabChecklist: React.FC<ModuleProps> = ({ user }) => {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'px-5 py-2 rounded-xl text-[13px] font-bold transition-all',
+                'px-5 py-2 rounded-xl text-[13px] font-semibold transition-all',
                 activeTab === tab.id
                   ? 'bg-[#1a1a19] text-white shadow-xl'
                   : 'bg-surface text-text-3 border border-border/20 hover:border-border'
@@ -239,7 +239,7 @@ export const LabChecklist: React.FC<ModuleProps> = ({ user }) => {
           <p className="text-[14px] text-text-2">
             Bu {activeTab === 'aylik' ? 'ayki' : 'haftaki'}{' '}
             {activeTab === 'temizlik' ? 'temizlik' : 'kontrol'}{' '}
-            <span className="font-bold text-text">{INITIAL_DATA[activeTab].sorumlu}</span> yapacak.{' '}
+            <span className="font-semibold text-text">{INITIAL_DATA[activeTab].sorumlu}</span> yapacak.{' '}
             {completedCount}/{currentItems.length} tamam.
           </p>
         </div>
@@ -267,7 +267,7 @@ export const LabChecklist: React.FC<ModuleProps> = ({ user }) => {
 
         <div className="bg-[#f1efe8]/30 border border-border/40 rounded-2xl p-8 flex items-center justify-between mt-auto shadow-inner">
           <div className="space-y-4 flex-1 max-w-100">
-            <div className="flex items-center justify-between text-[13px] font-bold">
+            <div className="flex items-center justify-between text-[13px] font-semibold">
               <span className="text-text-2 tracking-tight">
                 {completedCount} / {currentItems.length} ekipman onaylandı
               </span>
@@ -295,7 +295,7 @@ export const LabChecklist: React.FC<ModuleProps> = ({ user }) => {
             <button
               onClick={handleApproveAll}
               className={cn(
-                'px-8 py-4 rounded-xl text-[14px] font-bold shadow-xl transition-all flex items-center gap-3 active:scale-95',
+                'px-8 py-4 rounded-xl text-[14px] font-semibold shadow-xl transition-all flex items-center gap-3 active:scale-95',
                 progress === 100 ? 'bg-teal-600 text-white scale-105' : 'bg-teal-500 text-white hover:bg-teal-600'
               )}
             >
@@ -305,7 +305,7 @@ export const LabChecklist: React.FC<ModuleProps> = ({ user }) => {
         </div>
 
         <div className="text-center opacity-30 pt-4">
-          <p className="text-[11px] text-text-3 font-bold uppercase tracking-widest">
+          <p className="text-[11px] text-text-3 font-semibold uppercase tracking-widest">
             Prototip görünüm • Veriler tarayıcıda kalıcı tutulur • © Helios Bilim ve Teknoloji A.Ş.
           </p>
         </div>
@@ -319,7 +319,7 @@ export const LabChecklist: React.FC<ModuleProps> = ({ user }) => {
         if (problems.length === 0) return null;
         return (
           <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
-            <h3 className="text-[13px] font-bold uppercase tracking-widest text-text-3 mb-4">
+            <h3 className="text-[13px] font-semibold uppercase tracking-widest text-text-3 mb-4">
               Bu haftaki açık sorunlar ({problems.length})
             </h3>
             <div className="space-y-2">
@@ -331,12 +331,12 @@ export const LabChecklist: React.FC<ModuleProps> = ({ user }) => {
                     className="flex items-center justify-between p-3 bg-red-bg/40 border border-red-border/20 rounded-lg"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-bold text-red-text truncate">{item?.name}</p>
+                      <p className="text-[13px] font-semibold text-red-text truncate">{item?.name}</p>
                       {status.comment && (
-                        <p className="text-[12px] text-text-2 mt-0.5 truncate">{status.comment}</p>
+                        <p className="text-[12.5px] text-text-2 mt-0.5 truncate">{status.comment}</p>
                       )}
                     </div>
-                    <div className="text-[11px] font-bold text-text-3 shrink-0 ml-4">
+                    <div className="text-[11px] font-semibold text-text-3 shrink-0 ml-4">
                       {status.assigneeId
                         ? `→ ${assigneeName(status.assigneeId) || 'atanmış'}`
                         : 'atanmamış'}

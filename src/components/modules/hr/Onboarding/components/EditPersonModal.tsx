@@ -93,7 +93,7 @@ export const EditPersonModal: React.FC<EditPersonModalProps> = ({ mode, person, 
         >
           <form onSubmit={handleSubmit}>
             <div className="px-6 py-4 border-b border-border/40 flex items-center justify-between">
-              <h3 className="text-[15px] font-bold text-text">
+              <h3 className="text-[15px] font-semibold text-text">
                 {mode === 'add' ? 'Yeni kişi' : 'Kişi düzenle'}
               </h3>
               <button
@@ -107,13 +107,13 @@ export const EditPersonModal: React.FC<EditPersonModalProps> = ({ mode, person, 
 
             <div className="p-6 space-y-5">
               {error && (
-                <div className="px-3 py-2 bg-red-bg text-red-text border border-red-border/30 rounded-lg text-[13px] font-bold">
+                <div className="px-3 py-2 bg-red-bg text-red-text border border-red-border/30 rounded-lg text-[13px] font-semibold">
                   {error}
                 </div>
               )}
 
               <div className="space-y-2">
-                <label className="text-[12px] font-bold uppercase tracking-widest text-text-3">
+                <label className="text-[12.5px] font-semibold uppercase tracking-widest text-text-3">
                   İsim <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -129,7 +129,7 @@ export const EditPersonModal: React.FC<EditPersonModalProps> = ({ mode, person, 
               </div>
 
               <div className="space-y-2">
-                <label className="text-[12px] font-bold uppercase tracking-widest text-text-3">
+                <label className="text-[12.5px] font-semibold uppercase tracking-widest text-text-3">
                   Rol <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -141,7 +141,7 @@ export const EditPersonModal: React.FC<EditPersonModalProps> = ({ mode, person, 
               </div>
 
               <div className="space-y-2">
-                <label className="text-[12px] font-bold uppercase tracking-widest text-text-3">
+                <label className="text-[12.5px] font-semibold uppercase tracking-widest text-text-3">
                   Başlangıç Tarihi
                 </label>
                 <input
@@ -153,7 +153,7 @@ export const EditPersonModal: React.FC<EditPersonModalProps> = ({ mode, person, 
               </div>
 
               <div className="space-y-2">
-                <label className="text-[12px] font-bold uppercase tracking-widest text-text-3">
+                <label className="text-[12.5px] font-semibold uppercase tracking-widest text-text-3">
                   Portal Kullanıcısı (opsiyonel)
                 </label>
                 <select
@@ -184,13 +184,13 @@ export const EditPersonModal: React.FC<EditPersonModalProps> = ({ mode, person, 
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 border border-border rounded-lg text-[13px] font-bold text-text-2 hover:bg-surface-2 transition-colors"
+                className="px-4 py-2 border border-border rounded-lg text-[13px] font-semibold text-text-2 hover:bg-surface-2 transition-colors"
               >
                 Vazgeç
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 bg-[#BA7517] text-white rounded-lg text-[13px] font-bold shadow-sm hover:bg-[#a46515] transition-colors"
+                className="px-5 py-2 bg-[#BA7517] text-white rounded-lg text-[13px] font-semibold shadow-sm hover:bg-[#a46515] transition-colors"
               >
                 Kaydet
               </button>

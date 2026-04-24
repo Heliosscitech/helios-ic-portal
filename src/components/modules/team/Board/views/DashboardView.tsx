@@ -51,12 +51,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ tasks, columns }) 
       <div className="bg-white border border-border/40 rounded-xl p-6 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-[13px] font-bold uppercase tracking-widest text-text-3">
+            <h3 className="text-[13px] font-semibold uppercase tracking-widest text-text-3">
               Tamamlanma Oranı
             </h3>
-            <p className="text-[32px] font-black text-text mt-1">%{completionRate}</p>
+            <p className="text-[20px] font-semibold text-text mt-1">%{completionRate}</p>
           </div>
-          <div className="flex items-center gap-2 text-teal-text bg-teal-bg px-3 py-1.5 rounded-lg text-[12px] font-bold">
+          <div className="flex items-center gap-2 text-teal-text bg-teal-bg px-3 py-1.5 rounded-lg text-[12.5px] font-semibold">
             <TrendingUp size={14} />
             {doneCount}/{total} iş
           </div>
@@ -74,18 +74,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ tasks, columns }) 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Birim dağılımı */}
         <div className="bg-white border border-border/40 rounded-xl p-6 shadow-sm">
-          <h3 className="text-[13px] font-bold uppercase tracking-widest text-text-3 mb-5">
+          <h3 className="text-[13px] font-semibold uppercase tracking-widest text-text-3 mb-5">
             Birim Dağılımı
           </h3>
           <div className="space-y-4">
             {unitCounts.map((u) => (
               <div key={u.id} className="space-y-1.5">
-                <div className="flex items-center justify-between text-[12px]">
+                <div className="flex items-center justify-between text-[12.5px]">
                   <div className="flex items-center gap-2">
                     <span className={cn('w-2 h-2 rounded-full', u.dotColor)} />
                     <span className="font-semibold text-text-2">{u.label}</span>
                   </div>
-                  <span className="font-mono font-bold text-text">{u.count}</span>
+                  <span className="font-mono font-semibold text-text">{u.count}</span>
                 </div>
                 <div className="h-2 bg-surface-2 rounded-full overflow-hidden">
                   <motion.div
@@ -102,17 +102,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ tasks, columns }) 
 
         {/* Ekip dağılımı */}
         <div className="bg-white border border-border/40 rounded-xl p-6 shadow-sm">
-          <h3 className="text-[13px] font-bold uppercase tracking-widest text-text-3 mb-5">
+          <h3 className="text-[13px] font-semibold uppercase tracking-widest text-text-3 mb-5">
             Ekip Yükü
           </h3>
           <div className="space-y-4">
             {memberCounts.map((m) => (
               <div key={m.id} className="space-y-1.5">
-                <div className="flex items-center justify-between text-[12px]">
+                <div className="flex items-center justify-between text-[12.5px]">
                   <div className="flex items-center gap-2">
                     <span
                       className={cn(
-                        'w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold',
+                        'w-5 h-5 rounded-full flex items-center justify-center text-[10.5px] font-semibold',
                         m.color
                       )}
                     >
@@ -120,7 +120,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ tasks, columns }) 
                     </span>
                     <span className="font-semibold text-text-2">{m.name}</span>
                   </div>
-                  <span className="font-mono font-bold text-text">{m.count}</span>
+                  <span className="font-mono font-semibold text-text">{m.count}</span>
                 </div>
                 <div className="h-2 bg-surface-2 rounded-full overflow-hidden">
                   <motion.div
@@ -138,7 +138,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ tasks, columns }) 
 
       {/* Durum dağılımı */}
       <div className="bg-white border border-border/40 rounded-xl p-6 shadow-sm">
-        <h3 className="text-[13px] font-bold uppercase tracking-widest text-text-3 mb-5">
+        <h3 className="text-[13px] font-semibold uppercase tracking-widest text-text-3 mb-5">
           Durum Dağılımı
         </h3>
         <div
@@ -150,13 +150,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ tasks, columns }) 
             return (
               <div key={c.id} className="p-4 bg-surface-2/40 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2 text-[12px] font-bold text-text-2">
+                  <div className="flex items-center gap-2 text-[12.5px] font-semibold text-text-2">
                     <span className={cn('w-2 h-2 rounded-full', c.dot)} />
                     {c.title}
                   </div>
-                  <span className="text-[11px] font-bold text-text-3">%{pct}</span>
+                  <span className="text-[11px] font-semibold text-text-3">%{pct}</span>
                 </div>
-                <p className="text-[24px] font-black text-text">{c.count}</p>
+                <p className="text-[20px] font-semibold text-text">{c.count}</p>
                 <div className="h-1.5 bg-white mt-2 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
@@ -185,8 +185,8 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, tone, dot }) => (
   <div className="bg-white border border-border/40 rounded-xl p-5 shadow-sm">
     <div className="flex items-center gap-2 mb-2">
       {dot && <span className={cn('w-2 h-2 rounded-full', dot)} />}
-      <h4 className="text-[11px] font-bold uppercase tracking-widest text-text-3">{label}</h4>
+      <h4 className="text-[11px] font-semibold uppercase tracking-widest text-text-3">{label}</h4>
     </div>
-    <p className={cn('text-[28px] font-black leading-none', tone)}>{value}</p>
+    <p className={cn('text-[20px] font-semibold leading-none', tone)}>{value}</p>
   </div>
 );

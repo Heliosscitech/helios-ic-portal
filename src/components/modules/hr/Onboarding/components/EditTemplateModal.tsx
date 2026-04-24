@@ -117,7 +117,7 @@ export const EditTemplateModal: React.FC<EditTemplateModalProps> = ({
           className="bg-[#F7F3EA] rounded-2xl shadow-2xl border border-border w-full max-w-[800px] mt-10 mb-10 overflow-hidden flex flex-col max-h-[90vh]"
         >
           <div className="px-6 py-4 border-b border-border/40 flex items-center justify-between bg-white">
-            <h3 className="text-[15px] font-bold text-text">Onboarding şablonu</h3>
+            <h3 className="text-[15px] font-semibold text-text">Onboarding şablonu</h3>
             <button
               type="button"
               onClick={onClose}
@@ -137,7 +137,7 @@ export const EditTemplateModal: React.FC<EditTemplateModalProps> = ({
                   <input
                     value={phase.title}
                     onChange={(e) => updatePhaseTitle(phase.id, e.target.value)}
-                    className="flex-1 p-2.5 bg-white border border-border/60 rounded-lg text-[13px] font-bold outline-none focus:border-text transition-colors"
+                    className="flex-1 p-2.5 bg-white border border-border/60 rounded-lg text-[13px] font-semibold outline-none focus:border-text transition-colors"
                   />
                   <button
                     type="button"
@@ -156,7 +156,7 @@ export const EditTemplateModal: React.FC<EditTemplateModalProps> = ({
                         value={task.title}
                         onChange={(e) => updateTask(phase.id, task.id, { title: e.target.value })}
                         placeholder="Başlık"
-                        className="p-2 bg-white border border-border/40 rounded-lg text-[12px] outline-none focus:border-text transition-colors"
+                        className="p-2 bg-white border border-border/40 rounded-lg text-[12.5px] outline-none focus:border-text transition-colors"
                       />
                       <input
                         value={task.description}
@@ -164,7 +164,7 @@ export const EditTemplateModal: React.FC<EditTemplateModalProps> = ({
                           updateTask(phase.id, task.id, { description: e.target.value })
                         }
                         placeholder="Açıklama"
-                        className="p-2 bg-white border border-border/40 rounded-lg text-[12px] outline-none focus:border-text transition-colors"
+                        className="p-2 bg-white border border-border/40 rounded-lg text-[12.5px] outline-none focus:border-text transition-colors"
                       />
                       <input
                         value={task.assignee}
@@ -172,7 +172,7 @@ export const EditTemplateModal: React.FC<EditTemplateModalProps> = ({
                           updateTask(phase.id, task.id, { assignee: e.target.value })
                         }
                         placeholder="Atanan"
-                        className="p-2 bg-white border border-border/40 rounded-lg text-[12px] outline-none focus:border-text transition-colors"
+                        className="p-2 bg-white border border-border/40 rounded-lg text-[12.5px] outline-none focus:border-text transition-colors"
                       />
                       <button
                         type="button"
@@ -189,7 +189,7 @@ export const EditTemplateModal: React.FC<EditTemplateModalProps> = ({
                 <button
                   type="button"
                   onClick={() => addTask(phase.id)}
-                  className="mt-3 flex items-center gap-1.5 px-3 py-1.5 border border-border/40 rounded-lg text-[12px] font-medium text-text-2 hover:bg-surface-2 transition-colors"
+                  className="mt-3 flex items-center gap-1.5 px-3 py-1.5 border border-border/40 rounded-lg text-[12.5px] font-medium text-text-2 hover:bg-surface-2 transition-colors"
                 >
                   <Plus size={12} /> Bu faza görev ekle
                 </button>
@@ -209,7 +209,7 @@ export const EditTemplateModal: React.FC<EditTemplateModalProps> = ({
             <button
               type="button"
               onClick={handleSave}
-              className="px-6 py-2 bg-[#BA7517] text-white rounded-lg text-[13px] font-bold shadow-sm hover:bg-[#a46515] transition-colors"
+              className="px-6 py-2 bg-[#BA7517] text-white rounded-lg text-[13px] font-semibold shadow-sm hover:bg-[#a46515] transition-colors"
             >
               Tamam
             </button>

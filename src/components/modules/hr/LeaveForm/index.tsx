@@ -119,14 +119,14 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
           <Check size={40} />
         </div>
         <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-text">Talebiniz Alındı</h2>
+          <h2 className="text-[17px] font-semibold text-text">Talebiniz Alındı</h2>
           <p className="text-[15px] text-text-3">
             İzin talebiniz yöneticinize iletildi. Talep durumunu aşağıdan takip edebilirsiniz.
           </p>
         </div>
         <button
           onClick={handleNewRequest}
-          className="px-8 py-3 bg-[#1a1a19] text-white rounded-xl font-bold text-[14px]"
+          className="px-8 py-3 bg-[#1a1a19] text-white rounded-xl font-semibold text-[14px]"
         >
           Yeni Talep Oluştur
         </button>
@@ -139,7 +139,7 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
       <div className="bg-white px-6 py-3 border border-border/40 rounded-xl flex items-center gap-2 text-[13px] text-text-3 font-medium">
         <span className="hover:text-text cursor-pointer">Uygulamalar</span>
         <span>/</span>
-        <span className="text-text font-bold">İzin / mazeret</span>
+        <span className="text-text font-semibold">İzin / mazeret</span>
       </div>
 
       <div className="grid grid-cols-3 gap-2 px-2">
@@ -147,7 +147,7 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
           <div
             key={n}
             className={cn(
-              'flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-bold transition-all border',
+              'flex items-center justify-center gap-2 py-3 rounded-xl text-[13px] font-semibold transition-all border',
               step === n
                 ? 'bg-[#1a1a19] border-[#1a1a19] text-white shadow-lg'
                 : step > n
@@ -160,7 +160,7 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
             ) : (
               <span
                 className={cn(
-                  'w-5 h-5 rounded-full flex items-center justify-center text-[10px]',
+                  'w-5 h-5 rounded-full flex items-center justify-center text-[10.5px]',
                   step === n ? 'bg-white/20' : 'bg-surface-2'
                 )}
               >
@@ -218,7 +218,7 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
           {step > 1 && (
             <button
               onClick={() => setStep((s) => (s - 1) as 1 | 2 | 3)}
-              className="px-8 py-4 border border-border rounded-xl text-[14px] font-bold text-text-2 hover:bg-surface-2 transition-all flex items-center gap-2"
+              className="px-8 py-4 border border-border rounded-xl text-[14px] font-semibold text-text-2 hover:bg-surface-2 transition-all flex items-center gap-2"
             >
               <ChevronLeft size={18} /> Geri
             </button>
@@ -230,7 +230,7 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
             }}
             disabled={!canGoNext}
             className={cn(
-              'flex-1 py-4 rounded-xl font-bold text-[15px] transition-all flex items-center justify-center gap-3 shadow-xl active:scale-[0.98]',
+              'flex-1 py-4 rounded-xl font-semibold text-[15px] transition-all flex items-center justify-center gap-3 shadow-xl active:scale-[0.98]',
               canGoNext ? 'bg-[#1a1a19] text-white hover:bg-black' : 'bg-surface-2 text-text-3 cursor-not-allowed'
             )}
           >
@@ -265,7 +265,7 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
       )}
 
       <div className="text-center pt-10 opacity-40">
-        <p className="text-[11px] text-text-3 font-bold uppercase tracking-widest">
+        <p className="text-[11px] text-text-3 font-semibold uppercase tracking-widest">
           Prototip görünüm • Veriler tarayıcıda kalıcı tutulur • © Helios Bilim ve Teknoloji A.Ş.
         </p>
       </div>
@@ -287,7 +287,7 @@ const RequestsList: React.FC<RequestsListProps> = ({ title, requests, role }) =>
     <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">
       <div className="flex items-center gap-2 mb-4">
         <Inbox size={16} className="text-text-3" />
-        <h3 className="text-[13px] font-bold uppercase tracking-widest text-text-3">{title}</h3>
+        <h3 className="text-[13px] font-semibold uppercase tracking-widest text-text-3">{title}</h3>
         <span className="text-[11px] bg-surface-2 px-2 py-0.5 rounded text-text-3 font-mono">
           {requests.length}
         </span>
@@ -311,14 +311,14 @@ const RequestsList: React.FC<RequestsListProps> = ({ title, requests, role }) =>
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 <span
                   className={cn(
-                    'w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0',
+                    'w-8 h-8 rounded-full flex items-center justify-center text-[10.5px] font-semibold shrink-0',
                     other?.color ?? 'bg-surface-2 text-text-3'
                   )}
                 >
                   {other?.initials ?? '??'}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[13px] font-bold text-text truncate">
+                  <p className="text-[13px] font-semibold text-text truncate">
                     {role === 'employee' ? `→ ${manager?.name ?? '—'}` : employee?.name ?? '—'}
                   </p>
                   <p className="text-[11px] text-text-3 truncate">
@@ -343,7 +343,7 @@ const StatusPill: React.FC<{ status: LeaveRequest['status'] }> = ({ status }) =>
   };
   const s = map[status];
   return (
-    <span className={cn('text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded', s.cls)}>
+    <span className={cn('text-[10.5px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded', s.cls)}>
       {s.label}
     </span>
   );

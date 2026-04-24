@@ -29,7 +29,7 @@ export const StepSummary: React.FC<StepSummaryProps> = ({
     <div className="space-y-6">
       <div className="bg-white border border-border/40 rounded-2xl p-10 shadow-sm space-y-8">
         <div className="space-y-2">
-          <h4 className="text-[11px] font-black text-text-3 uppercase tracking-widest">
+          <h4 className="text-[11px] font-semibold text-text-3 uppercase tracking-widest">
             03 — TELAFİ GÜNLERİ
           </h4>
           <p className="text-[13px] text-text-3">
@@ -42,14 +42,14 @@ export const StepSummary: React.FC<StepSummaryProps> = ({
             <button className="p-1 hover:bg-white rounded border border-border/20">
               <ChevronLeft size={16} />
             </button>
-            <span className="text-[14px] font-bold text-text">Nisan 2026</span>
+            <span className="text-[14px] font-semibold text-text">Nisan 2026</span>
             <button className="p-1 hover:bg-white rounded border border-border/20">
               <ChevronRight size={16} />
             </button>
           </div>
           <div className="grid grid-cols-7 mb-2">
             {WEEK_DAYS.map((d) => (
-              <span key={d} className="text-[11px] font-bold text-text-3">
+              <span key={d} className="text-[11px] font-semibold text-text-3">
                 {d}
               </span>
             ))}
@@ -63,7 +63,7 @@ export const StepSummary: React.FC<StepSummaryProps> = ({
                 key={d}
                 onClick={() => onTelafiToggle(d)}
                 className={cn(
-                  'h-10 text-[13px] font-bold rounded-lg transition-all',
+                  'h-10 text-[13px] font-semibold rounded-lg transition-all',
                   form.telafiGunleri.includes(d)
                     ? 'bg-[#0F6E56] text-white'
                     : 'text-text-3 hover:bg-white'
@@ -78,7 +78,7 @@ export const StepSummary: React.FC<StepSummaryProps> = ({
               {[...form.telafiGunleri].sort((a, b) => a - b).map((d) => (
                 <span
                   key={d}
-                  className="px-3 py-1 bg-[#E1F5EE] border border-[#0F6E56]/20 text-[#0F6E56] text-[11px] font-black rounded-full"
+                  className="px-3 py-1 bg-[#E1F5EE] border border-[#0F6E56]/20 text-[#0F6E56] text-[11px] font-semibold rounded-full"
                 >
                   {d} Nisan
                 </span>
@@ -88,7 +88,7 @@ export const StepSummary: React.FC<StepSummaryProps> = ({
         </div>
 
         <div className="space-y-3">
-          <label className="text-[13px] font-bold text-text-2">Telafi notu (opsiyonel)</label>
+          <label className="text-[13px] font-semibold text-text-2">Telafi notu (opsiyonel)</label>
           <textarea
             value={form.telafiNotu}
             onChange={(e) => onTelafiNotuChange(e.target.value)}
@@ -99,7 +99,7 @@ export const StepSummary: React.FC<StepSummaryProps> = ({
       </div>
 
       <div className="bg-white border border-border/40 rounded-2xl p-10 shadow-sm space-y-8">
-        <h4 className="text-[11px] font-black text-text-3 uppercase tracking-widest">
+        <h4 className="text-[11px] font-semibold text-text-3 uppercase tracking-widest">
           ÖZET — KONTROL EDİN
         </h4>
 
@@ -129,7 +129,7 @@ export const StepSummary: React.FC<StepSummaryProps> = ({
               className="flex items-center justify-between py-4 border-b border-border/10 last:border-0 hover:bg-background px-2 transition-all"
             >
               <span className="text-[13px] text-text-3 font-medium">{item.label}</span>
-              <span className="text-[13px] text-text font-bold text-right truncate max-w-[60%]">
+              <span className="text-[13px] text-text font-semibold text-right truncate max-w-[60%]">
                 {item.value}
               </span>
             </div>

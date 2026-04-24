@@ -72,7 +72,7 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
     <div className="space-y-6">
       <div className="bg-white border border-border/40 rounded-2xl p-10 shadow-sm space-y-8">
         <div className="space-y-1">
-          <h2 className="text-[11px] font-black text-text-3 uppercase tracking-widest">
+          <h2 className="text-[11px] font-semibold text-text-3 uppercase tracking-widest">
             02 — DEVAMSIZLIK TARİHLERİ
           </h2>
           <p className="text-[13px] text-text-3">
@@ -85,14 +85,14 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
             <button className="p-1 hover:bg-surface-2 rounded border border-border/20">
               <ChevronLeft size={16} />
             </button>
-            <span className="text-[15px] font-bold text-text">Nisan 2026</span>
+            <span className="text-[15px] font-semibold text-text">Nisan 2026</span>
             <button className="p-1 hover:bg-surface-2 rounded border border-border/20">
               <ChevronRight size={16} />
             </button>
           </div>
           <div className="grid grid-cols-7 mb-2">
             {WEEK_DAYS.map((d) => (
-              <span key={d} className="text-[11px] font-bold text-text-3">
+              <span key={d} className="text-[11px] font-semibold text-text-3">
                 {d}
               </span>
             ))}
@@ -106,7 +106,7 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
                 key={d}
                 onClick={() => onToggleRange(d)}
                 className={cn(
-                  'h-10 text-[13px] font-bold rounded-lg transition-all',
+                  'h-10 text-[13px] font-semibold rounded-lg transition-all',
                   isInRange(d) ? 'bg-[#BA7517] text-white' : 'text-text-3 hover:bg-surface-2',
                   d === 22 && !isInRange(d) && 'text-[#378ADD]'
                 )}
@@ -117,13 +117,13 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
           </div>
           {rangeStart > 0 && (
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <span className="text-[13px] font-bold text-text-2 border-b-2 border-[#BA7517] pb-0.5">
+              <span className="text-[13px] font-semibold text-text-2 border-b-2 border-[#BA7517] pb-0.5">
                 {rangeStart} Nisan 2026 {rangeEnd ? `— ${rangeEnd} Nisan 2026` : ''}
               </span>
               <button
                 type="button"
                 onClick={onClearRange}
-                className="text-[12px] font-bold text-red-500 hover:scale-105 transition-all flex items-center gap-1"
+                className="text-[12.5px] font-semibold text-red-500 hover:scale-105 transition-all flex items-center gap-1"
               >
                 <X size={14} /> Temizle
               </button>
@@ -133,7 +133,7 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
       </div>
 
       <div className="bg-white border border-border/40 rounded-2xl p-10 shadow-sm space-y-8">
-        <h2 className="text-[11px] font-black text-text-3 uppercase tracking-widest">
+        <h2 className="text-[11px] font-semibold text-text-3 uppercase tracking-widest">
           02 — NEDEN <span className="text-red-500">*</span>
         </h2>
 
@@ -158,13 +158,13 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
               >
                 <r.icon size={20} />
               </div>
-              <span className="text-[14px] font-bold">{r.label}</span>
+              <span className="text-[14px] font-semibold">{r.label}</span>
             </button>
           ))}
         </div>
 
         <div className="space-y-3">
-          <label className="text-[13px] font-bold text-text-2">Hastalık / belirti detayı</label>
+          <label className="text-[13px] font-semibold text-text-2">Hastalık / belirti detayı</label>
           <textarea
             value={reasonDetail}
             onChange={(e) => onReasonDetailChange(e.target.value)}
@@ -174,7 +174,7 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
         </div>
 
         <div className="flex items-center gap-4 flex-wrap">
-          <label className="text-[13px] font-bold text-text-2 whitespace-nowrap">Belge durumu</label>
+          <label className="text-[13px] font-semibold text-text-2 whitespace-nowrap">Belge durumu</label>
           <select
             value={belge}
             onChange={(e) => {
@@ -185,7 +185,7 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
                 setFileError(null);
               }
             }}
-            className="p-3 pr-10 border border-border rounded-xl text-[13px] outline-none appearance-none bg-white font-bold text-text-3"
+            className="p-3 pr-10 border border-border rounded-xl text-[13px] outline-none appearance-none bg-white font-semibold text-text-3"
             style={{
               backgroundImage: SELECT_BG,
               backgroundRepeat: 'no-repeat',
@@ -203,14 +203,14 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
               {belgeFileName ? (
                 <div className="flex items-center gap-3 px-3 py-2 border border-teal-border/40 bg-teal-bg/30 rounded-xl">
                   <FileText size={16} className="text-teal-text shrink-0" />
-                  <span className="flex-1 min-w-0 text-[13px] font-bold text-text truncate">
+                  <span className="flex-1 min-w-0 text-[13px] font-semibold text-text truncate">
                     {belgeFileName}
                   </span>
                   {belgeFileDataUrl && (
                     <a
                       href={belgeFileDataUrl}
                       download={belgeFileName}
-                      className="text-[11px] font-bold text-info-text hover:underline"
+                      className="text-[11px] font-semibold text-info-text hover:underline"
                     >
                       İndir
                     </a>
@@ -230,7 +230,7 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
               ) : (
                 <label className="flex items-center gap-2 px-3 py-2 border border-dashed border-border rounded-xl cursor-pointer hover:bg-surface-2/40 transition-colors">
                   <Upload size={15} className="text-text-3" />
-                  <span className="text-[13px] font-bold text-text-3">Belge yükle...</span>
+                  <span className="text-[13px] font-semibold text-text-3">Belge yükle...</span>
                   <input
                     type="file"
                     className="hidden"

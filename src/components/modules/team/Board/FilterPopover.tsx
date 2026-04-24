@@ -69,7 +69,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
         <ChevronDown size={14} className="opacity-60" />
         {label}
         {hasSelection && (
-          <span className="bg-info-text/10 text-info-text text-[10px] font-black px-1.5 py-0.5 rounded tabular-nums">
+          <span className="bg-info-text/10 text-info-text text-[10.5px] font-semibold px-1.5 py-0.5 rounded tabular-nums">
             {count}
           </span>
         )}
@@ -95,7 +95,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
 
           <div className="max-h-64 overflow-y-auto py-1">
             {filtered.length === 0 ? (
-              <div className="px-4 py-6 text-center text-[12px] text-text-3 italic">
+              <div className="px-4 py-6 text-center text-[12.5px] text-text-3 italic">
                 {emptyText}
               </div>
             ) : (
@@ -139,7 +139,7 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
                   onClear();
                   setQuery('');
                 }}
-                className="w-full py-1.5 text-[12px] font-bold text-text-3 hover:text-text hover:bg-surface-2 rounded-md transition-colors"
+                className="w-full py-1.5 text-[12.5px] font-semibold text-text-3 hover:text-text hover:bg-surface-2 rounded-md transition-colors"
               >
                 Seçimi temizle
               </button>

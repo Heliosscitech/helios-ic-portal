@@ -57,7 +57,7 @@ export const AddEventForm: React.FC<AddEventFormProps> = ({
               type="date"
               value={date}
               onChange={(e) => onDateChange(e.target.value)}
-              className="w-full p-4 bg-white border border-border/40 rounded-xl text-[14px] outline-none focus:border-text transition-all font-bold text-text-3"
+              className="w-full p-4 bg-white border border-border/40 rounded-xl text-[14px] outline-none focus:border-text transition-all font-semibold text-text-3"
             />
           </div>
           <div className="relative">
@@ -68,7 +68,7 @@ export const AddEventForm: React.FC<AddEventFormProps> = ({
               type="time"
               value={time === '--:--' ? '' : time}
               onChange={(e) => onTimeChange(e.target.value)}
-              className="w-full p-4 bg-white border border-border/40 rounded-xl text-[14px] outline-none focus:border-text transition-all font-bold text-text-3"
+              className="w-full p-4 bg-white border border-border/40 rounded-xl text-[14px] outline-none focus:border-text transition-all font-semibold text-text-3"
             />
           </div>
         </div>
@@ -77,7 +77,7 @@ export const AddEventForm: React.FC<AddEventFormProps> = ({
         <div className="bg-white border border-border/40 rounded-xl p-4 space-y-2">
           <div className="flex items-center gap-2 mb-3">
             <Users size={14} className="text-text-3" />
-            <span className="text-[11px] font-bold uppercase tracking-widest text-text-3">
+            <span className="text-[11px] font-semibold uppercase tracking-widest text-text-3">
               Katılımcılar
             </span>
             {attendeeIds.length === 0 && (
@@ -101,7 +101,7 @@ export const AddEventForm: React.FC<AddEventFormProps> = ({
                     onChange={() => onAttendeeToggle(u.id)}
                     className="hidden"
                   />
-                  <div className={cn('w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0', u.color)}>
+                  <div className={cn('w-6 h-6 rounded-full flex items-center justify-center text-[10.5px] font-semibold shrink-0', u.color)}>
                     {u.initials}
                   </div>
                   <span className="text-[13px] font-medium text-text-2 truncate">{u.name}</span>
@@ -123,7 +123,7 @@ export const AddEventForm: React.FC<AddEventFormProps> = ({
             <select
               value={categoryId}
               onChange={(e) => onCategoryChange(e.target.value)}
-              className="w-full p-3 bg-white border border-border/40 rounded-xl text-[13px] outline-none font-bold text-text-2 appearance-none cursor-pointer"
+              className="w-full p-3 bg-white border border-border/40 rounded-xl text-[13px] outline-none font-semibold text-text-2 appearance-none cursor-pointer"
               style={{
                 backgroundImage:
                   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")",
@@ -143,13 +143,13 @@ export const AddEventForm: React.FC<AddEventFormProps> = ({
             <button
               type="button"
               onClick={onCancel}
-              className="px-6 py-2.5 bg-white border border-border rounded-xl text-[13px] font-bold text-text-2 hover:bg-white/80 transition-all shadow-sm"
+              className="px-6 py-2.5 bg-white border border-border rounded-xl text-[13px] font-semibold text-text-2 hover:bg-white/80 transition-all shadow-sm"
             >
               Vazgeç
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 bg-[#1a1a19] text-white border border-[#1a1a19] rounded-xl text-[13px] font-bold hover:bg-black transition-all shadow-lg"
+              className="px-6 py-2.5 bg-[#1a1a19] text-white border border-[#1a1a19] rounded-xl text-[13px] font-semibold hover:bg-black transition-all shadow-lg"
             >
               Kaydet
             </button>

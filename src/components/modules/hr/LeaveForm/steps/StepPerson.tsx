@@ -33,25 +33,25 @@ export const StepPerson: React.FC<StepPersonProps> = ({
 
   return (
     <div className="bg-white border border-border/40 rounded-2xl p-10 shadow-sm space-y-10">
-      <h2 className="text-[11px] font-black text-text-3 uppercase tracking-widest flex items-center gap-2">
+      <h2 className="text-[11px] font-semibold text-text-3 uppercase tracking-widest flex items-center gap-2">
         01 — KİŞİ BİLGİLERİ
       </h2>
 
       <div className="bg-[#f1efe8]/50 border border-border/20 rounded-xl p-4 flex items-center gap-3">
         <div
           className={cn(
-            'w-10 h-10 rounded-lg flex items-center justify-center font-bold text-[12px] shadow-sm',
+            'w-10 h-10 rounded-lg flex items-center justify-center font-semibold text-[12.5px] shadow-sm',
             employee.color
           )}
         >
           {employee.initials}
         </div>
-        <span className="text-[15px] font-bold text-text">{employee.name}</span>
+        <span className="text-[15px] font-semibold text-text">{employee.name}</span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <label className="text-[13px] font-bold text-text-2">
+          <label className="text-[13px] font-semibold text-text-2">
             Departman <span className="text-red-500">*</span>
           </label>
           <select
@@ -73,7 +73,7 @@ export const StepPerson: React.FC<StepPersonProps> = ({
           </select>
         </div>
         <div className="space-y-2">
-          <label className="text-[13px] font-bold text-text-2">
+          <label className="text-[13px] font-semibold text-text-2">
             Yönetici <span className="text-red-500">*</span>
           </label>
           <select
@@ -102,7 +102,7 @@ export const StepPerson: React.FC<StepPersonProps> = ({
       </div>
 
       <div className="space-y-2">
-        <label className="text-[13px] font-bold text-text-2">
+        <label className="text-[13px] font-semibold text-text-2">
           Kurumsal e-posta <span className="text-red-500">*</span>
         </label>
         <div className="relative">

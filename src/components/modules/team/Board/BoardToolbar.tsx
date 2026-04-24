@@ -41,7 +41,7 @@ export const BoardToolbar: React.FC<BoardToolbarProps> = ({
     badge: (
       <span
         className={cn(
-          'w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0',
+          'w-6 h-6 rounded-full flex items-center justify-center text-[10.5px] font-semibold shrink-0',
           u.color
         )}
       >
@@ -58,11 +58,11 @@ export const BoardToolbar: React.FC<BoardToolbarProps> = ({
 
   return (
     <div className="px-8 pt-6 pb-5 border-b border-border/40">
-      <p className="text-[12px] text-text-3 font-medium mb-1">Projeler · {unitLabel}</p>
+      <p className="text-[12.5px] text-text-3 font-medium mb-1">Projeler · {unitLabel}</p>
 
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-4 flex-wrap">
-          <h1 className="text-[22px] font-bold text-text tracking-tight">Tüm İşler</h1>
+          <h1 className="text-[20px] font-semibold text-text tracking-tight">Tüm İşler</h1>
 
           <div className="flex items-center gap-2 ml-4">
             <FilterPopover
@@ -103,7 +103,7 @@ export const BoardToolbar: React.FC<BoardToolbarProps> = ({
                 key={u.id}
                 title={u.name}
                 className={cn(
-                  'w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-bold',
+                  'w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-[10.5px] font-semibold',
                   u.color
                 )}
               >
@@ -111,7 +111,7 @@ export const BoardToolbar: React.FC<BoardToolbarProps> = ({
               </div>
             ))}
             {PORTAL_USERS.length > 5 && (
-              <div className="w-7 h-7 rounded-full border-2 border-white bg-surface-2 text-text-3 flex items-center justify-center text-[9px] font-bold">
+              <div className="w-7 h-7 rounded-full border-2 border-white bg-surface-2 text-text-3 flex items-center justify-center text-[10.5px] font-semibold">
                 +{PORTAL_USERS.length - 5}
               </div>
             )}
@@ -119,7 +119,7 @@ export const BoardToolbar: React.FC<BoardToolbarProps> = ({
 
           <button
             onClick={onNewTask}
-            className="flex items-center gap-2 px-4 py-2 bg-[#BA7517] text-white rounded-lg text-[13px] font-bold shadow-md hover:bg-[#a46515] transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-[#BA7517] text-white rounded-lg text-[13px] font-semibold shadow-md hover:bg-[#a46515] transition-colors"
           >
             <Plus size={14} /> Yeni iş
           </button>

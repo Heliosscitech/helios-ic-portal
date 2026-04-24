@@ -28,25 +28,25 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, columns, onTaskClick 
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-surface-2/50 border-b border-border/40">
-              <th className="px-4 py-3 text-[11px] font-black uppercase tracking-widest text-text-3">
+              <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-text-3">
                 İş
               </th>
-              <th className="px-4 py-3 text-[11px] font-black uppercase tracking-widest text-text-3">
+              <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-text-3">
                 Birim
               </th>
-              <th className="px-4 py-3 text-[11px] font-black uppercase tracking-widest text-text-3">
+              <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-text-3">
                 Durum
               </th>
-              <th className="px-4 py-3 text-[11px] font-black uppercase tracking-widest text-text-3">
+              <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-text-3">
                 Öncelik
               </th>
-              <th className="px-4 py-3 text-[11px] font-black uppercase tracking-widest text-text-3">
+              <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-text-3">
                 Atananlar
               </th>
-              <th className="px-4 py-3 text-[11px] font-black uppercase tracking-widest text-text-3">
+              <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-text-3">
                 Tarih
               </th>
-              <th className="px-4 py-3 text-[11px] font-black uppercase tracking-widest text-text-3 text-center">
+              <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-widest text-text-3 text-center">
                 💬
               </th>
             </tr>
@@ -62,7 +62,7 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, columns, onTaskClick 
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <span className="text-[10px] font-mono font-bold text-text-3 bg-surface-2 px-1.5 py-0.5 rounded">
+                      <span className="text-[10.5px] font-mono font-semibold text-text-3 bg-surface-2 px-1.5 py-0.5 rounded">
                         {task.id}
                       </span>
                       <span className="text-[13px] font-semibold text-text">{task.title}</span>
@@ -71,11 +71,11 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, columns, onTaskClick 
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <span className={cn('w-2 h-2 rounded-full', unit?.dotColor)} />
-                      <span className="text-[12px] text-text-2 font-medium">{unit?.label}</span>
+                      <span className="text-[12.5px] text-text-2 font-medium">{unit?.label}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-2 text-text-2 text-[10px] font-bold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-2 text-text-2 text-[10.5px] font-semibold uppercase tracking-wider">
                       <span
                         className={cn(
                           'w-1.5 h-1.5 rounded-full',
@@ -88,7 +88,7 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, columns, onTaskClick 
                   <td className="px-4 py-3">
                     <span
                       className={cn(
-                        'text-[12px] font-bold capitalize',
+                        'text-[12.5px] font-semibold capitalize',
                         PRIORITY_STYLE[task.priority]
                       )}
                     >
@@ -104,7 +104,7 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, columns, onTaskClick 
                             key={uid}
                             title={u?.name}
                             className={cn(
-                              'w-6 h-6 rounded-full border-2 border-white text-[9px] font-bold flex items-center justify-center',
+                              'w-6 h-6 rounded-full border-2 border-white text-[10.5px] font-semibold flex items-center justify-center',
                               u?.color
                             )}
                           >
@@ -117,8 +117,8 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, columns, onTaskClick 
                   <td className="px-4 py-3">
                     <div
                       className={cn(
-                        'flex items-center gap-1 text-[12px] font-mono',
-                        isToday(task.dueDate) ? 'text-red-border font-bold' : 'text-text-2'
+                        'flex items-center gap-1 text-[12.5px] font-mono',
+                        isToday(task.dueDate) ? 'text-red-border font-semibold' : 'text-text-2'
                       )}
                     >
                       <Clock size={12} /> {isToday(task.dueDate) ? 'Bugün' : formatTRCompact(task.dueDate)}
@@ -126,7 +126,7 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, columns, onTaskClick 
                   </td>
                   <td className="px-4 py-3 text-center">
                     {task.comments > 0 ? (
-                      <div className="inline-flex items-center gap-1 text-[12px] text-text-3">
+                      <div className="inline-flex items-center gap-1 text-[12.5px] text-text-3">
                         <MessageSquare size={12} /> {task.comments}
                       </div>
                     ) : (

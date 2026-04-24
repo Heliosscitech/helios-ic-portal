@@ -22,7 +22,7 @@ interface BoardSidebarProps {
   onMemberChange: (id: string | null) => void;
 }
 
-const SECTION_TITLE = 'text-[11px] font-bold uppercase tracking-widest text-text-3 px-3 mb-2';
+const SECTION_TITLE = 'text-[11px] font-semibold uppercase tracking-widest text-text-3 px-3 mb-2';
 const ITEM_BASE =
   'w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[13px] transition-colors group';
 const ITEM_IDLE = 'text-text-2 hover:bg-surface-2/60';
@@ -119,7 +119,7 @@ export const BoardSidebar: React.FC<BoardSidebarProps> = ({
           ))}
           <button className={cn(ITEM_BASE, 'text-text-3 italic hover:bg-surface-2/60')}>
             <Plus size={12} className="shrink-0 opacity-60" />
-            <span className="flex-1 text-left text-[12px]">Birim ekle / düzenle</span>
+            <span className="flex-1 text-left text-[12.5px]">Birim ekle / düzenle</span>
           </button>
         </div>
       </section>
@@ -136,7 +136,7 @@ export const BoardSidebar: React.FC<BoardSidebarProps> = ({
             >
               <span
                 className={cn(
-                  'w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0',
+                  'w-6 h-6 rounded-full flex items-center justify-center text-[10.5px] font-semibold shrink-0',
                   u.color
                 )}
               >

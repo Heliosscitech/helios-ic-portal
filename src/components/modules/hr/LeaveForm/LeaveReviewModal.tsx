@@ -96,22 +96,22 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
           <div className="flex items-center gap-3 min-w-0">
             <span
               className={cn(
-                'w-11 h-11 rounded-full flex items-center justify-center text-[13px] font-bold shrink-0',
+                'w-11 h-11 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0',
                 employee?.color ?? 'bg-surface-2 text-text-3'
               )}
             >
               {employee?.initials ?? '??'}
             </span>
             <div className="min-w-0">
-              <p className="text-[15px] font-bold text-text truncate">{employee?.name ?? '—'}</p>
-              <p className="text-[12px] text-text-3 truncate">
+              <p className="text-[15px] font-semibold text-text truncate">{employee?.name ?? '—'}</p>
+              <p className="text-[12.5px] text-text-3 truncate">
                 {request.departman} · {request.email}
               </p>
             </div>
           </div>
           <span
             className={cn(
-              'text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded shrink-0',
+              'text-[10.5px] font-semibold uppercase tracking-wider px-2 py-1 rounded shrink-0',
               statusStyle[request.status]
             )}
           >
@@ -141,7 +141,7 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
 
         {request.belgeFileName && (
           <div>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-text-3">Belge</span>
+            <span className="text-[10.5px] font-semibold uppercase tracking-widest text-text-3">Belge</span>
             <div className="mt-1 flex items-center gap-3 px-3 py-2 border border-border/60 bg-surface-2/30 rounded-lg">
               <FileText size={16} className="text-text-3 shrink-0" />
               <span className="flex-1 min-w-0 text-[13px] font-semibold text-text truncate">
@@ -153,7 +153,7 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
                   download={request.belgeFileName}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[11px] font-bold text-info-text hover:underline"
+                  className="text-[11px] font-semibold text-info-text hover:underline"
                 >
                   Aç / İndir
                 </a>
@@ -191,7 +191,7 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
         {canAct && (
           <div className="space-y-3 pt-3 border-t border-border/40">
             <label className="block">
-              <span className="text-[11px] font-bold uppercase tracking-widest text-text-3">
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-text-3">
                 Not (opsiyonel)
               </span>
               <textarea
@@ -206,14 +206,14 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
               <button
                 type="button"
                 onClick={() => applyDecision('rejected')}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-red-border/40 text-red-text rounded-lg text-[13px] font-bold hover:bg-red-bg transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-red-border/40 text-red-text rounded-lg text-[13px] font-semibold hover:bg-red-bg transition-colors"
               >
                 <XCircle size={15} /> Reddet
               </button>
               <button
                 type="button"
                 onClick={() => applyDecision('approved')}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-teal-600 text-white rounded-lg text-[13px] font-bold hover:bg-teal-700 transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-teal-600 text-white rounded-lg text-[13px] font-semibold hover:bg-teal-700 transition-colors"
               >
                 <Check size={15} /> Onayla
               </button>
@@ -222,7 +222,7 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
         )}
 
         {!canAct && isManager && request.status !== 'pending' && (
-          <p className="text-[12px] text-text-3 pt-3 border-t border-border/40">
+          <p className="text-[12.5px] text-text-3 pt-3 border-t border-border/40">
             Bu talep zaten {statusLabel[request.status].toLocaleLowerCase('tr-TR')}.
           </p>
         )}
@@ -255,7 +255,7 @@ const ModalShell: React.FC<{
         className="bg-white rounded-2xl shadow-2xl border border-border w-full max-w-lg mt-16 mb-8 overflow-hidden"
       >
         <div className="px-6 py-4 border-b border-border/40 flex items-center justify-between">
-          <h3 className="text-[15px] font-bold text-text">{title}</h3>
+          <h3 className="text-[15px] font-semibold text-text">{title}</h3>
           <button
             type="button"
             onClick={onClose}
@@ -278,7 +278,7 @@ const InfoCard: React.FC<{
   <div className="border border-border/40 rounded-xl p-3">
     <div className="flex items-center gap-1.5 text-text-3 mb-1">
       {icon}
-      <span className="text-[9px] font-bold uppercase tracking-widest">{label}</span>
+      <span className="text-[10.5px] font-semibold uppercase tracking-widest">{label}</span>
     </div>
     <p className="text-[13px] font-semibold text-text">{children}</p>
   </div>
@@ -286,7 +286,7 @@ const InfoCard: React.FC<{
 
 const Block: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
   <div>
-    <span className="text-[9px] font-bold uppercase tracking-widest text-text-3">{label}</span>
+    <span className="text-[10.5px] font-semibold uppercase tracking-widest text-text-3">{label}</span>
     <p className="mt-1 text-[13px] text-text-2 whitespace-pre-wrap">{children}</p>
   </div>
 );

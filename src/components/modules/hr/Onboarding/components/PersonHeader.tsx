@@ -17,11 +17,11 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({ person, canEdit, onE
   return (
     <div className="space-y-4">
       <div className="flex items-start gap-4">
-        <span className="w-14 h-14 rounded-full flex items-center justify-center text-[16px] font-bold shrink-0 bg-[#F7ECE4] text-[#8A4A1A]">
+        <span className="w-14 h-14 rounded-full flex items-center justify-center text-[15px] font-semibold shrink-0 bg-[#F7ECE4] text-[#8A4A1A]">
           {getInitials(person.name)}
         </span>
         <div className="flex-1 min-w-0 pt-1">
-          <h2 className="text-[20px] font-bold text-text leading-tight">{person.name}</h2>
+          <h2 className="text-[20px] font-semibold text-text leading-tight">{person.name}</h2>
           <p className="text-[13px] text-text-3 mt-1">
             {person.role} · Başlangıç: {formatDateTR(person.startDate)}
           </p>
@@ -52,7 +52,7 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({ person, canEdit, onE
             style={{ width: `${percent}%` }}
           />
         </div>
-        <span className="text-[12px] font-bold text-text-2 tabular-nums shrink-0">
+        <span className="text-[12.5px] font-semibold text-text-2 tabular-nums shrink-0">
           {done}/{total} · %{percent}
         </span>
       </div>

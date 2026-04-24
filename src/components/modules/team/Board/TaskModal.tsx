@@ -143,11 +143,11 @@ export const TaskModal: React.FC<TaskModalProps> = ({
             <div className="px-6 py-4 border-b border-border/40 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {task && (
-                  <span className="text-[11px] font-mono font-bold text-text-3 bg-surface-2 px-2 py-0.5 rounded">
+                  <span className="text-[11px] font-mono font-semibold text-text-3 bg-surface-2 px-2 py-0.5 rounded">
                     {task.id}
                   </span>
                 )}
-                <h3 className="text-[15px] font-bold text-text">
+                <h3 className="text-[15px] font-semibold text-text">
                   {mode === 'create' ? 'Yeni İş Oluştur' : 'İş Detayı'}
                 </h3>
               </div>
@@ -162,13 +162,13 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
             <div className="p-6 space-y-5">
               {error && (
-                <div className="px-3 py-2 bg-red-bg text-red-text border border-red-border/30 rounded-lg text-[13px] font-bold">
+                <div className="px-3 py-2 bg-red-bg text-red-text border border-red-border/30 rounded-lg text-[13px] font-semibold">
                   {error}
                 </div>
               )}
 
               <div className="space-y-2">
-                <label className="text-[12px] font-bold uppercase tracking-widest text-text-3">
+                <label className="text-[12.5px] font-semibold uppercase tracking-widest text-text-3">
                   Başlık <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -181,7 +181,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               </div>
 
               <div className="space-y-2">
-                <label className="text-[12px] font-bold uppercase tracking-widest text-text-3">
+                <label className="text-[12.5px] font-semibold uppercase tracking-widest text-text-3">
                   Açıklama
                 </label>
                 <textarea
@@ -195,7 +195,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[12px] font-bold uppercase tracking-widest text-text-3">
+                  <label className="text-[12.5px] font-semibold uppercase tracking-widest text-text-3">
                     Birim
                   </label>
                   <select
@@ -211,7 +211,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[12px] font-bold uppercase tracking-widest text-text-3">
+                  <label className="text-[12.5px] font-semibold uppercase tracking-widest text-text-3">
                     Durum
                   </label>
                   <select
@@ -227,7 +227,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[12px] font-bold uppercase tracking-widest text-text-3">
+                  <label className="text-[12.5px] font-semibold uppercase tracking-widest text-text-3">
                     Öncelik
                   </label>
                   <select
@@ -243,7 +243,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[12px] font-bold uppercase tracking-widest text-text-3">
+                  <label className="text-[12.5px] font-semibold uppercase tracking-widest text-text-3">
                     Son Tarih
                   </label>
                   <input
@@ -256,7 +256,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               </div>
 
               <div className="space-y-2">
-                <label className="text-[12px] font-bold uppercase tracking-widest text-text-3">
+                <label className="text-[12.5px] font-semibold uppercase tracking-widest text-text-3">
                   Atananlar <span className="text-red-500">*</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -276,13 +276,13 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                       >
                         <span
                           className={cn(
-                            'w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold',
+                            'w-6 h-6 rounded-full flex items-center justify-center text-[10.5px] font-semibold',
                             u.color
                           )}
                         >
                           {u.initials}
                         </span>
-                        <span className="text-[12px] font-bold">{u.name.split(' ')[0]}</span>
+                        <span className="text-[12.5px] font-semibold">{u.name.split(' ')[0]}</span>
                       </button>
                     );
                   })}
@@ -290,14 +290,14 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               </div>
 
               <div className="space-y-2">
-                <label className="text-[12px] font-bold uppercase tracking-widest text-text-3">
+                <label className="text-[12.5px] font-semibold uppercase tracking-widest text-text-3">
                   Etiketler
                 </label>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {form.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded bg-surface-2 text-text-2 uppercase tracking-wide"
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded bg-surface-2 text-text-2 uppercase tracking-wide"
                     >
                       <TagIcon size={10} />
                       {tag}
@@ -327,7 +327,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                   <button
                     type="button"
                     onClick={addTag}
-                    className="flex items-center gap-1 px-3 py-2 border border-border rounded-lg text-[12px] font-bold text-text-2 hover:bg-surface-2 transition-colors"
+                    className="flex items-center gap-1 px-3 py-2 border border-border rounded-lg text-[12.5px] font-semibold text-text-2 hover:bg-surface-2 transition-colors"
                   >
                     <Plus size={14} /> Ekle
                   </button>
@@ -337,7 +337,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               {mode === 'detail' && task && creator && (
                 <div className="pt-3 border-t border-border/30 flex items-center gap-6 text-[11px] text-text-3">
                   <div className="flex items-center gap-1.5">
-                    <UserIcon size={12} /> Atayan: <span className="font-bold text-text-2">{creator.name}</span>
+                    <UserIcon size={12} /> Atayan: <span className="font-semibold text-text-2">{creator.name}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Clock size={12} /> {formatTR(task.dueDate)}
@@ -357,7 +357,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                     onDelete(task.id);
                     onClose();
                   }}
-                  className="flex items-center gap-2 px-3 py-2 text-[12px] font-bold text-red-text hover:bg-red-bg rounded-lg transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 text-[12.5px] font-semibold text-red-text hover:bg-red-bg rounded-lg transition-colors"
                 >
                   <Trash2 size={14} /> Sil
                 </button>
@@ -369,13 +369,13 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 border border-border rounded-lg text-[13px] font-bold text-text-2 hover:bg-surface-2 transition-colors"
+                  className="px-4 py-2 border border-border rounded-lg text-[13px] font-semibold text-text-2 hover:bg-surface-2 transition-colors"
                 >
                   Vazgeç
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#1a1a19] text-white rounded-lg text-[13px] font-bold shadow-sm hover:bg-black transition-colors"
+                  className="px-5 py-2 bg-[#1a1a19] text-white rounded-lg text-[13px] font-semibold shadow-sm hover:bg-black transition-colors"
                 >
                   {mode === 'create' ? 'Oluştur' : 'Kaydet'}
                 </button>

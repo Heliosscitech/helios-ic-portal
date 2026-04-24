@@ -152,13 +152,13 @@ export const BoardView: React.FC<BoardViewProps> = ({
                         if (e.key === 'Escape') setRenamingId(null);
                       }}
                       onClick={(e) => e.stopPropagation()}
-                      className="flex-1 min-w-0 text-[11px] font-bold uppercase tracking-[1px] text-text-2 bg-white border border-info-border/60 rounded px-1.5 py-0.5 outline-none"
+                      className="flex-1 min-w-0 text-[11px] font-semibold uppercase tracking-[1px] text-text-2 bg-white border border-info-border/60 rounded px-1.5 py-0.5 outline-none"
                     />
                   ) : (
                     <h3
                       onDoubleClick={() => startRename(col)}
                       title="Çift tıkla: adı değiştir"
-                      className="text-[11px] font-bold uppercase tracking-[1px] text-text-2 truncate cursor-text"
+                      className="text-[11px] font-semibold uppercase tracking-[1px] text-text-2 truncate cursor-text"
                     >
                       {col.title}
                     </h3>
@@ -219,7 +219,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
                     <div className="flex flex-wrap gap-1.5 mb-3 pr-4">
                       <span
                         className={cn(
-                          'text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1.5 bg-surface-2 text-text-2'
+                          'text-[10.5px] font-semibold px-2 py-0.5 rounded flex items-center gap-1.5 bg-surface-2 text-text-2'
                         )}
                       >
                         <span className={cn('w-1.5 h-1.5 rounded-full', getUnitDot(task.unitId))} />
@@ -228,7 +228,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
                       {task.tags.slice(0, 2).map((tag) => (
                         <span
                           key={tag}
-                          className="text-[10px] font-bold px-2 py-0.5 rounded bg-surface-2 text-text-2 uppercase tracking-wide"
+                          className="text-[10.5px] font-semibold px-2 py-0.5 rounded bg-surface-2 text-text-2 uppercase tracking-wide"
                         >
                           {tag}
                         </span>
@@ -244,7 +244,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
                         <div
                           className={cn(
                             'flex items-center gap-1',
-                            isToday(task.dueDate) && 'text-red-border font-bold'
+                            isToday(task.dueDate) && 'text-red-border font-semibold'
                           )}
                         >
                           <Clock size={12} />
@@ -263,7 +263,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
                           <div
                             key={uid}
                             className={cn(
-                              'w-6 h-6 rounded-full border-2 border-white text-[9px] font-bold flex items-center justify-center',
+                              'w-6 h-6 rounded-full border-2 border-white text-[10.5px] font-semibold flex items-center justify-center',
                               getUserColor(uid)
                             )}
                             title={PORTAL_USERS.find((u) => u.id === uid)?.name}
@@ -279,7 +279,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
                 {colTasks.length === 0 && (
                   <div
                     className={cn(
-                      'py-10 text-center text-[12px] italic border-2 border-dashed rounded-lg transition-colors',
+                      'py-10 text-center text-[12.5px] italic border-2 border-dashed rounded-lg transition-colors',
                       isOver
                         ? 'border-info-border/60 text-info-text bg-white/50'
                         : 'border-border/30 text-text-3'
@@ -291,7 +291,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
               </div>
 
               <div className="px-2 pb-3">
-                <button className="w-full flex items-center gap-2 justify-center py-2 text-[12px] text-text-3 hover:text-text hover:bg-white/50 rounded-lg transition-all">
+                <button className="w-full flex items-center gap-2 justify-center py-2 text-[12.5px] text-text-3 hover:text-text hover:bg-white/50 rounded-lg transition-all">
                   <Plus size={14} /> Görev Ekle
                 </button>
               </div>
@@ -338,7 +338,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
           ) : (
             <button
               onClick={() => setAdding(true)}
-              className="group w-full flex flex-col items-center justify-center gap-2 py-10 text-[13px] font-bold text-text-2 hover:text-info-text bg-surface-2/70 hover:bg-info-bg border-2 border-dashed border-border-strong hover:border-info-border rounded-xl transition-all"
+              className="group w-full flex flex-col items-center justify-center gap-2 py-10 text-[13px] font-semibold text-text-2 hover:text-info-text bg-surface-2/70 hover:bg-info-bg border-2 border-dashed border-border-strong hover:border-info-border rounded-xl transition-all"
             >
               <span className="w-9 h-9 rounded-full bg-white border-2 border-border-strong group-hover:border-info-border group-hover:bg-info-bg flex items-center justify-center transition-colors">
                 <Plus size={18} />

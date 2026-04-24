@@ -15,7 +15,7 @@ const getUser = (id: string) => PORTAL_USERS.find((u) => u.id === id);
 export const DayEvents: React.FC<DayEventsProps> = ({ day, events, onDelete }) => {
   return (
     <div className="bg-[#f1efe8]/50 border border-border/40 rounded-2xl p-6">
-      <h3 className="text-[14px] font-bold text-text-2 mb-4">{day} Nisan 2026</h3>
+      <h3 className="text-[14px] font-semibold text-text-2 mb-4">{day} Nisan 2026</h3>
       <div className="space-y-3">
         {events.length > 0 ? (
           events.map((event) => {
@@ -33,19 +33,19 @@ export const DayEvents: React.FC<DayEventsProps> = ({ day, events, onDelete }) =
                     )}
                   />
                   <div>
-                    <p className="text-[14px] font-bold text-text mb-0.5">{event.title}</p>
+                    <p className="text-[14px] font-semibold text-text mb-0.5">{event.title}</p>
                     <div className="flex items-center gap-2 text-[11px] text-text-3 font-medium">
                       <UserIcon size={12} /> {author?.name ?? 'Bilinmeyen'}
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-6">
-                  <span className="text-[11px] font-bold text-text-3 uppercase tracking-wider">
+                  <span className="text-[11px] font-semibold text-text-3 uppercase tracking-wider">
                     {event.time}
                   </span>
                   <button
                     onClick={() => onDelete(event.id)}
-                    className="p-1 px-2 text-[11px] font-bold text-text-3 hover:text-red-border bg-surface-2 rounded opacity-0 group-hover:opacity-100 transition-all flex items-center gap-1"
+                    className="p-1 px-2 text-[11px] font-semibold text-text-3 hover:text-red-border bg-surface-2 rounded opacity-0 group-hover:opacity-100 transition-all flex items-center gap-1"
                   >
                     <Trash2 size={12} /> sil
                   </button>

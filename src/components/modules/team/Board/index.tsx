@@ -308,7 +308,7 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
       <div className="bg-white px-6 py-3 border border-border/40 rounded-xl flex items-center gap-2 text-[13px] text-text-3 font-medium mb-4">
         <span className="hover:text-text cursor-pointer">Uygulamalar</span>
         <span>/</span>
-        <span className="text-text font-bold">Board</span>
+        <span className="text-text font-semibold">Board</span>
       </div>
 
       <div className="bg-white border border-border/40 rounded-2xl shadow-sm overflow-hidden flex min-h-[calc(100vh-240px)]">

@@ -122,12 +122,12 @@ export const Press: React.FC = () => {
       {/* Header */}
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-text tracking-tight mb-1">Basın / Haber arşivi</h2>
+          <h2 className="text-[17px] font-semibold text-text tracking-tight mb-1">Basın / Haber arşivi</h2>
           <p className="text-[13px] text-text-3">Her haberin LinkedIn, Web sitesi, Instagram versiyonu</p>
         </div>
         <button
           onClick={() => setShowNew(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold text-white shadow-sm hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold text-white shadow-sm hover:opacity-90 transition-opacity"
           style={{ backgroundColor: BRAND }}
         >
           <Plus size={15} /> Yeni haber
@@ -139,7 +139,7 @@ export const Press: React.FC = () => {
         {items.length === 0 && (
           <div className="text-center py-16 text-text-3 text-[14px]">
             Henüz haber yok.{' '}
-            <button onClick={() => setShowNew(true)} className="font-bold underline" style={{ color: BRAND }}>
+            <button onClick={() => setShowNew(true)} className="font-semibold underline" style={{ color: BRAND }}>
               İlk haberi ekle
             </button>
           </div>
@@ -165,7 +165,7 @@ export const Press: React.FC = () => {
                   onClick={() => toggleExpand(item.id)}
                   className="flex-1 text-left min-w-0"
                 >
-                  <p className="text-[14px] font-bold text-text truncate">{item.title}</p>
+                  <p className="text-[14px] font-semibold text-text truncate">{item.title}</p>
                   <p className="text-[11px] text-text-3 mt-0.5">
                     {formatDate(item.date)} · {item.category}
                   </p>
@@ -180,7 +180,7 @@ export const Press: React.FC = () => {
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); setEditItem(item); }}
-                    className="px-3 py-1.5 text-[12px] font-bold text-text-2 hover:bg-surface-2 rounded-lg transition-colors"
+                    className="px-3 py-1.5 text-[12.5px] font-semibold text-text-2 hover:bg-surface-2 rounded-lg transition-colors"
                   >
                     Düzenle
                   </button>
@@ -219,7 +219,7 @@ export const Press: React.FC = () => {
                               setCopied(false);
                             }}
                             className={cn(
-                              'px-4 py-2 text-[13px] font-bold border-b-2 transition-all -mb-px',
+                              'px-4 py-2 text-[13px] font-semibold border-b-2 transition-all -mb-px',
                               activeTab === tab
                                 ? 'border-[#8A2A4A] text-[#8A2A4A]'
                                 : 'border-transparent text-text-3 hover:text-text-2'
@@ -245,7 +245,7 @@ export const Press: React.FC = () => {
                           <button
                             onClick={() => copyToClipboard(isDraftCurrent ? draft : item[activeTab])}
                             className={cn(
-                              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold border transition-all',
+                              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold border transition-all',
                               copied
                                 ? 'border-teal-border/40 bg-teal-bg text-teal-text'
                                 : 'border-border text-text-2 hover:bg-surface-2'
@@ -258,7 +258,7 @@ export const Press: React.FC = () => {
                           {isDraftCurrent && (
                             <button
                               onClick={handleSave}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold text-white transition-all"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold text-white transition-all"
                               style={{ backgroundColor: BRAND }}
                             >
                               Kaydet
@@ -266,7 +266,7 @@ export const Press: React.FC = () => {
                           )}
 
                           {savedFeedback && !isDraftCurrent && (
-                            <span className="flex items-center gap-1 text-[12px] font-bold text-teal-text">
+                            <span className="flex items-center gap-1 text-[12.5px] font-semibold text-teal-text">
                               <Check size={12} /> Kaydedildi
                             </span>
                           )}
@@ -324,7 +324,7 @@ const ImageUploadButton: React.FC = () => {
       <button
         type="button"
         onClick={() => ref.current?.click()}
-        className="flex items-center gap-2 px-3 py-1.5 border border-border rounded-lg text-[12px] font-bold text-text-2 hover:bg-surface-2 transition-colors"
+        className="flex items-center gap-2 px-3 py-1.5 border border-border rounded-lg text-[12.5px] font-semibold text-text-2 hover:bg-surface-2 transition-colors"
       >
         <ImagePlus size={14} /> Görsel yükle
       </button>
@@ -386,7 +386,7 @@ const PressFormModal: React.FC<PressFormModalProps> = ({
         >
           <form onSubmit={handleSubmit}>
             <div className="px-6 py-4 border-b border-border/40 flex items-center justify-between">
-              <h3 className="text-[15px] font-bold text-text">
+              <h3 className="text-[15px] font-semibold text-text">
                 {isEdit ? 'Haberi düzenle' : 'Yeni haber'}
               </h3>
               <button
@@ -400,7 +400,7 @@ const PressFormModal: React.FC<PressFormModalProps> = ({
 
             <div className="p-6 space-y-4">
               {error && (
-                <div className="px-3 py-2 bg-red-bg text-red-text border border-red-border/30 rounded-lg text-[13px] font-bold">
+                <div className="px-3 py-2 bg-red-bg text-red-text border border-red-border/30 rounded-lg text-[13px] font-semibold">
                   {error}
                 </div>
               )}
@@ -450,13 +450,13 @@ const PressFormModal: React.FC<PressFormModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 border border-border rounded-lg text-[13px] font-bold text-text-2 hover:bg-surface-2 transition-colors"
+                className="px-4 py-2 border border-border rounded-lg text-[13px] font-semibold text-text-2 hover:bg-surface-2 transition-colors"
               >
                 Vazgeç
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 text-white rounded-lg text-[13px] font-bold shadow-sm hover:opacity-90 transition-opacity"
+                className="px-5 py-2 text-white rounded-lg text-[13px] font-semibold shadow-sm hover:opacity-90 transition-opacity"
                 style={{ backgroundColor: BRAND }}
               >
                 {isEdit ? 'Kaydet' : 'Oluştur'}
@@ -473,7 +473,7 @@ const FormField: React.FC<{ label: string; required?: boolean; children: React.R
   label, required, children,
 }) => (
   <div className="space-y-1.5">
-    <label className="text-[11px] font-bold uppercase tracking-widest text-text-3">
+    <label className="text-[11px] font-semibold uppercase tracking-widest text-text-3">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     {children}

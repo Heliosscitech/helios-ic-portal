@@ -88,7 +88,7 @@ export const Takvim: React.FC<ModuleProps> = ({ user }) => {
               <button className="p-1.5 hover:bg-surface-2 rounded-lg text-text-3">
                 <ChevronLeft size={18} />
               </button>
-              <h2 className="text-[18px] font-black text-text tracking-tight">Nisan 2026</h2>
+              <h2 className="text-[17px] font-semibold text-text tracking-tight">Nisan 2026</h2>
               <button className="p-1.5 hover:bg-surface-2 rounded-lg text-text-3">
                 <ChevronRight size={18} />
               </button>
@@ -98,14 +98,14 @@ export const Takvim: React.FC<ModuleProps> = ({ user }) => {
                 setSelectedDay(22);
                 setNewDate('2026-04-22');
               }}
-              className="px-4 py-1.5 border border-border rounded-lg text-[13px] font-bold text-text-2 hover:bg-surface-2 transition-all"
+              className="px-4 py-1.5 border border-border rounded-lg text-[13px] font-semibold text-text-2 hover:bg-surface-2 transition-all"
             >
               Bugün
             </button>
           </div>
           <button
             onClick={() => setIsAddingEvent(!isAddingEvent)}
-            className="flex items-center gap-2 bg-[#1a1a19] text-white px-5 py-2.5 rounded-lg text-[13px] font-bold shadow-lg hover:bg-black transition-all"
+            className="flex items-center gap-2 bg-[#1a1a19] text-white px-5 py-2.5 rounded-lg text-[13px] font-semibold shadow-lg hover:bg-black transition-all"
           >
             <Plus size={18} /> Etkinlik ekle
           </button>
@@ -142,7 +142,7 @@ export const Takvim: React.FC<ModuleProps> = ({ user }) => {
       <DayEvents day={selectedDay} events={selectedDayEvents} onDelete={handleDeleteEvent} />
 
       <div className="text-center pt-8 opacity-50">
-        <p className="text-[11px] text-text-3 font-bold uppercase tracking-widest">
+        <p className="text-[11px] text-text-3 font-semibold uppercase tracking-widest">
           Prototip görünüm • Veriler tarayıcıda kalıcı tutulur • © Helios Bilim ve Teknoloji A.Ş.
         </p>
       </div>

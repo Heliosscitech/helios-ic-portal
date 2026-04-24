@@ -23,7 +23,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ events, selectedDay,
         {WEEK_DAYS.map((wd) => (
           <div
             key={wd}
-            className="px-4 py-2.5 text-center text-[11px] font-black tracking-widest text-text-3 border-r border-b border-border/30"
+            className="px-4 py-2.5 text-center text-[11px] font-semibold tracking-widest text-text-3 border-r border-b border-border/30"
           >
             {wd}
           </div>
@@ -34,7 +34,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ events, selectedDay,
         {PADDING_BEFORE.map((d) => (
           <div
             key={`prev-${d}`}
-            className="min-h-25 p-2 border-r border-b border-border/20 bg-surface-2/20 text-text-3 opacity-30 text-[12px] font-bold"
+            className="min-h-25 p-2 border-r border-b border-border/20 bg-surface-2/20 text-text-3 opacity-30 text-[12.5px] font-semibold"
           >
             {d}
           </div>
@@ -45,7 +45,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ events, selectedDay,
             key={d}
             onClick={() => onDaySelect(d)}
             className={cn(
-              'min-h-30 p-2 border-r border-b border-border/30 text-[12px] font-bold transition-all relative cursor-pointer hover:bg-surface-2/30 select-none',
+              'min-h-30 p-2 border-r border-b border-border/30 text-[12.5px] font-semibold transition-all relative cursor-pointer hover:bg-surface-2/30 select-none',
               selectedDay === d
                 ? 'bg-[#E6F1FB]/30 ring-1 ring-inset ring-[#378ADD]/20'
                 : 'bg-white'
@@ -68,7 +68,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ events, selectedDay,
                 <div
                   key={event.id}
                   className={cn(
-                    'mt-1 px-2 py-0.5 rounded text-[10px] font-bold truncate flex items-center gap-1.5',
+                    'mt-1 px-2 py-0.5 rounded text-[10.5px] font-semibold truncate flex items-center gap-1.5',
                     event.color
                   )}
                   title={event.title}
@@ -83,7 +83,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ events, selectedDay,
         {PADDING_AFTER.map((d) => (
           <div
             key={`next-${d}`}
-            className="min-h-30 p-2 border-r border-b border-border/20 bg-surface-2/20 text-text-3 opacity-30 text-[12px] font-bold"
+            className="min-h-30 p-2 border-r border-b border-border/20 bg-surface-2/20 text-text-3 opacity-30 text-[12.5px] font-semibold"
           >
             {d}
           </div>

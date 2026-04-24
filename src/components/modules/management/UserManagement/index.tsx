@@ -56,12 +56,12 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId })
     <div className="max-w-3xl mx-auto p-8 md:p-10">
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-text tracking-tight mb-1">Kullanıcı Yönetimi</h2>
+          <h2 className="text-[17px] font-semibold text-text tracking-tight mb-1">Kullanıcı Yönetimi</h2>
           <p className="text-[13px] text-text-3">Ekip üyelerinin rolleri ve modül erişimleri</p>
         </div>
         <button
           onClick={() => setShowNew(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-bold text-white bg-[#1a1a19] shadow-sm hover:bg-black transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold text-white bg-[#1a1a19] shadow-sm hover:bg-black transition-colors"
         >
           <Plus size={15} /> Yeni kullanıcı
         </button>
@@ -73,15 +73,15 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId })
             key={user.id}
             className="bg-white border-[0.5px] border-border rounded-2xl px-5 py-4 flex items-center gap-4 shadow-sm"
           >
-            <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center font-bold text-[13px] shrink-0', user.color)}>
+            <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center font-semibold text-[13px] shrink-0', user.color)}>
               {user.initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[14px] font-bold text-text">{user.name}</p>
-              <p className="text-[12px] text-text-3 mt-0.5">{user.role || '—'}</p>
+              <p className="text-[14px] font-semibold text-text">{user.name}</p>
+              <p className="text-[12.5px] text-text-3 mt-0.5">{user.role || '—'}</p>
             </div>
             <span className={cn(
-              'px-2.5 py-1 rounded-full text-[11px] font-bold shrink-0',
+              'px-2.5 py-1 rounded-full text-[11px] font-semibold shrink-0',
               user.userRole === 'yonetici' ? 'bg-[#1a1a19] text-white' : 'bg-surface-2 text-text-3'
             )}>
               {user.userRole === 'yonetici' ? 'Yönetici' : 'Çalışan'}
@@ -93,7 +93,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId })
             )}
             <button
               onClick={() => setEditUser(user)}
-              className="px-3 py-1.5 text-[12px] font-bold text-text-2 hover:bg-surface-2 rounded-lg transition-colors shrink-0"
+              className="px-3 py-1.5 text-[12.5px] font-semibold text-text-2 hover:bg-surface-2 rounded-lg transition-colors shrink-0"
             >
               Düzenle
             </button>
@@ -198,7 +198,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
           <form onSubmit={handleSubmit}>
             {/* Header */}
             <div className="px-6 py-4 border-b border-border/40 flex items-center justify-between">
-              <h3 className="text-[15px] font-bold text-text">
+              <h3 className="text-[15px] font-semibold text-text">
                 {isNew ? 'Yeni kullanıcı' : 'Kullanıcıyı düzenle'}
               </h3>
               <button type="button" onClick={onClose} className="p-1.5 text-text-3 hover:text-text hover:bg-surface-2 rounded-lg transition-colors">
@@ -208,13 +208,13 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
 
             <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
               {error && (
-                <div className="px-3 py-2 bg-red-bg text-red-text border border-red-border/30 rounded-lg text-[13px] font-bold">{error}</div>
+                <div className="px-3 py-2 bg-red-bg text-red-text border border-red-border/30 rounded-lg text-[13px] font-semibold">{error}</div>
               )}
 
               {/* Name + Initials */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2 space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-text-3">İsim *</label>
+                  <label className="text-[11px] font-semibold uppercase tracking-widest text-text-3">İsim *</label>
                   <input
                     autoFocus
                     value={name}
@@ -227,19 +227,19 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-text-3">Kısaltma</label>
+                  <label className="text-[11px] font-semibold uppercase tracking-widest text-text-3">Kısaltma</label>
                   <input
                     value={initials}
                     onChange={(e) => setInitials(e.target.value.toUpperCase().slice(0, 2))}
                     placeholder="AB"
-                    className="w-full p-3 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-text transition-colors font-bold text-center tracking-widest"
+                    className="w-full p-3 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-text transition-colors font-semibold text-center tracking-widest"
                   />
                 </div>
               </div>
 
               {/* Position */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-widest text-text-3">Unvan / Pozisyon</label>
+                <label className="text-[11px] font-semibold uppercase tracking-widest text-text-3">Unvan / Pozisyon</label>
                 <input
                   value={roleTitle}
                   onChange={(e) => setRoleTitle(e.target.value)}
@@ -250,7 +250,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
 
               {/* Color */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-widest text-text-3">Avatar Rengi</label>
+                <label className="text-[11px] font-semibold uppercase tracking-widest text-text-3">Avatar Rengi</label>
                 <div className="flex gap-2 flex-wrap">
                   {COLOR_PRESETS.map((c) => (
                     <button
@@ -258,7 +258,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
                       type="button"
                       onClick={() => setColor(c)}
                       className={cn(
-                        'w-9 h-9 rounded-lg font-bold text-[10px] transition-all border-2',
+                        'w-9 h-9 rounded-lg font-semibold text-[10.5px] transition-all border-2',
                         c,
                         color === c ? 'border-[#1a1a19] scale-110 shadow' : 'border-transparent'
                       )}
@@ -271,7 +271,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
 
               {/* User role */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-widest text-text-3">Rol</label>
+                <label className="text-[11px] font-semibold uppercase tracking-widest text-text-3">Rol</label>
                 <div className="grid grid-cols-2 gap-2">
                   {(['yonetici', 'calisan'] as UserRole[]).map((r) => {
                     const disabled = isSelf;
@@ -282,7 +282,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
                         onClick={() => !disabled && setUserRole(r)}
                         disabled={disabled}
                         className={cn(
-                          'flex items-center gap-2.5 p-3 border-2 rounded-xl text-[13px] font-bold transition-all',
+                          'flex items-center gap-2.5 p-3 border-2 rounded-xl text-[13px] font-semibold transition-all',
                           userRole === r
                             ? 'border-[#1a1a19] bg-[#1a1a19] text-white'
                             : 'border-border text-text-2 hover:bg-surface-2',
@@ -306,14 +306,14 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
               {userRole === 'calisan' ? (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-[11px] font-bold uppercase tracking-widest text-text-3">Modül Erişimi</label>
+                    <label className="text-[11px] font-semibold uppercase tracking-widest text-text-3">Modül Erişimi</label>
                     <div className="flex gap-3">
                       <button type="button" onClick={() => setAllowedModules([...ALL_MODULE_IDS])}
-                        className="text-[11px] font-bold text-text-3 hover:text-text underline">
+                        className="text-[11px] font-semibold text-text-3 hover:text-text underline">
                         Tümünü seç
                       </button>
                       <button type="button" onClick={() => setAllowedModules(['pano'])}
-                        className="text-[11px] font-bold text-text-3 hover:text-text underline">
+                        className="text-[11px] font-semibold text-text-3 hover:text-text underline">
                         Temizle
                       </button>
                     </div>
@@ -323,7 +323,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
                       <div key={group}>
                         {gi > 0 && <div className="border-t border-border/40" />}
                         <div className="px-3 py-1.5 bg-surface-2/40">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-text-3">{group}</span>
+                          <span className="text-[10.5px] font-semibold uppercase tracking-widest text-text-3">{group}</span>
                         </div>
                         {MODULE_INFO.filter((m) => m.group === group).map((mod) => {
                           const checked = allowedModules.includes(mod.id);
@@ -365,22 +365,22 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
                   <button
                     type="button"
                     onClick={onDelete}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-bold text-red-text hover:bg-red-bg rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12.5px] font-semibold text-red-text hover:bg-red-bg rounded-lg transition-colors"
                   >
                     <Trash2 size={13} /> Sil
                   </button>
                 )}
                 {isSelf && (
-                  <span className="text-[12px] text-text-3 italic">Kendi hesabınızı silemezsiniz</span>
+                  <span className="text-[12.5px] text-text-3 italic">Kendi hesabınızı silemezsiniz</span>
                 )}
               </div>
               <div className="flex gap-2">
                 <button type="button" onClick={onClose}
-                  className="px-4 py-2 border border-border rounded-lg text-[13px] font-bold text-text-2 hover:bg-surface-2 transition-colors">
+                  className="px-4 py-2 border border-border rounded-lg text-[13px] font-semibold text-text-2 hover:bg-surface-2 transition-colors">
                   Vazgeç
                 </button>
                 <button type="submit"
-                  className="px-5 py-2 text-white rounded-lg text-[13px] font-bold bg-[#1a1a19] shadow-sm hover:bg-black transition-colors">
+                  className="px-5 py-2 text-white rounded-lg text-[13px] font-semibold bg-[#1a1a19] shadow-sm hover:bg-black transition-colors">
                   {isNew ? 'Oluştur' : 'Kaydet'}
                 </button>
               </div>

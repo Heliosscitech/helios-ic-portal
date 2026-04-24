@@ -13,7 +13,7 @@ export const TasksList: React.FC<TasksListProps> = ({ phases, onToggleTask }) =>
     <div className="space-y-8">
       {phases.map((phase) => (
         <section key={phase.id} className="space-y-3">
-          <h3 className="text-[12px] font-black text-[#8A4A1A] uppercase tracking-widest">
+          <h3 className="text-[12.5px] font-semibold text-[#8A4A1A] uppercase tracking-widest">
             {phase.title.toUpperCase()}
           </h3>
           <div className="divide-y divide-border/30">
@@ -42,11 +42,11 @@ export const TasksList: React.FC<TasksListProps> = ({ phases, onToggleTask }) =>
                   >
                     {task.title}
                   </h4>
-                  <p className="text-[12px] text-text-3 mt-1 leading-relaxed">
+                  <p className="text-[12.5px] text-text-3 mt-1 leading-relaxed">
                     {task.description}
                   </p>
                 </div>
-                <span className="text-[12px] text-[#8A4A1A] font-medium shrink-0 pt-0.5">
+                <span className="text-[12.5px] text-[#8A4A1A] font-medium shrink-0 pt-0.5">
                   {task.assignee}
                 </span>
               </div>

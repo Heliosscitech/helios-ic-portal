@@ -45,8 +45,8 @@ export const ChecklistTable: React.FC<ChecklistTableProps> = ({
       <table className="w-full text-left border-collapse font-sans">
         <thead>
           <tr className="bg-[#f1efe8]/50 border-b border-border/30">
-            <th className="px-8 py-4 text-[12px] font-black text-text-3 uppercase tracking-widest">Ekipman</th>
-            <th className="px-8 py-4 text-[12px] font-black text-text-3 uppercase tracking-widest text-center">Durum</th>
+            <th className="px-8 py-4 text-[12.5px] font-semibold text-text-3 uppercase tracking-widest">Ekipman</th>
+            <th className="px-8 py-4 text-[12.5px] font-semibold text-text-3 uppercase tracking-widest text-center">Durum</th>
           </tr>
         </thead>
         <tbody>
@@ -64,11 +64,11 @@ export const ChecklistTable: React.FC<ChecklistTableProps> = ({
                   isProblem && "bg-red-50/60"
                 )}>
                   <td className="px-8 py-6">
-                    <p className="text-[14px] font-bold text-text mb-0.5">
+                    <p className="text-[14px] font-semibold text-text mb-0.5">
                       {item.name}
-                      {item.isCustom && <span className="ml-2 text-[9px] bg-surface-2 px-1.5 py-0.5 rounded text-text-3 font-black uppercase tracking-tighter">Yeni</span>}
+                      {item.isCustom && <span className="ml-2 text-[10.5px] bg-surface-2 px-1.5 py-0.5 rounded text-text-3 font-semibold uppercase tracking-tighter">Yeni</span>}
                     </p>
-                    <p className="text-[12px] text-text-3 italic font-medium opacity-70">{item.instruction}</p>
+                    <p className="text-[12.5px] text-text-3 italic font-medium opacity-70">{item.instruction}</p>
                   </td>
                   <td className="px-8 py-6 w-48">
                     <div className="flex flex-col items-center gap-2">
@@ -97,8 +97,8 @@ export const ChecklistTable: React.FC<ChecklistTableProps> = ({
                         </button>
                       </div>
                       {isProblem && status.userInitials && (
-                        <div className="flex items-center gap-1.5 text-[10px] text-text-3 font-bold animate-in fade-in zoom-in duration-300 whitespace-nowrap">
-                          <span className="w-5 h-5 bg-red-100 text-red-700 rounded-full flex items-center justify-center text-[8px] font-black shadow-sm ring-1 ring-red-200">{status.userInitials}</span>
+                        <div className="flex items-center gap-1.5 text-[10.5px] text-text-3 font-semibold animate-in fade-in zoom-in duration-300 whitespace-nowrap">
+                          <span className="w-5 h-5 bg-red-100 text-red-700 rounded-full flex items-center justify-center text-[8px] font-semibold shadow-sm ring-1 ring-red-200">{status.userInitials}</span>
                           <span className="text-red-700/80">{status.userName} — {status.timestamp}</span>
                         </div>
                       )}

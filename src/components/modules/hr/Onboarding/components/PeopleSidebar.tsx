@@ -21,7 +21,7 @@ export const PeopleSidebar: React.FC<PeopleSidebarProps> = ({
 }) => {
   return (
     <aside className="w-60 shrink-0 bg-white border border-border/40 rounded-2xl p-4 h-fit">
-      <h4 className="text-[11px] font-bold uppercase tracking-widest text-text-3 px-2 mb-3">
+      <h4 className="text-[11px] font-semibold uppercase tracking-widest text-text-3 px-2 mb-3">
         Ekip Üyeleri
       </h4>
 
@@ -38,11 +38,11 @@ export const PeopleSidebar: React.FC<PeopleSidebarProps> = ({
                 isActive ? 'bg-amber-bg' : 'hover:bg-surface-2/60'
               )}
             >
-              <span className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 bg-[#F7ECE4] text-[#8A4A1A]">
+              <span className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-semibold shrink-0 bg-[#F7ECE4] text-[#8A4A1A]">
                 {getInitials(p.name)}
               </span>
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-bold text-text truncate leading-tight">{p.name}</p>
+                <p className="text-[13px] font-semibold text-text truncate leading-tight">{p.name}</p>
                 <p className="text-[11px] text-text-3 truncate leading-tight mt-0.5">{p.role}</p>
               </div>
               <span className="text-[11px] text-text-3 font-medium tabular-nums shrink-0">
