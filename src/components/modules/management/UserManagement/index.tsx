@@ -4,7 +4,7 @@ import { Plus, X, Trash2, Shield, User as UserIcon, Check } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import { usePortalUsers } from '../../../../lib/users';
 import { ALL_MODULE_IDS, DEFAULT_CALISAN_MODULES } from '../../../../types/users';
-import type { ModuleId, User, UserRole } from '../../../../types/portal';
+import type { ModuleId, Responsibility, User, UserRole } from '../../../../types/portal';
 
 interface UserManagementProps {
   currentUserId: string;
@@ -43,6 +43,14 @@ const MODULE_INFO: { id: ModuleId; label: string; group: string }[] = [
 ];
 
 const MODULE_GROUPS = [...new Set(MODULE_INFO.map((m) => m.group))];
+
+const RESPONSIBILITY_INFO: { id: Responsibility; label: string; description: string }[] = [
+  {
+    id: 'purchasing',
+    label: 'Satın alma sorumlusu',
+    description: 'Talepleri yönetir, atanır, statü günceller.',
+  },
+];
 
 const getAutoInitials = (name: string) =>
   name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
@@ -155,6 +163,9 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
   const [allowedModules, setAllowedModules] = useState<ModuleId[]>(
     user?.allowedModules ?? [...DEFAULT_CALISAN_MODULES]
   );
+  const [responsibilities, setResponsibilities] = useState<Responsibility[]>(
+    user?.responsibilities ?? []
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -168,12 +179,29 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
       prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
     );
 
+  const toggleResponsibility = (id: Responsibility) =>
+    setResponsibilities((prev) =>
+      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
+    );
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) { setError('İsim zorunlu.'); return; }
     const finalInitials = initials.trim() || getAutoInitials(name);
     const finalAllowed: ModuleId[] = userRole === 'yonetici' ? [...ALL_MODULE_IDS] : allowedModules;
-    onSave({ name: name.trim(), initials: finalInitials, role: roleTitle, color, userRole, allowedModules: finalAllowed });
+    const finalResp: Responsibility[] =
+      userRole === 'yonetici'
+        ? Array.from(new Set<Responsibility>([...responsibilities, 'purchasing']))
+        : responsibilities;
+    onSave({
+      name: name.trim(),
+      initials: finalInitials,
+      role: roleTitle,
+      color,
+      userRole,
+      allowedModules: finalAllowed,
+      responsibilities: finalResp,
+    });
   };
 
   const isSelf = user?.id === currentUserId;
@@ -356,6 +384,45 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
                   Yöneticiler tüm modüllere erişebilir
                 </div>
               )}
+
+              {/* Responsibilities */}
+              <div className="space-y-2">
+                <label className="text-[11px] font-semibold uppercase tracking-widest text-text-3">Sorumluluklar</label>
+                {userRole === 'yonetici' ? (
+                  <div className="px-4 py-3 bg-surface-2/40 rounded-xl border border-border/40 text-[13px] text-text-3 flex items-center gap-2">
+                    <Shield size={14} />
+                    Yöneticiler tüm sorumluluk yetkilerine sahiptir
+                  </div>
+                ) : (
+                  <div className="border border-border rounded-xl overflow-hidden">
+                    {RESPONSIBILITY_INFO.map((r, i) => {
+                      const checked = responsibilities.includes(r.id);
+                      return (
+                        <div
+                          key={r.id}
+                          onClick={() => toggleResponsibility(r.id)}
+                          className={cn(
+                            'flex items-start gap-3 px-4 py-3 cursor-pointer transition-colors',
+                            i > 0 && 'border-t border-border/20',
+                            checked ? 'bg-surface-2/30' : 'hover:bg-surface-2/20'
+                          )}
+                        >
+                          <div className={cn(
+                            'w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors mt-0.5',
+                            checked ? 'bg-[#1a1a19] border-[#1a1a19]' : 'border-border'
+                          )}>
+                            {checked && <Check size={10} color="white" strokeWidth={3} />}
+                          </div>
+                          <div className="select-none">
+                            <div className="text-[13px] text-text-2 font-medium">{r.label}</div>
+                            <div className="text-[11.5px] text-text-3 mt-0.5">{r.description}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Footer */}
