@@ -79,7 +79,7 @@ function App() {
       case 'lab-book':
         return <LabBook />;
       case 'satin-alma':
-        return <Purchasing />;
+        return <Purchasing user={currentUser} />;
       case 'board':
         return <Board user={currentUser} />;
       case 'on-muhasebe':
@@ -121,6 +121,7 @@ function App() {
       <ActiveEntityBridge
         currentUserId={currentUser.id}
         onRequestBoard={() => setCurrentModule('board')}
+        onRequestPurchasing={() => setCurrentModule('satin-alma')}
       />
     <Layout
       user={currentUser}
@@ -164,14 +165,16 @@ function App() {
 interface BridgeProps {
   currentUserId: string;
   onRequestBoard: () => void;
+  onRequestPurchasing: () => void;
 }
 
-const ActiveEntityBridge = ({ currentUserId, onRequestBoard }: BridgeProps) => {
+const ActiveEntityBridge = ({ currentUserId, onRequestBoard, onRequestPurchasing }: BridgeProps) => {
   const { active, clear } = useActiveEntity();
 
   useEffect(() => {
     if (active?.source === 'board') onRequestBoard();
-  }, [active, onRequestBoard]);
+    if (active?.source === 'satin-alma') onRequestPurchasing();
+  }, [active, onRequestBoard, onRequestPurchasing]);
 
   if (active?.source === 'leave') {
     return (
