@@ -1,4 +1,4 @@
-export type NotificationSource = 'board' | 'takvim' | 'lab-checklist' | 'leave' | 'onboarding' | 'kartvizit' | 'satin-alma';
+export type NotificationSource = 'board' | 'takvim' | 'lab-checklist' | 'leave' | 'onboarding' | 'kartvizit' | 'satin-alma' | 'distributor' | 'arge';
 
 export type NotificationType =
   | 'task-created'
@@ -15,7 +15,9 @@ export type NotificationType =
   | 'onboarding-person-added'
   | 'contact-created'
   | 'purchase-assigned'
-  | 'purchase-status-changed';
+  | 'purchase-status-changed'
+  | 'distributor-assigned'
+  | 'experiment-assigned';
 
 export interface Notification {
   id: string;
