@@ -99,11 +99,11 @@ function App() {
       case 'runway':
         return <Runway />;
       case 'arge-plani':
-        return <ResearchPlan />;
+        return <ResearchPlan user={currentUser} />;
       case 'lab-stok':
         return <LabStock />;
       case 'distributor':
-        return <Distributors />;
+        return <Distributors user={currentUser} />;
       case 'kullanicilar':
         return <UserManagement currentUserId={currentUser.id} />;
       default:
@@ -122,6 +122,8 @@ function App() {
         currentUserId={currentUser.id}
         onRequestBoard={() => setCurrentModule('board')}
         onRequestPurchasing={() => setCurrentModule('satin-alma')}
+        onRequestDistributors={() => setCurrentModule('distributor')}
+        onRequestResearchPlan={() => setCurrentModule('arge-plani')}
       />
     <Layout
       user={currentUser}
@@ -166,15 +168,25 @@ interface BridgeProps {
   currentUserId: string;
   onRequestBoard: () => void;
   onRequestPurchasing: () => void;
+  onRequestDistributors: () => void;
+  onRequestResearchPlan: () => void;
 }
 
-const ActiveEntityBridge = ({ currentUserId, onRequestBoard, onRequestPurchasing }: BridgeProps) => {
+const ActiveEntityBridge = ({
+  currentUserId,
+  onRequestBoard,
+  onRequestPurchasing,
+  onRequestDistributors,
+  onRequestResearchPlan,
+}: BridgeProps) => {
   const { active, clear } = useActiveEntity();
 
   useEffect(() => {
     if (active?.source === 'board') onRequestBoard();
     if (active?.source === 'satin-alma') onRequestPurchasing();
-  }, [active, onRequestBoard, onRequestPurchasing]);
+    if (active?.source === 'distributor') onRequestDistributors();
+    if (active?.source === 'arge') onRequestResearchPlan();
+  }, [active, onRequestBoard, onRequestPurchasing, onRequestDistributors, onRequestResearchPlan]);
 
   if (active?.source === 'leave') {
     return (
