@@ -85,6 +85,9 @@ export const Distributors: React.FC<ModuleProps> = ({ user }) => {
       clear();
       return;
     }
+    // Bildirim deep-link akışı: dış (active-entity) context değiştiğinde
+    // yerel UI state'ini eşitliyoruz, sonra context'i temizliyoruz.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveRegion(target.region);
     setEditingId(target.id);
     clear();
@@ -221,7 +224,7 @@ export const Distributors: React.FC<ModuleProps> = ({ user }) => {
                 key={r}
                 onClick={() => setActiveRegion(r)}
                 className={cn(
-                  'flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold whitespace-nowrap transition-colors border-b-2 -mb-[1px]',
+                  'flex items-center gap-2 px-4 py-2.5 text-[13px] font-semibold whitespace-nowrap transition-colors border-b-2 -mb-px',
                   tabActive
                     ? 'border-info-border text-text'
                     : 'border-transparent text-text-3 hover:text-text-2'

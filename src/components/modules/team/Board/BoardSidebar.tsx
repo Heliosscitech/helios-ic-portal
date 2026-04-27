@@ -40,7 +40,7 @@ export const BoardSidebar: React.FC<BoardSidebarProps> = ({
   const isUnitAll = filter.unitId === 'all' && filter.scope === 'all' && !filter.memberId;
 
   return (
-    <aside className="w-[260px] shrink-0 bg-surface-2/40 border-r border-border/40 p-4 overflow-y-auto">
+    <aside className="w-65 shrink-0 bg-surface-2/40 border-r border-border/40 p-4 overflow-y-auto">
       {/* GÖRÜNÜMLER */}
       <section className="mb-6">
         <h4 className={SECTION_TITLE}>Görünümler</h4>
