@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useState } from 'react';
 
-export type ActiveEntitySource = 'board' | 'leave';
+export type ActiveEntitySource = 'board' | 'leave' | 'satin-alma';
 
 export interface ActiveEntity {
   source: ActiveEntitySource;

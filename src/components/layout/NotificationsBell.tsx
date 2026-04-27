@@ -15,6 +15,7 @@ import {
   BookUser,
   Check,
   XCircle,
+  ShoppingCart,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useNotifications } from '../../lib/notifications';
@@ -37,6 +38,8 @@ const TYPE_ICON: Record<NotificationType, React.ReactNode> = {
   'leave-rejected': <XCircle size={10} />,
   'onboarding-person-added': <UserPlus size={10} />,
   'contact-created': <BookUser size={10} />,
+  'purchase-assigned': <ShoppingCart size={10} />,
+  'purchase-status-changed': <ArrowRightCircle size={10} />,
 };
 
 const TYPE_TONE: Record<NotificationType, string> = {
@@ -53,9 +56,11 @@ const TYPE_TONE: Record<NotificationType, string> = {
   'leave-rejected': 'bg-red-bg text-red-text',
   'onboarding-person-added': 'bg-teal-bg text-teal-text',
   'contact-created': 'bg-info-bg text-info-text',
+  'purchase-assigned': 'bg-amber-bg text-amber-text',
+  'purchase-status-changed': 'bg-teal-bg text-teal-text',
 };
 
-const ROUTABLE_SOURCES: NotificationSource[] = ['board', 'leave'];
+const ROUTABLE_SOURCES: NotificationSource[] = ['board', 'leave', 'satin-alma'];
 
 const getActor = (id: string) => PORTAL_USERS.find((u) => u.id === id);
 
@@ -69,7 +74,7 @@ export const NotificationsBell: React.FC = () => {
   const handleActivate = (n: Notification) => {
     markRead(n.id);
     if (ROUTABLE_SOURCES.includes(n.source)) {
-      openActiveEntity({ source: n.source as 'board' | 'leave', entityId: n.entityId });
+      openActiveEntity({ source: n.source as 'board' | 'leave' | 'satin-alma', entityId: n.entityId });
       setOpen(false);
     }
   };
