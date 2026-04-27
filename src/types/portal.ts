@@ -30,6 +30,8 @@ export type ModuleConfig = {
   soon?: boolean;
 }
 
+export type Responsibility = 'purchasing';
+
 export type User = {
   id: string;
   name: string;
@@ -38,6 +40,7 @@ export type User = {
   color: string;
   userRole: UserRole;
   allowedModules: ModuleId[];
+  responsibilities: Responsibility[];
 }
 
 export type ModuleProps = {
