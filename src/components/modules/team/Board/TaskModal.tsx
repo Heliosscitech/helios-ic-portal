@@ -137,7 +137,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           exit={{ opacity: 0, y: 10, scale: 0.98 }}
           transition={{ duration: 0.18, ease: 'easeOut' }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white rounded-2xl shadow-2xl border border-border w-full max-w-[640px] mt-10 mb-10 overflow-hidden"
+          className="bg-white rounded-2xl shadow-2xl border border-border w-full max-w-160 mt-10 mb-10 overflow-hidden"
         >
           <form onSubmit={handleSubmit}>
             <div className="px-6 py-4 border-b border-border/40 flex items-center justify-between">

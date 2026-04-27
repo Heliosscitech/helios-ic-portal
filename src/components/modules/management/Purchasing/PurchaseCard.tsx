@@ -88,7 +88,7 @@ export const PurchaseCard: React.FC<Props> = ({
     <div
       data-purchase-id={purchase.id}
       className={cn(
-        'group bg-surface border-[0.5px] border-border rounded-2xl p-5 transition-all hover:border-text/20 hover:shadow-sm border-l-[4px]',
+        'group bg-surface border-[0.5px] border-border rounded-2xl p-5 transition-all hover:border-text/20 hover:shadow-sm border-l-4',
         typeMeta.border,
         highlighted && 'ring-2 ring-info-border shadow-md'
       )}
