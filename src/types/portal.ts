@@ -34,6 +34,8 @@ export type Responsibility = 'purchasing';
 
 export type User = {
   id: string;
+  dbId?: string;
+  email?: string;
   name: string;
   initials: string;
   role: string;
