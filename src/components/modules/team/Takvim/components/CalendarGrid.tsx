@@ -5,17 +5,45 @@ import type { CalendarEvent } from '../types';
 
 interface CalendarGridProps {
   events: CalendarEvent[];
+  year: number;
+  month: number; // 1-12
   selectedDay: number;
+  todayYear: number;
+  todayMonth: number;
+  todayDay: number;
   onDaySelect: (day: number) => void;
 }
 
-const PADDING_BEFORE = [30, 31];
-const PADDING_AFTER = [1, 2, 3];
+export const CalendarGrid: React.FC<CalendarGridProps> = ({
+  events,
+  year,
+  month,
+  selectedDay,
+  todayYear,
+  todayMonth,
+  todayDay,
+  onDaySelect,
+}) => {
+  // First day of month, weekday 0=Mon..6=Sun (Turkish convention)
+  const firstJsDay = new Date(year, month - 1, 1).getDay(); // 0=Sun..6=Sat
+  const firstMonIdx = firstJsDay === 0 ? 6 : firstJsDay - 1;
 
-export const CalendarGrid: React.FC<CalendarGridProps> = ({ events, selectedDay, onDaySelect }) => {
-  const days = Array.from({ length: 30 }, (_, i) => i + 1);
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const prevMonthDays = new Date(year, month - 1, 0).getDate();
+
+  const paddingBefore = Array.from(
+    { length: firstMonIdx },
+    (_, i) => prevMonthDays - firstMonIdx + 1 + i
+  );
+
+  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+  const totalCells = Math.ceil((firstMonIdx + daysInMonth) / 7) * 7;
+  const paddingAfterCount = totalCells - firstMonIdx - daysInMonth;
+  const paddingAfter = Array.from({ length: paddingAfterCount }, (_, i) => i + 1);
 
   const eventsForDay = (day: number) => events.filter((e) => e.day === day);
+  const isToday = (d: number) => year === todayYear && month === todayMonth && d === todayDay;
 
   return (
     <>
@@ -31,7 +59,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ events, selectedDay,
       </div>
 
       <div className="grid grid-cols-7 border-l border-border/30 flex-1">
-        {PADDING_BEFORE.map((d) => (
+        {paddingBefore.map((d) => (
           <div
             key={`prev-${d}`}
             className="min-h-25 p-2 border-r border-b border-border/20 bg-surface-2/20 text-text-3 opacity-30 text-[12.5px] font-semibold"
@@ -54,7 +82,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ events, selectedDay,
             <span
               className={cn(
                 'inline-flex items-center justify-center w-6 h-6 rounded-full mb-1',
-                d === 22
+                isToday(d)
                   ? 'bg-[#1a1a19] text-white'
                   : selectedDay === d
                     ? 'text-[#378ADD]'
@@ -80,7 +108,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({ events, selectedDay,
           </div>
         ))}
 
-        {PADDING_AFTER.map((d) => (
+        {paddingAfter.map((d) => (
           <div
             key={`next-${d}`}
             className="min-h-30 p-2 border-r border-b border-border/20 bg-surface-2/20 text-text-3 opacity-30 text-[12.5px] font-semibold"

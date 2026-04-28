@@ -1,24 +1,37 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import type { ModuleProps } from '../../../../types/portal';
-import { usePersistentState } from '../../../../lib/persistence';
 import { useNotifications } from '../../../../lib/notifications';
 import { EVENT_CATEGORIES } from './types';
-import type { CalendarEvent } from './types';
-import { INITIAL_EVENTS } from './data';
 import { CalendarGrid } from './components/CalendarGrid';
 import { DayEvents } from './components/DayEvents';
 import { AddEventForm } from './components/AddEventForm';
+import { useTakvimEvents } from './hooks';
 
-const STORAGE_KEY = 'helios:takvim:events';
+const TR_MONTH_NAMES = [
+  'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+  'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık',
+];
+const TR_MONTH_SHORT = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+
+const fmt = (year: number, month: number, day: number) =>
+  `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
 export const Takvim: React.FC<ModuleProps> = ({ user }) => {
-  const [events, setEvents] = usePersistentState<CalendarEvent[]>(STORAGE_KEY, INITIAL_EVENTS);
-  const [selectedDay, setSelectedDay] = useState(22);
+  const today = useMemo(() => new Date(), []);
+  const todayYear = today.getFullYear();
+  const todayMonth = today.getMonth() + 1;
+  const todayDay = today.getDate();
+
+  const [viewYear, setViewYear] = useState(todayYear);
+  const [viewMonth, setViewMonth] = useState(todayMonth);
+  const [selectedDay, setSelectedDay] = useState(todayDay);
+
+  const { events, addEvent, deleteEvent } = useTakvimEvents(viewYear, viewMonth);
   const [isAddingEvent, setIsAddingEvent] = useState(false);
 
   const [newTitle, setNewTitle] = useState('');
-  const [newDate, setNewDate] = useState('2026-04-22');
+  const [newDate, setNewDate] = useState(fmt(todayYear, todayMonth, todayDay));
   const [newTime, setNewTime] = useState('--:--');
   const [newCategory, setNewCategory] = useState(EVENT_CATEGORIES[0].id);
   const [newAttendees, setNewAttendees] = useState<string[]>([]);
@@ -33,36 +46,59 @@ export const Takvim: React.FC<ModuleProps> = ({ user }) => {
     [events, selectedDay]
   );
 
-  const handleAddEvent = (e: React.FormEvent) => {
+  const goPrevMonth = () => {
+    if (viewMonth === 1) {
+      setViewMonth(12);
+      setViewYear(viewYear - 1);
+    } else {
+      setViewMonth(viewMonth - 1);
+    }
+    setSelectedDay(1);
+  };
+
+  const goNextMonth = () => {
+    if (viewMonth === 12) {
+      setViewMonth(1);
+      setViewYear(viewYear + 1);
+    } else {
+      setViewMonth(viewMonth + 1);
+    }
+    setSelectedDay(1);
+  };
+
+  const goToday = () => {
+    setViewYear(todayYear);
+    setViewMonth(todayMonth);
+    setSelectedDay(todayDay);
+    setNewDate(fmt(todayYear, todayMonth, todayDay));
+  };
+
+  const handleAddEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
 
-    const category = EVENT_CATEGORIES.find((c) => c.id === newCategory) ?? EVENT_CATEGORIES[0];
-    const eventDay = parseInt(newDate.split('-')[2], 10);
-
-    const newEvent: CalendarEvent = {
-      id: `EV-${Date.now().toString(36).toUpperCase()}`,
+    const saved = await addEvent({
       title: newTitle.trim(),
-      day: eventDay,
-      time: newTime === '--:--' || !newTime ? '12:00' : newTime,
-      authorId: user.id,
-      color: `${category.bg} ${category.text}`,
-      attendeeIds: newAttendees,
-    };
+      date: newDate,
+      time: newTime,
+      categoryId: newCategory,
+      authorLegacyId: user.id,
+      attendeeLegacyIds: newAttendees,
+    });
 
-    if (newAttendees.length > 0) {
+    if (saved && newAttendees.length > 0) {
+      const monthShort = TR_MONTH_SHORT[parseInt(newDate.split('-')[1], 10) - 1];
       dispatch({
         type: 'event-created',
         source: 'takvim',
-        entityId: newEvent.id,
-        entityTitle: newEvent.title,
+        entityId: saved.id,
+        entityTitle: saved.title,
         actorId: user.id,
         targetUserIds: newAttendees,
-        message: `takvime sizi ekledi: "${newEvent.title}" (${newEvent.day} Nis ${newEvent.time})`,
+        message: `takvime sizi ekledi: "${saved.title}" (${saved.day} ${monthShort} ${saved.time})`,
       });
     }
 
-    setEvents((prev) => [...prev, newEvent]);
     setIsAddingEvent(false);
     setNewTitle('');
     setNewTime('--:--');
@@ -70,7 +106,7 @@ export const Takvim: React.FC<ModuleProps> = ({ user }) => {
   };
 
   const handleDeleteEvent = (id: string) => {
-    setEvents((prev) => prev.filter((e) => e.id !== id));
+    deleteEvent(id);
   };
 
   return (
@@ -85,19 +121,26 @@ export const Takvim: React.FC<ModuleProps> = ({ user }) => {
         <div className="flex items-center justify-between mb-8 px-4">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
-              <button className="p-1.5 hover:bg-surface-2 rounded-lg text-text-3">
+              <button
+                onClick={goPrevMonth}
+                className="p-1.5 hover:bg-surface-2 rounded-lg text-text-3"
+                title="Önceki ay"
+              >
                 <ChevronLeft size={18} />
               </button>
-              <h2 className="text-[17px] font-semibold text-text tracking-tight">Nisan 2026</h2>
-              <button className="p-1.5 hover:bg-surface-2 rounded-lg text-text-3">
+              <h2 className="text-[17px] font-semibold text-text tracking-tight w-32 text-center">
+                {TR_MONTH_NAMES[viewMonth - 1]} {viewYear}
+              </h2>
+              <button
+                onClick={goNextMonth}
+                className="p-1.5 hover:bg-surface-2 rounded-lg text-text-3"
+                title="Sonraki ay"
+              >
                 <ChevronRight size={18} />
               </button>
             </div>
             <button
-              onClick={() => {
-                setSelectedDay(22);
-                setNewDate('2026-04-22');
-              }}
+              onClick={goToday}
               className="px-4 py-1.5 border border-border rounded-lg text-[13px] font-semibold text-text-2 hover:bg-surface-2 transition-all"
             >
               Bugün
@@ -131,10 +174,15 @@ export const Takvim: React.FC<ModuleProps> = ({ user }) => {
 
         <CalendarGrid
           events={events}
+          year={viewYear}
+          month={viewMonth}
           selectedDay={selectedDay}
+          todayYear={todayYear}
+          todayMonth={todayMonth}
+          todayDay={todayDay}
           onDaySelect={(d) => {
             setSelectedDay(d);
-            setNewDate(`2026-04-${String(d).padStart(2, '0')}`);
+            setNewDate(fmt(viewYear, viewMonth, d));
           }}
         />
       </div>
@@ -143,7 +191,7 @@ export const Takvim: React.FC<ModuleProps> = ({ user }) => {
 
       <div className="text-center pt-8 opacity-50">
         <p className="text-[11px] text-text-3 font-semibold uppercase tracking-widest">
-          Prototip görünüm • Veriler tarayıcıda kalıcı tutulur • © Helios Bilim ve Teknoloji A.Ş.
+          © Helios Bilim ve Teknoloji A.Ş.
         </p>
       </div>
     </div>

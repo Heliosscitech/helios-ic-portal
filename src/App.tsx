@@ -30,31 +30,73 @@ import { Runway } from './components/modules/management/Runway';
 import { Distributors } from './components/modules/management/Distributors';
 import { UserManagement } from './components/modules/management/UserManagement/index';
 
-import type { ModuleId, User } from './types/portal';
-import { PORTAL_USERS } from './types/users';
-import { usePortalUsers } from './lib/users';
+import type { ModuleId, Responsibility, User, UserRole } from './types/portal';
 import { ArrowLeft } from 'lucide-react';
 import { NotificationsProvider } from './lib/notifications';
 import { ActiveEntityProvider, useActiveEntity } from './lib/active-entity';
 import { LeaveReviewModal } from './components/modules/hr/LeaveForm/LeaveReviewModal';
+import { supabase } from './lib/supabase';
 
 function App() {
-  const { users } = usePortalUsers();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUser, setCurrentUser] = useState<User>(PORTAL_USERS[0]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [restoring, setRestoring] = useState(true);
   const [currentModule, setCurrentModule] = useState<ModuleId>('pano');
 
-  const handleLogin = (selected: User) => {
-    // Grab the freshest version from persisted users list
-    const fresh = users.find((u) => u.id === selected.id) ?? selected;
-    setCurrentUser(fresh);
-    setIsAuthenticated(true);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (cancelled) return;
+      if (!session) {
+        setRestoring(false);
+        return;
+      }
+      const { data: row } = await supabase
+        .from('users')
+        .select('id, legacy_id, name, initials, role, color, user_role, allowed_modules, responsibilities, email')
+        .eq('id', session.user.id)
+        .single();
+      if (cancelled) return;
+      if (row) {
+        setCurrentUser({
+          id: row.legacy_id ?? row.id,
+          dbId: row.id,
+          email: row.email ?? undefined,
+          name: row.name,
+          initials: row.initials,
+          role: row.role,
+          color: row.color,
+          userRole: row.user_role as UserRole,
+          allowedModules: (row.allowed_modules ?? []) as ModuleId[],
+          responsibilities: (row.responsibilities ?? []) as Responsibility[],
+        });
+      }
+      setRestoring(false);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const handleLogin = (user: User) => {
+    setCurrentUser(user);
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setCurrentUser(null);
     setCurrentModule('pano');
   };
+
+  if (restoring) {
+    return (
+      <div className="fixed inset-0 bg-[#f5f7f9] flex items-center justify-center">
+        <span className="text-[13px] text-text-3">Yükleniyor…</span>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   const canAccess = (module: ModuleId): boolean => {
     if (module === 'pano') return true;
@@ -111,12 +153,8 @@ function App() {
     }
   };
 
-  if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
-  }
-
   return (
-    <NotificationsProvider currentUserId={currentUser.id}>
+    <NotificationsProvider currentUser={currentUser}>
     <ActiveEntityProvider>
       <ActiveEntityBridge
         currentUserId={currentUser.id}
