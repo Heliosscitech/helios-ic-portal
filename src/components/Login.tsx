@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
-import type { User } from '../types/portal';
-import { usePortalUsers } from '../lib/users';
+import React, { useEffect, useState } from 'react';
+import type { ModuleId, Responsibility, User, UserRole } from '../types/portal';
+import { supabase } from '../lib/supabase';
 import { cn } from '../lib/utils';
 
 interface LoginProps {
   onLogin: (user: User) => void;
 }
+
+type LoginUser = {
+  id: string;
+  legacy_id: string | null;
+  name: string;
+  initials: string;
+  role: string;
+  color: string;
+  user_role: UserRole;
+  email: string;
+};
 
 const HeliosLogo = () => (
   <div className="flex flex-col items-center gap-2 mb-10">
@@ -28,16 +39,84 @@ const HeliosLogo = () => (
 );
 
 export const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  const { users } = usePortalUsers();
-  const [selectedUser, setSelectedUser] = useState<User>(users[0]);
-  const [password, setPassword] = useState('helios2026');
+  const [users, setUsers] = useState<LoginUser[]>([]);
+  const [selectedUser, setSelectedUser] = useState<LoginUser | null>(null);
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase.rpc('get_login_users');
+      if (cancelled) return;
+      if (error) {
+        setError('Kullanıcı listesi yüklenemedi: ' + error.message);
+        setLoading(false);
+        return;
+      }
+      const list = (data ?? []) as LoginUser[];
+      setUsers(list);
+      setSelectedUser(list[0] ?? null);
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'helios2026') {
-      onLogin(selectedUser);
+    if (!selectedUser) return;
+    setSubmitting(true);
+    setError(null);
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: selectedUser.email,
+      password,
+    });
+
+    if (signInError) {
+      setError('Şifre hatalı.');
+      setSubmitting(false);
+      return;
     }
+
+    const { data: row, error: fetchError } = await supabase
+      .from('users')
+      .select('id, legacy_id, name, initials, role, color, user_role, allowed_modules, responsibilities, email')
+      .eq('id', selectedUser.id)
+      .single();
+
+    if (fetchError || !row) {
+      setError('Profil yüklenemedi: ' + (fetchError?.message ?? 'bilinmeyen hata'));
+      setSubmitting(false);
+      return;
+    }
+
+    const user: User = {
+      id: row.legacy_id ?? row.id,
+      dbId: row.id,
+      email: row.email ?? undefined,
+      name: row.name,
+      initials: row.initials,
+      role: row.role,
+      color: row.color,
+      userRole: row.user_role as UserRole,
+      allowedModules: (row.allowed_modules ?? []) as ModuleId[],
+      responsibilities: (row.responsibilities ?? []) as Responsibility[],
+    };
+    onLogin(user);
   };
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-[#f5f7f9] flex items-center justify-center">
+        <span className="text-[13px] text-text-3">Yükleniyor…</span>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-[#f5f7f9] flex items-center justify-center p-5 z-100 overflow-y-auto">
@@ -51,6 +130,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <button
               key={user.id}
               onClick={() => setSelectedUser(user)}
+              type="button"
               className={cn(
                 "flex items-center gap-3 p-2.5 border rounded-xl transition-all text-left group",
                 selectedUser?.id === user.id
@@ -63,7 +143,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
               </div>
               <div className="min-w-0">
                 <span className="text-[13px] font-semibold text-text truncate block">{user.name}</span>
-                {user.userRole === 'yonetici' && (
+                {user.user_role === 'yonetici' && (
                   <span className="text-[10px] text-text-3 font-medium">Yönetici</span>
                 )}
               </div>
@@ -78,26 +158,21 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoFocus
+              required
               className="w-full p-3 text-[14px] border border-border rounded-xl outline-none focus:border-text focus:ring-4 focus:ring-black/5 transition-all text-center tracking-[8px]"
             />
+            {error && <p className="text-[12px] text-red-600 text-center">{error}</p>}
           </div>
-
-          <label className="flex items-center gap-2 cursor-pointer select-none py-1">
-            <input type="checkbox" className="w-4 h-4 rounded border-border accent-text" defaultChecked />
-            <span className="text-[13px] text-text-2">Beni hatırla</span>
-          </label>
 
           <button
             type="submit"
-            className="w-full py-4 rounded-xl bg-[#1a1a19] text-white font-bold text-[14px] hover:bg-black transition-all shadow-lg active:scale-[0.98]"
+            disabled={submitting || !selectedUser}
+            className="w-full py-4 rounded-xl bg-[#1a1a19] text-white font-bold text-[14px] hover:bg-black transition-all shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Giriş yap
+            {submitting ? 'Giriş yapılıyor…' : 'Giriş yap'}
           </button>
         </form>
-
-        <div className="mt-10 pt-6 border-t border-border/50 text-[12px] text-text-3 text-center">
-          Prototip • ortak şifre: <code className="bg-surface-2 px-1.5 py-0.5 rounded text-text font-mono">helios2026</code>
-        </div>
       </div>
     </div>
   );

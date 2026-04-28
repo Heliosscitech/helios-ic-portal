@@ -8,10 +8,8 @@ import { ListView } from './views/ListView';
 import { DashboardView } from './views/DashboardView';
 import { TaskModal } from './TaskModal';
 import type { TaskModalMode } from './TaskModal';
-import { BOARD_TASKS } from './data';
-import { UNITS, DEFAULT_COLUMNS, collectTags, columnTitle } from './types';
+import { UNITS, collectTags, columnTitle } from './types';
 import type {
-  BoardColumn,
   BoardFilter,
   BoardTask,
   FilterScope,
@@ -19,12 +17,9 @@ import type {
   UnitId,
   ViewMode,
 } from './types';
-import { usePersistentState } from '../../../../lib/persistence';
 import { useNotifications } from '../../../../lib/notifications';
 import { useActiveEntity } from '../../../../lib/active-entity';
-
-const TASKS_STORAGE_KEY = 'helios:board:tasks:v2';
-const COLUMNS_STORAGE_KEY = 'helios:board:columns:v1';
+import { useBoardTasks, useBoardColumns } from './hooks';
 
 const DEFAULT_FILTER: BoardFilter = {
   scope: 'all',
@@ -61,8 +56,14 @@ const uniqueTargets = (ids: string[], actorId: string) =>
   Array.from(new Set(ids)).filter((id) => id !== actorId);
 
 export const Board: React.FC<ModuleProps> = ({ user }) => {
-  const [tasks, setTasks] = usePersistentState<BoardTask[]>(TASKS_STORAGE_KEY, BOARD_TASKS);
-  const [columns, setColumns] = usePersistentState<BoardColumn[]>(COLUMNS_STORAGE_KEY, DEFAULT_COLUMNS);
+  const { tasks, saveTask, deleteTask: deleteTaskRow, changeStatus } = useBoardTasks();
+  const {
+    columns,
+    addColumn: addColumnRow,
+    renameColumn: renameColumnRow,
+    deleteColumn: deleteColumnRow,
+    reorderColumns: reorderColumnsRow,
+  } = useBoardColumns();
   const [view, setView] = useState<ViewMode>('board');
   const [filter, setFilter] = useState<BoardFilter>(DEFAULT_FILTER);
   const [modal, setModal] = useState<{ mode: TaskModalMode; taskId?: string } | null>(null);
@@ -190,14 +191,7 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
       }
     }
 
-    // State güncellemesi saf kalsın
-    setTasks((prev) => {
-      const idx = prev.findIndex((t) => t.id === saved.id);
-      if (idx === -1) return [saved, ...prev];
-      const next = [...prev];
-      next[idx] = saved;
-      return next;
-    });
+    saveTask(saved);
     setModal(null);
   };
 
@@ -217,7 +211,7 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
         });
       }
     }
-    setTasks((prev) => prev.filter((t) => t.id !== id));
+    deleteTaskRow(id);
   };
 
   const handleStatusChange = (id: string, status: TaskStatus) => {
@@ -237,27 +231,19 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
       });
     }
 
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, status } : t))
-    );
+    changeStatus(id, status);
   };
 
   // ── Column CRUD + reorder ────────────────────────────────
   const addColumn = (title: string) => {
-    const id = `col-${Date.now().toString(36)}`;
-    setColumns((prev) => [
-      ...prev,
-      { id, title: title.trim() || 'Yeni Kolon', dot: 'bg-info-border' },
-    ]);
+    addColumnRow(title);
   };
 
   const renameColumn = (id: string, title: string) => {
-    const t = title.trim();
-    if (!t) return;
-    setColumns((prev) => prev.map((c) => (c.id === id ? { ...c, title: t } : c)));
+    renameColumnRow(id, title);
   };
 
-  const deleteColumn = (id: string) => {
+  const deleteColumn = async (id: string) => {
     const col = columns.find((c) => c.id === id);
     if (!col) return;
     if (columns.length <= 1) {
@@ -271,22 +257,13 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
         `"${col.title}" kolonunda ${tasksInCol.length} iş var. Silersen bunlar "${columnTitle(columns, fallbackId)}" kolonuna taşınacak. Devam?`
       );
       if (!confirmed) return;
-      setTasks((prev) => prev.map((t) => (t.status === id ? { ...t, status: fallbackId } : t)));
+      await Promise.all(tasksInCol.map((t) => changeStatus(t.id, fallbackId)));
     }
-    setColumns((prev) => prev.filter((c) => c.id !== id));
+    deleteColumnRow(id);
   };
 
   const reorderColumns = (fromId: string, toId: string) => {
-    if (fromId === toId) return;
-    setColumns((prev) => {
-      const fromIdx = prev.findIndex((c) => c.id === fromId);
-      const toIdx = prev.findIndex((c) => c.id === toId);
-      if (fromIdx === -1 || toIdx === -1) return prev;
-      const next = [...prev];
-      const [moved] = next.splice(fromIdx, 1);
-      next.splice(toIdx, 0, moved);
-      return next;
-    });
+    reorderColumnsRow(fromId, toId);
   };
 
   const togglePerson = (id: string) =>

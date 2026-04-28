@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, X, Trash2, Shield, User as UserIcon, Check } from 'lucide-react';
+import { X, Shield, User as UserIcon, Check } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import { usePortalUsers } from '../../../../lib/users';
 import { ALL_MODULE_IDS, DEFAULT_CALISAN_MODULES } from '../../../../types/users';
@@ -56,9 +56,8 @@ const getAutoInitials = (name: string) =>
   name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
 
 export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId }) => {
-  const { users, updateUser, addUser, deleteUser } = usePortalUsers();
+  const { users, loading, updateUser } = usePortalUsers();
   const [editUser, setEditUser] = useState<User | null>(null);
-  const [showNew, setShowNew] = useState(false);
 
   return (
     <div className="max-w-3xl mx-auto p-8 md:p-10">
@@ -67,13 +66,14 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId })
           <h2 className="text-[17px] font-semibold text-text tracking-tight mb-1">Kullanıcı Yönetimi</h2>
           <p className="text-[13px] text-text-3">Ekip üyelerinin rolleri ve modül erişimleri</p>
         </div>
-        <button
-          onClick={() => setShowNew(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold text-white bg-[#1a1a19] shadow-sm hover:bg-black transition-colors"
-        >
-          <Plus size={15} /> Yeni kullanıcı
-        </button>
+        <div className="text-[11px] text-text-3 max-w-56 text-right leading-relaxed">
+          Yeni kullanıcı eklemek için Supabase Studio → Authentication panelini kullanın
+        </div>
       </div>
+
+      {loading && (
+        <div className="text-[12px] text-text-3 mb-4">Yükleniyor…</div>
+      )}
 
       <div className="space-y-2">
         {users.map((user) => (
@@ -114,22 +114,8 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId })
           key={editUser.id}
           user={editUser}
           currentUserId={currentUserId}
-          isNew={false}
           onClose={() => setEditUser(null)}
           onSave={(patch) => { updateUser(editUser.id, patch); setEditUser(null); }}
-          onDelete={() => { deleteUser(editUser.id); setEditUser(null); }}
-        />
-      )}
-
-      {showNew && (
-        <UserFormModal
-          currentUserId={currentUserId}
-          isNew
-          onClose={() => setShowNew(false)}
-          onSave={(data) => {
-            addUser({ ...(data as User), id: `u-${Date.now().toString(36)}` });
-            setShowNew(false);
-          }}
         />
       )}
     </div>
@@ -139,33 +125,25 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId })
 // ── Modal ─────────────────────────────────────────────────────────────────────
 
 interface UserFormModalProps {
-  user?: User;
+  user: User;
   currentUserId: string;
-  isNew: boolean;
   onClose: () => void;
   onSave: (data: Partial<User>) => void;
-  onDelete?: () => void;
 }
 
 const UserFormModal: React.FC<UserFormModalProps> = ({
   user,
   currentUserId,
-  isNew,
   onClose,
   onSave,
-  onDelete,
 }) => {
-  const [name, setName] = useState(user?.name ?? '');
-  const [initials, setInitials] = useState(user?.initials ?? '');
-  const [roleTitle, setRoleTitle] = useState(user?.role ?? '');
-  const [color, setColor] = useState(user?.color ?? COLOR_PRESETS[0]);
-  const [userRole, setUserRole] = useState<UserRole>(user?.userRole ?? 'calisan');
-  const [allowedModules, setAllowedModules] = useState<ModuleId[]>(
-    user?.allowedModules ?? [...DEFAULT_CALISAN_MODULES]
-  );
-  const [responsibilities, setResponsibilities] = useState<Responsibility[]>(
-    user?.responsibilities ?? []
-  );
+  const [name, setName] = useState(user.name);
+  const [initials, setInitials] = useState(user.initials);
+  const [roleTitle, setRoleTitle] = useState(user.role);
+  const [color, setColor] = useState(user.color);
+  const [userRole, setUserRole] = useState<UserRole>(user.userRole);
+  const [allowedModules, setAllowedModules] = useState<ModuleId[]>([...user.allowedModules]);
+  const [responsibilities, setResponsibilities] = useState<Responsibility[]>([...user.responsibilities]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -226,9 +204,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
           <form onSubmit={handleSubmit}>
             {/* Header */}
             <div className="px-6 py-4 border-b border-border/40 flex items-center justify-between">
-              <h3 className="text-[15px] font-semibold text-text">
-                {isNew ? 'Yeni kullanıcı' : 'Kullanıcıyı düzenle'}
-              </h3>
+              <h3 className="text-[15px] font-semibold text-text">Kullanıcıyı düzenle</h3>
               <button type="button" onClick={onClose} className="p-1.5 text-text-3 hover:text-text hover:bg-surface-2 rounded-lg transition-colors">
                 <X size={18} />
               </button>
@@ -246,10 +222,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
                   <input
                     autoFocus
                     value={name}
-                    onChange={(e) => {
-                      setName(e.target.value);
-                      if (!user) setInitials(getAutoInitials(e.target.value));
-                    }}
+                    onChange={(e) => setName(e.target.value)}
                     placeholder="Adı Soyadı"
                     className="w-full p-3 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-text transition-colors font-medium"
                   />
@@ -426,31 +399,15 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-border/40 bg-surface-2/30 flex items-center justify-between">
-              <div>
-                {!isNew && onDelete && !isSelf && (
-                  <button
-                    type="button"
-                    onClick={onDelete}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12.5px] font-semibold text-red-text hover:bg-red-bg rounded-lg transition-colors"
-                  >
-                    <Trash2 size={13} /> Sil
-                  </button>
-                )}
-                {isSelf && (
-                  <span className="text-[12.5px] text-text-3 italic">Kendi hesabınızı silemezsiniz</span>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <button type="button" onClick={onClose}
-                  className="px-4 py-2 border border-border rounded-lg text-[13px] font-semibold text-text-2 hover:bg-surface-2 transition-colors">
-                  Vazgeç
-                </button>
-                <button type="submit"
-                  className="px-5 py-2 text-white rounded-lg text-[13px] font-semibold bg-[#1a1a19] shadow-sm hover:bg-black transition-colors">
-                  {isNew ? 'Oluştur' : 'Kaydet'}
-                </button>
-              </div>
+            <div className="px-6 py-4 border-t border-border/40 bg-surface-2/30 flex items-center justify-end gap-2">
+              <button type="button" onClick={onClose}
+                className="px-4 py-2 border border-border rounded-lg text-[13px] font-semibold text-text-2 hover:bg-surface-2 transition-colors">
+                Vazgeç
+              </button>
+              <button type="submit"
+                className="px-5 py-2 text-white rounded-lg text-[13px] font-semibold bg-[#1a1a19] shadow-sm hover:bg-black transition-colors">
+                Kaydet
+              </button>
             </div>
           </form>
         </motion.div>
