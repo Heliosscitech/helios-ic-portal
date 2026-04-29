@@ -2,25 +2,20 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Plus, ShoppingCart } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
-import { usePersistentState } from '../../../../lib/persistence';
 import { usePortalUsers } from '../../../../lib/users';
 import { useNotifications } from '../../../../lib/notifications';
 import { useActiveEntity } from '../../../../lib/active-entity';
 import type { ModuleProps } from '../../../../types/portal';
-import { INITIAL_PURCHASES } from './data';
-import { PERSISTENCE_KEY, STATUS_META, STATUS_TABS } from './constants';
+import { STATUS_META, STATUS_TABS } from './constants';
 import { PurchaseForm, type NewPurchaseInput } from './PurchaseForm';
 import { PurchaseCard } from './PurchaseCard';
 import type { PurchaseAuthor, PurchaseRequest, PurchaseStatus, StatusTab } from './types';
-import { generateId } from './utils';
+import { usePurchases } from './hooks';
 
 const ACTIVE_STATUSES: PurchaseStatus[] = ['yeni', 'siparis-verildi'];
 
 export const Purchasing: React.FC<ModuleProps> = ({ user }) => {
-  const [purchases, setPurchases] = usePersistentState<PurchaseRequest[]>(
-    PERSISTENCE_KEY,
-    INITIAL_PURCHASES
-  );
+  const { purchases, addPurchase: addPurchaseRow, updateStatus: updateStatusRow, deletePurchase: deletePurchaseRow } = usePurchases();
   const { users } = usePortalUsers();
   const { dispatch } = useNotifications();
   const { active, clear } = useActiveEntity();
@@ -33,10 +28,7 @@ export const Purchasing: React.FC<ModuleProps> = ({ user }) => {
   const isAdmin = user.userRole === 'yonetici';
 
   const assigneeCandidates: PurchaseAuthor[] = useMemo(
-    () =>
-      users
-        .filter((u) => u.userRole === 'yonetici' || u.responsibilities.includes('purchasing'))
-        .map((u) => ({ id: u.id, name: u.name, initials: u.initials, color: u.color })),
+    () => users.map((u) => ({ id: u.id, name: u.name, initials: u.initials, color: u.color })),
     [users]
   );
 
@@ -85,28 +77,15 @@ export const Purchasing: React.FC<ModuleProps> = ({ user }) => {
     };
   }, [active, purchases, clear]);
 
-  const addPurchase = (input: NewPurchaseInput) => {
-    const id = generateId();
-    const next: PurchaseRequest = {
-      ...input,
-      id,
-      createdAt: new Date().toISOString(),
-      createdBy: {
-        id: user.id,
-        name: user.name,
-        initials: user.initials,
-        color: user.color,
-      },
-      status: 'yeni',
-    };
-    setPurchases((prev) => [next, ...prev]);
+  const addPurchase = async (input: NewPurchaseInput) => {
+    const next = await addPurchaseRow(input, user.id);
     setShowForm(false);
-
+    if (!next) return;
     if (next.assignedTo && next.assignedTo.id !== user.id) {
       dispatch({
         type: 'purchase-assigned',
         source: 'satin-alma',
-        entityId: id,
+        entityId: next.id,
         entityTitle: next.title,
         actorId: user.id,
         targetUserIds: [next.assignedTo.id],
@@ -117,14 +96,16 @@ export const Purchasing: React.FC<ModuleProps> = ({ user }) => {
 
   const canManage = (p: PurchaseRequest): boolean => {
     if (isAdmin) return true;
+    if (user.responsibilities.includes('purchasing')) return true;
     return p.assignedTo?.id === user.id;
   };
 
-  const updateStatus = (id: string, status: PurchaseStatus) => {
+  const updateStatus = async (id: string, status: PurchaseStatus) => {
     const target = purchases.find((p) => p.id === id);
     if (!target || !canManage(target)) return;
     if (target.status === status) return;
-    setPurchases((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)));
+    const ok = await updateStatusRow(id, status);
+    if (!ok) return;
 
     if (target.createdBy.id !== user.id) {
       dispatch({
@@ -139,11 +120,11 @@ export const Purchasing: React.FC<ModuleProps> = ({ user }) => {
     }
   };
 
-  const deletePurchase = (id: string) => {
+  const deletePurchase = async (id: string) => {
     const target = purchases.find((p) => p.id === id);
     if (!target || !canManage(target)) return;
     if (!window.confirm('Bu talebi silmek istediğinize emin misiniz?')) return;
-    setPurchases((prev) => prev.filter((p) => p.id !== id));
+    await deletePurchaseRow(id);
   };
 
   return (

@@ -3,6 +3,7 @@ import { cn } from '../../../../lib/utils';
 import { STATUS_META, STATUS_ORDER, STORAGE_LABEL, TYPE_META } from './constants';
 import { formatShortDate } from './utils';
 import type { PurchaseRequest, PurchaseStatus } from './types';
+import { downloadFromBucket } from '../../../../lib/storage';
 
 interface Props {
   purchase: PurchaseRequest;
@@ -79,9 +80,14 @@ export const PurchaseCard: React.FC<Props> = ({
   const meta = detailItems(purchase);
   const statusMeta = STATUS_META[purchase.status];
 
-  const openAttachment = () => {
-    if (!purchase.attachment?.dataUrl) return;
-    window.open(purchase.attachment.dataUrl, '_blank', 'noopener,noreferrer');
+  const openAttachment = async () => {
+    if (!purchase.attachment) return;
+    // Hooks içinde attachment.dataUrl alanına storage path yazıyoruz
+    const path = purchase.attachment.dataUrl;
+    const result = await downloadFromBucket('purchase-attachments', path, purchase.attachment.name);
+    if (!result.ok) {
+      window.alert('Dosya indirilemedi:\n' + (result.error ?? 'bilinmeyen hata'));
+    }
   };
 
   return (
