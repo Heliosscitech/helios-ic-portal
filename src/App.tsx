@@ -37,10 +37,27 @@ import { ActiveEntityProvider, useActiveEntity } from './lib/active-entity';
 import { LeaveReviewModal } from './components/modules/hr/LeaveForm/LeaveReviewModal';
 import { supabase } from './lib/supabase';
 
+const CURRENT_MODULE_KEY = 'helios:portal:currentModule';
+
 function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [restoring, setRestoring] = useState(true);
-  const [currentModule, setCurrentModule] = useState<ModuleId>('pano');
+  const [currentModule, setCurrentModuleState] = useState<ModuleId>(() => {
+    try {
+      return (localStorage.getItem(CURRENT_MODULE_KEY) as ModuleId) || 'pano';
+    } catch {
+      return 'pano';
+    }
+  });
+
+  const setCurrentModule = (m: ModuleId) => {
+    setCurrentModuleState(m);
+    try {
+      localStorage.setItem(CURRENT_MODULE_KEY, m);
+    } catch {
+      // localStorage unavailable, ignore
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -135,9 +152,9 @@ function App() {
       case 'onboarding':
         return <Onboarding user={currentUser} />;
       case 'basin':
-        return <Press />;
+        return <Press user={currentUser} />;
       case 'sop-prosedur':
-        return <SOP />;
+        return <SOP user={currentUser} />;
       case 'runway':
         return <Runway />;
       case 'arge-plani':
