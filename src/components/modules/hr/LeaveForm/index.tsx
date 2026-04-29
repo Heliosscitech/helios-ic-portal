@@ -3,19 +3,17 @@ import { Check, ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import { PORTAL_USERS } from '../../../../types/users';
 import type { ModuleProps } from '../../../../types/portal';
-import { usePersistentState } from '../../../../lib/persistence';
 import { useNotifications } from '../../../../lib/notifications';
 import { StepPerson } from './steps/StepPerson';
 import { StepDateReason } from './steps/StepDateReason';
 import { StepSummary } from './steps/StepSummary';
 import { REASONS } from './types';
 import type { LeaveFormState, LeaveRequest } from './types';
-
-const REQUESTS_KEY = 'helios:leave-requests';
+import { useLeaveRequests } from './hooks';
 
 const buildInitialForm = (employeeId: string, employeeName: string): LeaveFormState => ({
   employeeId,
-  departman: 'İş Geliştirme',
+  departman: 'is-gelistirme',
   managerId: '',
   email: employeeName.split(' ')[0]?.toLowerCase() ?? '',
   rangeStart: 0,
@@ -31,7 +29,7 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [form, setForm] = useState<LeaveFormState>(() => buildInitialForm(user.id, user.name));
   const [justSubmittedId, setJustSubmittedId] = useState<string | null>(null);
-  const [requests, setRequests] = usePersistentState<LeaveRequest[]>(REQUESTS_KEY, []);
+  const { requests, submitRequest } = useLeaveRequests();
 
   const { dispatch } = useNotifications();
 
@@ -63,36 +61,19 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
     step === 2 ? form.rangeStart > 0 && form.reason :
     true;
 
-  const handleSubmit = () => {
-    const id = `LR-${Date.now().toString(36).toUpperCase()}`;
-    const req: LeaveRequest = {
-      id,
-      employeeId: user.id,
-      departman: form.departman,
-      managerId: form.managerId,
-      email: form.email,
-      rangeStart: form.rangeStart,
-      rangeEnd: form.rangeEnd,
-      reason: form.reason,
-      reasonDetail: form.reasonDetail,
-      belge: form.belge,
-      belgeFileName: form.belgeFileName,
-      belgeFileDataUrl: form.belgeFileDataUrl,
-      telafiNotu: form.telafiNotu,
-      telafiGunleri: form.telafiGunleri,
-      submittedAt: Date.now(),
-      status: 'pending',
-    };
+  const handleSubmit = async () => {
+    const saved = await submitRequest(form, user.id);
+    if (!saved) return;
 
-    const rangeLabel = req.rangeEnd
-      ? `${req.rangeStart}–${req.rangeEnd} Nisan 2026`
-      : `${req.rangeStart} Nisan 2026`;
+    const rangeLabel = saved.rangeEnd
+      ? `${saved.rangeStart}–${saved.rangeEnd} Nisan 2026`
+      : `${saved.rangeStart} Nisan 2026`;
 
     if (form.managerId && form.managerId !== user.id) {
       dispatch({
         type: 'leave-requested',
         source: 'leave',
-        entityId: id,
+        entityId: saved.id,
         entityTitle: `${user.name} — ${rangeLabel}`,
         actorId: user.id,
         targetUserIds: [form.managerId],
@@ -102,8 +83,7 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
       });
     }
 
-    setRequests((prev) => [req, ...prev]);
-    setJustSubmittedId(id);
+    setJustSubmittedId(saved.id);
   };
 
   const handleNewRequest = () => {

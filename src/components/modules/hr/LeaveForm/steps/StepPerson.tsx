@@ -66,7 +66,7 @@ export const StepPerson: React.FC<StepPersonProps> = ({
             }}
           >
             {DEPARTMENTS.map((d) => (
-              <option key={d.id} value={d.label}>
+              <option key={d.id} value={d.id}>
                 {d.label}
               </option>
             ))}

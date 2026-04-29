@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, XCircle, CalendarClock, User as UserIcon, FileText, Clock } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
-import { usePersistentState, writePersistedState } from '../../../../lib/persistence';
 import { useNotifications } from '../../../../lib/notifications';
 import { PORTAL_USERS } from '../../../../types/users';
-import { REASONS } from './types';
+import { DEPARTMENTS, REASONS } from './types';
 import type { LeaveRequest } from './types';
-
-const REQUESTS_KEY = 'helios:leave-requests';
+import { useLeaveRequests } from './hooks';
+import { downloadFromBucket } from '../../../../lib/storage';
 
 interface LeaveReviewModalProps {
   requestId: string;
@@ -37,17 +36,30 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
   currentUserId,
   onClose,
 }) => {
-  const [requests] = usePersistentState<LeaveRequest[]>(REQUESTS_KEY, []);
+  const { requests, decideRequest, refresh, loading } = useLeaveRequests();
   const { dispatch } = useNotifications();
   const [note, setNote] = useState('');
+  const [didRefresh, setDidRefresh] = useState(false);
+
+  // Modal açılınca cache'i tazele (bildirimden açılıyorsa stale olabilir)
+  useEffect(() => {
+    refresh().finally(() => setDidRefresh(true));
+  }, [refresh]);
 
   const request = requests.find((r) => r.id === requestId);
 
   if (!request) {
+    if (loading || !didRefresh) {
+      return (
+        <ModalShell onClose={onClose} title="Yükleniyor">
+          <p className="text-[13px] text-text-3">Talep yükleniyor…</p>
+        </ModalShell>
+      );
+    }
     return (
       <ModalShell onClose={onClose} title="Talep bulunamadı">
         <p className="text-[13px] text-text-3">
-          Bu izin talebi artık mevcut değil (silinmiş veya başka bir tarayıcıda oluşturulmuş olabilir).
+          Bu izin talebi mevcut değil veya görüntüleme yetkiniz yok.
         </p>
       </ModalShell>
     );
@@ -59,18 +71,9 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
   const canAct = isManager && request.status === 'pending';
   const reason = REASONS.find((r) => r.id === request.reason);
 
-  const applyDecision = (decision: 'approved' | 'rejected') => {
-    const next = requests.map((r) =>
-      r.id === request.id
-        ? {
-            ...r,
-            status: decision,
-            reviewerNote: note.trim() || undefined,
-            reviewedAt: Date.now(),
-          }
-        : r
-    );
-    writePersistedState(REQUESTS_KEY, next);
+  const applyDecision = async (decision: 'approved' | 'rejected') => {
+    const ok = await decideRequest(request.id, decision, note, currentUserId);
+    if (!ok) return;
     if (request.employeeId !== currentUserId) {
       dispatch({
         type: decision === 'approved' ? 'leave-approved' : 'leave-rejected',
@@ -86,6 +89,18 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
       });
     }
     onClose();
+  };
+
+  const handleOpenBelge = async () => {
+    if (!request.belgePath || !request.belgeFileName) return;
+    const result = await downloadFromBucket(
+      'leave-documents',
+      request.belgePath,
+      request.belgeFileName
+    );
+    if (!result.ok) {
+      window.alert('Belge indirilemedi:\n' + (result.error ?? 'bilinmeyen hata'));
+    }
   };
 
   return (
@@ -105,7 +120,7 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
             <div className="min-w-0">
               <p className="text-[15px] font-semibold text-text truncate">{employee?.name ?? '—'}</p>
               <p className="text-[12.5px] text-text-3 truncate">
-                {request.departman} · {request.email}
+                {DEPARTMENTS.find((d) => d.id === request.departman)?.label ?? request.departman} · {request.email}
               </p>
             </div>
           </div>
@@ -147,16 +162,14 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
               <span className="flex-1 min-w-0 text-[13px] font-semibold text-text truncate">
                 {request.belgeFileName}
               </span>
-              {request.belgeFileDataUrl && (
-                <a
-                  href={request.belgeFileDataUrl}
-                  download={request.belgeFileName}
-                  target="_blank"
-                  rel="noopener noreferrer"
+              {request.belgePath && (
+                <button
+                  type="button"
+                  onClick={handleOpenBelge}
                   className="text-[11px] font-semibold text-info-text hover:underline"
                 >
-                  Aç / İndir
-                </a>
+                  İndir
+                </button>
               )}
             </div>
           </div>

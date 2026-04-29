@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
 import { PORTAL_USERS } from '../../../../../types/users';
 import type { User } from '../../../../../types/portal';
-import { REASONS } from '../types';
+import { DEPARTMENTS, REASONS } from '../types';
 import type { LeaveFormState } from '../types';
 
 interface StepSummaryProps {
@@ -106,7 +106,7 @@ export const StepSummary: React.FC<StepSummaryProps> = ({
         <div className="space-y-0.5 border-t border-border/20">
           {[
             { label: 'Çalışan', value: employee.name },
-            { label: 'Departman', value: form.departman },
+            { label: 'Departman', value: DEPARTMENTS.find((d) => d.id === form.departman)?.label ?? form.departman },
             { label: 'Yönetici', value: managerName },
             { label: 'E-posta', value: `${form.email}@heliosscitech.com` },
             {

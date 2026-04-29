@@ -60,6 +60,7 @@ export interface LeaveRequest {
   belge: BelgeDurumu;
   belgeFileName?: string;
   belgeFileDataUrl?: string;
+  belgePath?: string;
   telafiNotu: string;
   telafiGunleri: number[];
   submittedAt: number;
