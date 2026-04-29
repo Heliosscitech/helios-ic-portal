@@ -1,28 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, FlaskConical, Plus, Archive } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
-import { usePersistentState } from '../../../../lib/persistence';
 import { usePortalUsers } from '../../../../lib/users';
 import { useNotifications } from '../../../../lib/notifications';
 import { useActiveEntity } from '../../../../lib/active-entity';
 import type { ModuleProps, User } from '../../../../types/portal';
-import { INITIAL_EXPERIMENTS } from './data';
-import {
-  DEFAULT_DEVICES,
-  DEVICES_KEY,
-  EXPERIMENTS_KEY,
-} from './constants';
 import { ExperimentRow } from './ExperimentRow';
 import { ExperimentModal } from './ExperimentModal';
-import { formatRelativeWeek, formatWeekRange, generateId, groupByWeek, todayISO } from './utils';
+import { formatRelativeWeek, formatWeekRange, groupByWeek } from './utils';
 import type { Experiment, ViewMode } from './types';
+import { useExperiments, useLabDevices } from './hooks';
 
 export const ResearchPlan: React.FC<ModuleProps> = ({ user }) => {
-  const [experiments, setExperiments] = usePersistentState<Experiment[]>(
-    EXPERIMENTS_KEY,
-    INITIAL_EXPERIMENTS
-  );
-  const [devices, setDevices] = usePersistentState<string[]>(DEVICES_KEY, DEFAULT_DEVICES);
+  const { experiments, addExperiment: addExperimentRow, updateExperiment: updateExperimentRow, deleteExperiment: deleteExperimentRow } = useExperiments();
+  const { devices, addDevice } = useLabDevices();
   const { users } = usePortalUsers();
   const { dispatch } = useNotifications();
   const { active, clear } = useActiveEntity();
@@ -69,25 +60,9 @@ export const ResearchPlan: React.FC<ModuleProps> = ({ user }) => {
 
   const editingExperiment = editingId ? experiments.find((e) => e.id === editingId) : undefined;
 
-  const addDevice = (name: string) => {
-    const trimmed = name.trim();
-    if (!trimmed) return;
-    setDevices((prev) => (prev.includes(trimmed) ? prev : [...prev, trimmed]));
-  };
-
   const updateExperiment = (id: string, patch: Partial<Experiment>) => {
-    setExperiments((prev) =>
-      prev.map((e) => {
-        if (e.id !== id) return e;
-        const merged: Experiment = { ...e, ...patch, updatedAt: new Date().toISOString() };
-        if (patch.status !== undefined) {
-          merged.archived = patch.status === 'tamamlandi';
-        }
-        return merged;
-      })
-    );
-
     const target = experiments.find((e) => e.id === id);
+    updateExperimentRow(id, patch);
     if (!target) return;
     const newOwnerId = patch.ownerId;
     if (newOwnerId && newOwnerId !== target.ownerId && newOwnerId !== user.id) {
@@ -103,33 +78,10 @@ export const ResearchPlan: React.FC<ModuleProps> = ({ user }) => {
     }
   };
 
-  const addExperiment = (input: Partial<Experiment>) => {
-    const now = new Date().toISOString();
-    const next: Experiment = {
-      id: generateId(),
-      code: input.code ?? '',
-      mof: input.mof ?? '',
-      name: input.name ?? '',
-      purpose: input.purpose ?? '',
-      ownerId: input.ownerId ?? user.id,
-      device: input.device ?? devices[0] ?? 'Etüv',
-      startDate: input.startDate ?? todayISO(),
-      endDate: input.endDate ?? todayISO(),
-      synthesisAmount: input.synthesisAmount ?? '',
-      workupAmount: input.workupAmount ?? '',
-      elnLink: input.elnLink ?? '',
-      bet: '',
-      xrd: '',
-      sem: '',
-      status: 'bekliyor',
-      archived: false,
-      createdAt: now,
-      updatedAt: now,
-    };
-    setExperiments((prev) => [next, ...prev]);
+  const addExperiment = async (input: Partial<Experiment>) => {
+    const next = await addExperimentRow(input, user.id);
     setCreating(false);
-
-    if (next.ownerId && next.ownerId !== user.id) {
+    if (next && next.ownerId && next.ownerId !== user.id) {
       dispatch({
         type: 'experiment-assigned',
         source: 'arge',
@@ -144,7 +96,7 @@ export const ResearchPlan: React.FC<ModuleProps> = ({ user }) => {
 
   const deleteExperiment = (id: string) => {
     if (!window.confirm('Bu deneyi silmek istediğinize emin misiniz?')) return;
-    setExperiments((prev) => prev.filter((e) => e.id !== id));
+    deleteExperimentRow(id);
     setEditingId(null);
   };
 

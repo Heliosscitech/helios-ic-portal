@@ -1,19 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, Plus, Search, Users } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
-import { usePersistentState } from '../../../../lib/persistence';
 import { usePortalUsers } from '../../../../lib/users';
 import { useNotifications } from '../../../../lib/notifications';
 import { useActiveEntity } from '../../../../lib/active-entity';
 import type { ModuleProps, User } from '../../../../types/portal';
-import { INITIAL_DISTRIBUTORS } from './data';
 import {
-  PERSISTENCE_KEY,
   REGION_CONFIG,
   REGION_ORDER,
   STATUS_META,
   STATUS_ORDER,
 } from './constants';
+import { useDistributors } from './hooks';
 import { DistributorCard } from './DistributorCard';
 import { DistributorDetailModal } from './DistributorDetailModal';
 import { computeStats, filterDistributors } from './utils';
@@ -33,10 +31,7 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, color }) => (
 );
 
 export const Distributors: React.FC<ModuleProps> = ({ user }) => {
-  const [distributors, setDistributors] = usePersistentState<Distributor[]>(
-    PERSISTENCE_KEY,
-    INITIAL_DISTRIBUTORS
-  );
+  const { distributors, addDistributor: addDistributorRow, updateDistributor: updateDistributorRow, deleteDistributor: deleteDistributorRow } = useDistributors();
   const { users } = usePortalUsers();
   const { dispatch } = useNotifications();
   const { active, clear } = useActiveEntity();
@@ -101,33 +96,11 @@ export const Distributors: React.FC<ModuleProps> = ({ user }) => {
     return d.ownerId === user.id;
   };
 
-  const addDistributor = (input: Partial<Distributor>) => {
-    const now = new Date().toISOString();
-    const next: Distributor = {
-      id: `d-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
-      region: input.region ?? 'avrupa',
-      country: input.country ?? '',
-      name: input.name ?? '',
-      website: input.website ?? '',
-      expertise: input.expertise ?? '',
-      contact1: input.contact1 ?? { name: '', title: '', email: '', phone: '' },
-      contact2: input.contact2 ?? { name: '', title: '', email: '', phone: '' },
-      steps: input.steps ?? {
-        'ilk-mail': false, 'fu-1': false, 'fu-2': false,
-        'meet': false, 'toplanti': false,
-        'numune': false, 'teklif': false, 'sozlesme': false,
-      },
-      status: input.status ?? 'arastirilacak',
-      ownerId: input.ownerId ?? null,
-      nextStep: input.nextStep ?? '',
-      notes: input.notes ?? '',
-      createdAt: now,
-      updatedAt: now,
-    };
-    setDistributors((prev) => [next, ...prev]);
-    setActiveRegion(next.region);
+  const addDistributor = async (input: Partial<Distributor>) => {
+    const next = await addDistributorRow(input);
     setCreating(false);
-
+    if (!next) return;
+    setActiveRegion(next.region);
     if (next.ownerId && next.ownerId !== user.id) {
       dispatch({
         type: 'distributor-assigned',
@@ -145,9 +118,7 @@ export const Distributors: React.FC<ModuleProps> = ({ user }) => {
     const target = distributors.find((d) => d.id === id);
     if (!target || !canManage(target)) return;
 
-    setDistributors((prev) =>
-      prev.map((d) => (d.id === id ? { ...d, ...patch, updatedAt: new Date().toISOString() } : d))
-    );
+    updateDistributorRow(id, patch);
 
     const newOwnerId = patch.ownerId;
     if (newOwnerId && newOwnerId !== target.ownerId && newOwnerId !== user.id) {
@@ -169,7 +140,7 @@ export const Distributors: React.FC<ModuleProps> = ({ user }) => {
     const target = distributors.find((d) => d.id === id);
     if (!target || !canManage(target)) return;
     if (!window.confirm('Bu distribütör kaydını silmek istediğinize emin misiniz?')) return;
-    setDistributors((prev) => prev.filter((d) => d.id !== id));
+    deleteDistributorRow(id);
     setEditingId(null);
   };
 

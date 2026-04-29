@@ -5,11 +5,9 @@ import {
   Trash2, ImagePlus, ClipboardCopy, X, Check,
 } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
-import { usePersistentState } from '../../../../lib/persistence';
-import { INITIAL_ITEMS } from './data';
+import type { ModuleProps } from '../../../../types/portal';
 import type { PressCategory, PressItem, PressTab } from './types';
-
-const PRESS_KEY = 'helios:basin:items';
+import { usePressItems } from './hooks';
 
 const BRAND = '#8A2A4A';
 
@@ -38,8 +36,8 @@ const formatDate = (iso: string) => {
 
 const todayISO = () => new Date().toISOString().split('T')[0];
 
-export const Press: React.FC = () => {
-  const [items, setItems] = usePersistentState<PressItem[]>(PRESS_KEY, INITIAL_ITEMS);
+export const Press: React.FC<ModuleProps> = ({ user }) => {
+  const { items, addItem: addItemRow, updateMeta, updateContent: updateContentRow, deleteItem: deleteItemRow } = usePressItems();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<PressTab>('linkedin');
   const [showNew, setShowNew] = useState(false);
@@ -62,7 +60,7 @@ export const Press: React.FC = () => {
   };
 
   const updateContent = (id: string, tab: PressTab, value: string) =>
-    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, [tab]: value } : item)));
+    updateContentRow(id, tab, value);
 
   const handleDraftChange = (value: string) => {
     setDraftKey(currentKey);
@@ -79,33 +77,24 @@ export const Press: React.FC = () => {
     setTimeout(() => setSavedFeedback(false), 2500);
   };
 
-  const addItem = (title: string, date: string, category: PressCategory) => {
-    const newItem: PressItem = {
-      id: `press-${Date.now().toString(36)}`,
-      title,
-      date,
-      category,
-      linkedin: '',
-      website: '',
-      instagram: '',
-    };
-    setItems((prev) => [newItem, ...prev]);
-    setExpandedId(newItem.id);
-    setActiveTab('linkedin');
+  const addItem = async (title: string, date: string, category: PressCategory) => {
+    const created = await addItemRow(title, date, category, user.id);
+    if (created) {
+      setExpandedId(created.id);
+      setActiveTab('linkedin');
+    }
     setShowNew(false);
   };
 
-  const saveEdit = (patch: Pick<PressItem, 'title' | 'date' | 'category'>) => {
+  const saveEdit = async (patch: Pick<PressItem, 'title' | 'date' | 'category'>) => {
     if (!editItem) return;
-    setItems((prev) =>
-      prev.map((item) => (item.id === editItem.id ? { ...item, ...patch } : item))
-    );
+    await updateMeta(editItem.id, patch);
     setEditItem(null);
   };
 
-  const deleteItem = (id: string) => {
+  const deleteItem = async (id: string) => {
     if (!window.confirm('Bu haberi silmek istediğinize emin misiniz?')) return;
-    setItems((prev) => prev.filter((item) => item.id !== id));
+    await deleteItemRow(id);
     if (expandedId === id) setExpandedId(null);
   };
 

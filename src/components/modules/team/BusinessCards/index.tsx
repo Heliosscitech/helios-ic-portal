@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import { Search, UserPlus } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
-import { usePersistentState } from '../../../../lib/persistence';
 import type { ModuleProps } from '../../../../types/portal';
 
 import { ContactCard } from './components/ContactCard';
 import { ContactModal } from './components/ContactModal';
-import { INITIAL_CONTACTS } from './data';
+import { useBusinessCards } from './hooks';
 import type { ContactInfo, ContactFormData } from './types';
-
-const CONTACTS_KEY = 'helios:kartvizit:contacts';
 
 const FILTER_TABS = [
   { id: 'all', label: 'Tümü' },
@@ -18,8 +15,8 @@ const FILTER_TABS = [
   { id: 'academic', label: 'Akademi' },
 ] as const;
 
-export const BusinessCards: React.FC<ModuleProps> = () => {
-  const [contacts, setContacts] = usePersistentState<ContactInfo[]>(CONTACTS_KEY, INITIAL_CONTACTS);
+export const BusinessCards: React.FC<ModuleProps> = ({ user }) => {
+  const { contacts, addContact, updateContact, deleteContact } = useBusinessCards();
   const [search, setSearch] = useState('');
   const [activeType, setActiveType] = useState<string>('all');
   const [modalContact, setModalContact] = useState<ContactInfo | 'new' | null>(null);
@@ -31,27 +28,18 @@ export const BusinessCards: React.FC<ModuleProps> = () => {
     return matchSearch && matchType;
   });
 
-  const handleSave = (data: ContactFormData) => {
+  const handleSave = async (data: ContactFormData) => {
     if (modalContact === 'new') {
-      const newContact: ContactInfo = {
-        id: `contact-${Date.now().toString(36)}`,
-        ...data,
-      };
-
-      setContacts((prev) => [...prev, newContact]);
+      await addContact(data, user.id);
     } else if (modalContact) {
-      const id = modalContact.id;
-      setContacts((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, ...data } : c))
-      );
+      await updateContact(modalContact.id, data);
     }
     setModalContact(null);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!modalContact || modalContact === 'new') return;
-    const id = modalContact.id;
-    setContacts((prev) => prev.filter((c) => c.id !== id));
+    await deleteContact(modalContact.id);
     setModalContact(null);
   };
 

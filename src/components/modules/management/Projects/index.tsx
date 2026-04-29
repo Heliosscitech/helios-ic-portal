@@ -5,13 +5,10 @@ import {
   TrendingUp, Clock, Activity, Pencil,
 } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
-import { usePersistentState } from '../../../../lib/persistence';
 import { PORTAL_USERS } from '../../../../types/users';
-import { INITIAL_PROJECTS } from './data';
 import type { Project, ReportPeriod, WPStatus, NewProjectFormData } from './types';
 import { formatTR, daysUntil } from '../../../../lib/dates';
-
-const PROJECTS_KEY = 'helios:projeler:projects:v2';
+import { useProjects } from './hooks';
 
 const SELECT_BG =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")";
@@ -53,154 +50,118 @@ const completionPct = (wps: Project['workPackages']) =>
   wps.length === 0 ? 0 : Math.round((wps.filter((wp) => wp.status === 'tamam').length / wps.length) * 100);
 
 export const Projects: React.FC = () => {
-  const [projects, setProjects] = usePersistentState<Project[]>(PROJECTS_KEY, INITIAL_PROJECTS);
-  const [activeId, setActiveId] = useState<string>(INITIAL_PROJECTS[0].id);
+  const {
+    projects,
+    addProject: addProjectRow,
+    updateProjectMeta,
+    deleteProject: deleteProjectRow,
+    updateProjectNotes: updateProjectNotesRow,
+    addWP: addWPRow,
+    updateWP: updateWPRow,
+    deleteWP: deleteWPRow,
+    addReportPeriod: addReportPeriodRow,
+    updateReportPeriod: updateReportPeriodRow,
+    deleteReportPeriod: deleteReportPeriodRow,
+  } = useProjects();
+  const [activeId, setActiveId] = useState<string>('');
   const [showNewModal, setShowNewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+
+  // İlk proje yüklendiğinde activeId'yi set et
+  useEffect(() => {
+    if (!activeId && projects.length > 0) setActiveId(projects[0].id);
+  }, [activeId, projects]);
 
   const active = projects.find((p) => p.id === activeId) ?? projects[0];
 
   // ── WP handlers ──────────────────────────────────────────
-  const updateWP = (wpId: string, patch: Partial<Project['workPackages'][0]>) =>
-    setProjects((prev) =>
-      prev.map((p) =>
-        p.id === activeId
-          ? { ...p, workPackages: p.workPackages.map((wp) => (wp.id === wpId ? { ...wp, ...patch } : wp)) }
-          : p
-      )
-    );
+  const updateWP = (wpId: string, patch: Partial<Project['workPackages'][0]>) => {
+    if (!active) return;
+    updateWPRow(active.id, wpId, patch);
+  };
 
-  const addWP = () =>
-    setProjects((prev) =>
-      prev.map((p) =>
-        p.id === activeId
-          ? {
-              ...p,
-              workPackages: [
-                ...p.workPackages,
-                {
-                  id: `IP${p.workPackages.length + 1}`,
-                  title: '',
-                  status: 'bekliyor' as WPStatus,
-                  deadline: '',
-                  notes: '',
-                },
-              ],
-            }
-          : p
-      )
-    );
+  const addWP = () => {
+    if (!active) return;
+    addWPRow(active.id);
+  };
 
-  const deleteWP = (wpId: string) =>
-    setProjects((prev) =>
-      prev.map((p) =>
-        p.id === activeId
-          ? { ...p, workPackages: p.workPackages.filter((wp) => wp.id !== wpId) }
-          : p
-      )
-    );
+  const deleteWP = (wpId: string) => {
+    if (!active) return;
+    deleteWPRow(active.id, wpId);
+  };
 
   // ── Report period handlers ───────────────────────────────
-  const updateReportPeriod = (periodId: string, patch: Partial<ReportPeriod>) =>
-    setProjects((prev) =>
-      prev.map((p) =>
-        p.id === activeId
-          ? { ...p, reportPeriods: p.reportPeriods.map((r) => (r.id === periodId ? { ...r, ...patch } : r)) }
-          : p
-      )
-    );
+  const updateReportPeriod = (periodId: string, patch: Partial<ReportPeriod>) => {
+    if (!active) return;
+    updateReportPeriodRow(active.id, periodId, patch);
+  };
 
-  const addReportPeriod = () =>
-    setProjects((prev) =>
-      prev.map((p) =>
-        p.id === activeId
-          ? {
-              ...p,
-              reportPeriods: [
-                ...p.reportPeriods,
-                {
-                  id: `R${p.reportPeriods.length + 1}-${Date.now().toString(36).slice(-4)}`,
-                  title: '',
-                  date: '',
-                  status: 'bekliyor' as WPStatus,
-                },
-              ],
-            }
-          : p
-      )
-    );
+  const addReportPeriod = () => {
+    if (!active) return;
+    addReportPeriodRow(active.id);
+  };
 
-  const deleteReportPeriod = (periodId: string) =>
-    setProjects((prev) =>
-      prev.map((p) =>
-        p.id === activeId
-          ? { ...p, reportPeriods: p.reportPeriods.filter((r) => r.id !== periodId) }
-          : p
-      )
-    );
+  const deleteReportPeriod = (periodId: string) => {
+    if (!active) return;
+    deleteReportPeriodRow(active.id, periodId);
+  };
 
   // ── Notes handler ─────────────────────────────────────────
-  const updateProjectNotes = (notes: string) =>
-    setProjects((prev) => prev.map((p) => (p.id === activeId ? { ...p, notes } : p)));
+  const updateProjectNotes = (notes: string) => {
+    if (!active) return;
+    updateProjectNotesRow(active.id, notes);
+  };
 
   // ── Delete project ────────────────────────────────────────
-  const deleteProject = () => {
+  const deleteProject = async () => {
+    if (!active) return;
     if (!window.confirm(`"${active.name}" projesini silmek istediğinize emin misiniz?`)) return;
-    const remaining = projects.filter((p) => p.id !== activeId);
-    setProjects(remaining);
+    const remaining = projects.filter((p) => p.id !== active.id);
+    await deleteProjectRow(active.id);
     if (remaining.length > 0) setActiveId(remaining[0].id);
+    else setActiveId('');
   };
 
   // ── Add new project ───────────────────────────────────────
-  const addProject = (data: NewProjectFormData) => {
-    const newProject: Project = {
-      id: `proj-${Date.now().toString(36)}`,
-      code: data.code,
-      name: data.name,
-      subtitle: data.subtitle || data.code,
-      color: 'bg-info-border',
-      startDate: data.startDate,
-      endDate: data.endDate,
-      leaderId: data.leaderId,
-      memberIds: data.memberIds,
-      status: 'aktif',
-      workPackages: [],
-      reportPeriods: [],
-      notes: '',
-    };
-    setProjects((prev) => [...prev, newProject]);
-    setActiveId(newProject.id);
+  const addProject = async (data: NewProjectFormData) => {
+    const created = await addProjectRow(data);
+    if (created) setActiveId(created.id);
     setShowNewModal(false);
   };
 
   // ── Edit project metadata ─────────────────────────────────
-  const editProject = (data: NewProjectFormData) => {
-    setProjects((prev) =>
-      prev.map((p) =>
-        p.id === activeId
-          ? {
-              ...p,
-              name: data.name,
-              subtitle: data.subtitle,
-              code: data.code,
-              leaderId: data.leaderId,
-              memberIds: data.memberIds,
-              startDate: data.startDate,
-              endDate: data.endDate,
-            }
-          : p
-      )
-    );
+  const editProject = async (data: NewProjectFormData) => {
+    if (!active) return;
+    await updateProjectMeta(active.id, data);
     setShowEditModal(false);
   };
 
   if (!active) {
     return (
-      <div className="max-w-7xl mx-auto p-8 text-center text-text-3 text-[14px]">
-        Henüz proje yok.{' '}
-        <button onClick={() => setShowNewModal(true)} className="text-info-text font-semibold underline">
-          Yeni proje ekle
-        </button>
+      <div className="max-w-7xl mx-auto p-8 md:p-10">
+        <div className="bg-white border-[0.5px] border-border rounded-3xl shadow-sm py-20 px-8 text-center flex flex-col items-center">
+          <div className="w-16 h-16 rounded-2xl bg-[#ECE4F7] text-[#4a2e85] flex items-center justify-center mb-5">
+            <FolderOpen size={26} />
+          </div>
+          <h3 className="text-[17px] font-semibold text-text mb-1.5">Henüz proje yok</h3>
+          <p className="text-[13px] text-text-3 max-w-sm mb-6 leading-relaxed">
+            Ar-Ge ve iş geliştirme projelerini yönetmek, iş paketlerini takip
+            etmek ve raporları planlamak için ilk projeyi ekle.
+          </p>
+          <button
+            onClick={() => setShowNewModal(true)}
+            className="flex items-center gap-2 bg-[#4a2e85] text-white px-5 py-2.5 rounded-xl text-[13px] font-semibold shadow-sm hover:bg-[#3a2168] transition-colors active:scale-95"
+          >
+            <Plus size={15} /> Yeni proje ekle
+          </button>
+        </div>
+
+        {showNewModal && (
+          <ProjectFormModal
+            onClose={() => setShowNewModal(false)}
+            onSave={addProject}
+          />
+        )}
       </div>
     );
   }
