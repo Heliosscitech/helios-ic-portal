@@ -104,13 +104,25 @@ export const NotificationsProvider: React.FC<{
 
   const dispatch = useCallback(
     async (input: DispatchInput) => {
-      if (input.targetUserIds.length === 0) return;
+      if (input.targetUserIds.length === 0) {
+        console.warn('[notif] dispatch skipped: empty targetUserIds');
+        return;
+      }
       const me = meRef.current;
       const actorDbId = me.dbId ?? legacyToDbId(input.actorId);
       const targetDbIds = input.targetUserIds
-        .map((legacy) => legacyToDbId(legacy))
+        .map((legacy) => {
+          const dbId = legacyToDbId(legacy);
+          if (!dbId) console.warn('[notif] no dbId for legacy', legacy);
+          return dbId;
+        })
         .filter((v): v is string => Boolean(v));
-      if (targetDbIds.length === 0) return;
+      if (targetDbIds.length === 0) {
+        console.warn('[notif] dispatch skipped: no resolvable targets', input.targetUserIds);
+        return;
+      }
+
+      console.log('[notif] dispatching', { type: input.type, source: input.source, targets: targetDbIds });
 
       const { data: inserted, error: insertError } = await supabase
         .from('notifications')
@@ -126,7 +138,8 @@ export const NotificationsProvider: React.FC<{
         .single();
 
       if (insertError || !inserted) {
-        console.error('notification insert failed', insertError);
+        console.error('[notif] insert failed', insertError);
+        window.alert('Bildirim kaydedilemedi:\n' + JSON.stringify(insertError));
         return;
       }
 
@@ -141,7 +154,10 @@ export const NotificationsProvider: React.FC<{
         .insert(targetRows);
 
       if (targetsError) {
-        console.error('notification targets insert failed', targetsError);
+        console.error('[notif] targets insert failed', targetsError);
+        window.alert('Bildirim hedefleri kaydedilemedi:\n' + JSON.stringify(targetsError));
+      } else {
+        console.log('[notif] dispatched OK', inserted.id);
       }
     },
     []

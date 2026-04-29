@@ -13,6 +13,7 @@ export type NotificationType =
   | 'leave-approved'
   | 'leave-rejected'
   | 'onboarding-person-added'
+  | 'onboarding-task-done'
   | 'contact-created'
   | 'purchase-assigned'
   | 'purchase-status-changed'
