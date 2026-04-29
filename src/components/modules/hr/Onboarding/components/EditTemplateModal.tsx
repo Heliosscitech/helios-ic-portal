@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, GripVertical, Trash2 } from 'lucide-react';
 import type { OnboardingTemplate, PhaseTemplate, TaskTemplate } from '../types';
+import { usePortalUsers } from '../../../../../lib/users';
 
 interface EditTemplateModalProps {
   template: OnboardingTemplate;
@@ -30,6 +31,7 @@ export const EditTemplateModal: React.FC<EditTemplateModalProps> = ({
   onClose,
   onSave,
 }) => {
+  const { users } = usePortalUsers();
   const [draft, setDraft] = useState<OnboardingTemplate>(() => structuredClone(template));
 
   useEffect(() => {
@@ -166,14 +168,18 @@ export const EditTemplateModal: React.FC<EditTemplateModalProps> = ({
                         placeholder="Açıklama"
                         className="p-2 bg-white border border-border/40 rounded-lg text-[12.5px] outline-none focus:border-text transition-colors"
                       />
-                      <input
+                      <select
                         value={task.assignee}
                         onChange={(e) =>
                           updateTask(phase.id, task.id, { assignee: e.target.value })
                         }
-                        placeholder="Atanan"
                         className="p-2 bg-white border border-border/40 rounded-lg text-[12.5px] outline-none focus:border-text transition-colors"
-                      />
+                      >
+                        <option value="">Atanan seç…</option>
+                        {users.map((u) => (
+                          <option key={u.id} value={u.name}>{u.name}</option>
+                        ))}
+                      </select>
                       <button
                         type="button"
                         onClick={() => removeTask(phase.id, task.id)}

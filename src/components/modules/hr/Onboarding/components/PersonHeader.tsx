@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2 } from 'lucide-react';
+import { RefreshCw, Trash2 } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
 import { formatDateTR, getInitials, getProgress } from '../utils';
 import type { OnboardingPerson } from '../types';
@@ -9,9 +9,16 @@ interface PersonHeaderProps {
   canEdit: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  onResync?: () => void;
 }
 
-export const PersonHeader: React.FC<PersonHeaderProps> = ({ person, canEdit, onEdit, onDelete }) => {
+export const PersonHeader: React.FC<PersonHeaderProps> = ({
+  person,
+  canEdit,
+  onEdit,
+  onDelete,
+  onResync,
+}) => {
   const { done, total, percent } = getProgress(person);
 
   return (
@@ -28,6 +35,15 @@ export const PersonHeader: React.FC<PersonHeaderProps> = ({ person, canEdit, onE
         </div>
         {canEdit && (
           <div className="flex items-center gap-2 shrink-0">
+            {onResync && (
+              <button
+                onClick={onResync}
+                title="Görevleri şablonun güncel halinden yeniden oluştur (tamamlanan işaretler kaybolur)"
+                className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-lg text-[13px] font-semibold text-text-2 hover:bg-surface-2 transition-colors"
+              >
+                <RefreshCw size={13} /> Şablondan yenile
+              </button>
+            )}
             <button
               onClick={onEdit}
               className="px-4 py-1.5 border border-border rounded-lg text-[13px] font-semibold text-text-2 hover:bg-surface-2 transition-colors"

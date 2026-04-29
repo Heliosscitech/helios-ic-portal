@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { AlertCircle, Lock } from 'lucide-react';
 import type { ModuleProps } from '../../../../types/portal';
 import { isHr } from '../../../../types/users';
-import { usePersistentState } from '../../../../lib/persistence';
+import { usePortalUsers } from '../../../../lib/users';
 import { useNotifications } from '../../../../lib/notifications';
 
 import { PeopleSidebar } from './components/PeopleSidebar';
@@ -12,19 +12,13 @@ import { EditPersonModal } from './components/EditPersonModal';
 import type { PersonModalMode, PersonFormData } from './components/EditPersonModal';
 import { EditTemplateModal } from './components/EditTemplateModal';
 
-import { DEFAULT_TEMPLATE, SEED_PEOPLE } from './data';
-import { cloneTemplateToPerson } from './utils';
+import { useOnboardingPeople, useOnboardingTemplate } from './hooks';
 import type { OnboardingPerson, OnboardingTemplate } from './types';
 
-const TEMPLATE_KEY = 'helios:onboarding:template';
-const PEOPLE_KEY = 'helios:onboarding:people';
-
 export const Onboarding: React.FC<ModuleProps> = ({ user }) => {
-  const [template, setTemplate] = usePersistentState<OnboardingTemplate>(
-    TEMPLATE_KEY,
-    DEFAULT_TEMPLATE
-  );
-  const [people, setPeople] = usePersistentState<OnboardingPerson[]>(PEOPLE_KEY, SEED_PEOPLE);
+  const { template, saveTemplate } = useOnboardingTemplate();
+  const { people, addPerson, updatePerson, deletePerson, toggleTask, resyncFromTemplate } = useOnboardingPeople();
+  const { users } = usePortalUsers();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [personModal, setPersonModal] = useState<PersonModalMode | null>(null);
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
@@ -54,89 +48,90 @@ export const Onboarding: React.FC<ModuleProps> = ({ user }) => {
     }
   }, [selected, selectedId]);
 
-  const handleToggleTask = (phaseId: string, taskId: string) => {
+  const handleToggleTask = (_phaseId: string, taskId: string) => {
     if (!selected) return;
-    const personId = selected.id;
-    setPeople((prev) =>
-      prev.map((p) =>
-        p.id !== personId
-          ? p
-          : {
-              ...p,
-              phases: p.phases.map((ph) =>
-                ph.id !== phaseId
-                  ? ph
-                  : {
-                      ...ph,
-                      tasks: ph.tasks.map((t) =>
-                        t.id !== taskId ? t : { ...t, isDone: !t.isDone }
-                      ),
-                    }
-              ),
-            }
-      )
-    );
+    const target = selected.phases.flatMap((p) => p.tasks).find((t) => t.id === taskId);
+    if (!target) return;
+    toggleTask(taskId, target.isDone);
+
+    // Görev "yapılmadı → yapıldı" geçişinde, görev atanan kişiye bildirim
+    const becomingDone = !target.isDone;
+    if (becomingDone && target.assignee) {
+      const assigneeUser = users.find((u) => u.name === target.assignee);
+      if (assigneeUser && assigneeUser.id !== user.id) {
+        dispatch({
+          type: 'onboarding-task-done',
+          source: 'onboarding',
+          entityId: selected.id,
+          entityTitle: selected.name,
+          actorId: user.id,
+          targetUserIds: [assigneeUser.id],
+          message: `"${selected.name}" onboarding'inde sana atanan görevi tamamladı: "${target.title}"`,
+        });
+      }
+    }
   };
 
-  const handleSavePerson = (data: PersonFormData) => {
+  const handleSavePerson = async (data: PersonFormData) => {
     if (personModal === 'edit' && selected) {
-      setPeople((prev) =>
-        prev.map((p) =>
-          p.id === selected.id
-            ? {
-                ...p,
-                name: data.name,
-                role: data.role,
-                startDate: data.startDate,
-                ownerId: data.ownerId ?? undefined,
-              }
-            : p
-        )
-      );
-    } else if (personModal === 'add') {
-      const newPerson: OnboardingPerson = {
-        id: `person-${Date.now().toString(36)}`,
+      await updatePerson(selected.id, {
         name: data.name,
         role: data.role,
         startDate: data.startDate,
-        ownerId: data.ownerId ?? undefined,
-        phases: cloneTemplateToPerson(template),
-      };
+        ownerLegacyId: data.ownerId ?? undefined,
+      });
+    } else if (personModal === 'add') {
+      const created = await addPerson(
+        {
+          name: data.name,
+          role: data.role,
+          startDate: data.startDate,
+          ownerLegacyId: data.ownerId ?? undefined,
+        },
+        template
+      );
 
-      // Bildirim: bağlantılı kullanıcı varsa ona, yoksa sessiz kal
-      if (newPerson.ownerId && newPerson.ownerId !== user.id) {
+      if (created && created.ownerId && created.ownerId !== user.id) {
         dispatch({
           type: 'onboarding-person-added',
           source: 'onboarding',
-          entityId: newPerson.id,
-          entityTitle: newPerson.name,
+          entityId: created.id,
+          entityTitle: created.name,
           actorId: user.id,
-          targetUserIds: [newPerson.ownerId],
-          message: `senin için yeni bir onboarding kaydı oluşturdu: "${newPerson.name}" (${newPerson.role})`,
+          targetUserIds: [created.ownerId],
+          message: `senin için yeni bir onboarding kaydı oluşturdu: "${created.name}" (${created.role})`,
         });
       }
 
-      setPeople((prev) => [...prev, newPerson]);
-      setSelectedId(newPerson.id);
+      if (created) setSelectedId(created.id);
     }
     setPersonModal(null);
   };
 
-  const handleDeletePerson = () => {
+  const handleDeletePerson = async () => {
     if (!selected) return;
     if (!window.confirm(`"${selected.name}" onboarding kaydını silmek istediğinize emin misiniz?`)) {
       return;
     }
     const idx = people.findIndex((p) => p.id === selected.id);
-    setPeople((prev) => prev.filter((p) => p.id !== selected.id));
+    await deletePerson(selected.id);
     const nextList = people.filter((p) => p.id !== selected.id);
     const fallback = nextList[idx] ?? nextList[idx - 1] ?? null;
     setSelectedId(fallback ? fallback.id : null);
   };
 
-  const handleSaveTemplate = (next: OnboardingTemplate) => {
-    setTemplate(next);
+  const handleSaveTemplate = async (next: OnboardingTemplate) => {
+    await saveTemplate(next);
     setTemplateModalOpen(false);
+  };
+
+  const handleResync = async () => {
+    if (!selected) return;
+    const ok = window.confirm(
+      `"${selected.name}" görevleri şablonun güncel halinden yeniden oluşturulacak.\n\nDikkat: Tamamlandı işaretleri kaybolacak.\n\nDevam edilsin mi?`
+    );
+    if (!ok) return;
+    await resyncFromTemplate(selected.id);
   };
 
   // Boş durumlar
@@ -166,6 +161,7 @@ export const Onboarding: React.FC<ModuleProps> = ({ user }) => {
               canEdit={canManage}
               onEdit={() => setPersonModal('edit')}
               onDelete={handleDeletePerson}
+              onResync={canManage ? handleResync : undefined}
             />
 
             {canManage ? (
