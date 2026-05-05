@@ -1,0 +1,5 @@
+# Supabase project config
+# Sadece edge function override'ları için kullanılıyor.
+
+[functions.sync-from-helios-portal]
+verify_jwt = false

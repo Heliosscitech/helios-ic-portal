@@ -31,9 +31,11 @@ import { Distributors } from './components/modules/management/Distributors';
 import { UserManagement } from './components/modules/management/UserManagement/index';
 
 import type { ModuleId, Responsibility, User, UserRole } from './types/portal';
-import { ArrowLeft } from 'lucide-react';
 import { NotificationsProvider } from './lib/notifications';
 import { ActiveEntityProvider, useActiveEntity } from './lib/active-entity';
+import { NavigationProvider } from './lib/navigation';
+import { ToastProvider } from './lib/toast';
+import { ConfirmProvider } from './lib/confirm';
 import { LeaveReviewModal } from './components/modules/hr/LeaveForm/LeaveReviewModal';
 import { supabase } from './lib/supabase';
 
@@ -173,6 +175,9 @@ function App() {
   return (
     <NotificationsProvider currentUser={currentUser}>
     <ActiveEntityProvider>
+    <NavigationProvider value={{ goHome: () => setCurrentModule('pano') }}>
+    <ToastProvider>
+    <ConfirmProvider>
       <ActiveEntityBridge
         currentUserId={currentUser.id}
         onRequestBoard={() => setCurrentModule('board')}
@@ -186,18 +191,6 @@ function App() {
       onGoHome={() => setCurrentModule('pano')}
     >
       <div className="min-h-[calc(100vh-160px)] flex flex-col">
-        {currentModule !== 'pano' && (
-          <div className="max-w-7xl mx-auto w-full px-8 pt-6">
-            <button
-              onClick={() => setCurrentModule('pano')}
-              className="flex items-center gap-2 text-[12px] text-text-3 hover:text-text mb-4 transition-colors group px-2 py-1 hover:bg-surface-2 rounded-lg w-fit"
-            >
-              <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-              Panoya Dön
-            </button>
-          </div>
-        )}
-
         <div className="flex-1">
           <AnimatePresence mode="wait">
             <motion.div
@@ -214,6 +207,9 @@ function App() {
         </div>
       </div>
     </Layout>
+    </ConfirmProvider>
+    </ToastProvider>
+    </NavigationProvider>
     </ActiveEntityProvider>
     </NotificationsProvider>
   );
