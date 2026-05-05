@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Plus, ShoppingCart } from 'lucide-react';
+import { Plus, ShoppingCart } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import { usePortalUsers } from '../../../../lib/users';
 import { useNotifications } from '../../../../lib/notifications';
 import { useActiveEntity } from '../../../../lib/active-entity';
 import type { ModuleProps } from '../../../../types/portal';
+import { BreadcrumbHome } from '../../../BreadcrumbHome';
+import { confirmAction } from '../../../../lib/confirm';
 import { STATUS_META, STATUS_TABS } from './constants';
 import { PurchaseForm, type NewPurchaseInput } from './PurchaseForm';
 import { PurchaseCard } from './PurchaseCard';
@@ -123,7 +125,13 @@ export const Purchasing: React.FC<ModuleProps> = ({ user }) => {
   const deletePurchase = async (id: string) => {
     const target = purchases.find((p) => p.id === id);
     if (!target || !canManage(target)) return;
-    if (!window.confirm('Bu talebi silmek istediğinize emin misiniz?')) return;
+    const ok = await confirmAction({
+      title: 'Talebi sil?',
+      message: 'Bu satın alma talebi kalıcı olarak silinecek.',
+      confirmText: 'Sil',
+      variant: 'danger',
+    });
+    if (!ok) return;
     await deletePurchaseRow(id);
   };
 
@@ -131,8 +139,7 @@ export const Purchasing: React.FC<ModuleProps> = ({ user }) => {
     <div className="max-w-7xl mx-auto px-6 md:px-8 pb-10 space-y-5">
       {/* Breadcrumb */}
       <div className="bg-white px-5 py-3 border border-border/40 rounded-xl flex items-center gap-2 text-[13px] text-text-3 font-medium">
-        <ChevronLeft size={14} />
-        <span className="hover:text-text cursor-pointer">Uygulamalar</span>
+        <BreadcrumbHome />
         <span>/</span>
         <span className="text-text font-semibold">Satın alma</span>
       </div>

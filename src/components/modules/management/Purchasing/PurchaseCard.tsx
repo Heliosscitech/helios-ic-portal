@@ -4,6 +4,7 @@ import { STATUS_META, STATUS_ORDER, STORAGE_LABEL, TYPE_META } from './constants
 import { formatShortDate } from './utils';
 import type { PurchaseRequest, PurchaseStatus } from './types';
 import { downloadFromBucket } from '../../../../lib/storage';
+import { toast } from '../../../../lib/toast';
 
 interface Props {
   purchase: PurchaseRequest;
@@ -86,7 +87,7 @@ export const PurchaseCard: React.FC<Props> = ({
     const path = purchase.attachment.dataUrl;
     const result = await downloadFromBucket('purchase-attachments', path, purchase.attachment.name);
     if (!result.ok) {
-      window.alert('Dosya indirilemedi:\n' + (result.error ?? 'bilinmeyen hata'));
+      toast.error('Dosya indirilemedi:\n' + (result.error ?? 'bilinmeyen hata'));
     }
   };
 

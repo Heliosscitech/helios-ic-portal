@@ -9,6 +9,8 @@ import { PORTAL_USERS } from '../../../../types/users';
 import type { Project, ReportPeriod, WPStatus, NewProjectFormData } from './types';
 import { formatTR, daysUntil } from '../../../../lib/dates';
 import { useProjects } from './hooks';
+import { Breadcrumb } from '../../../BreadcrumbHome';
+import { confirmAction } from '../../../../lib/confirm';
 
 const SELECT_BG =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")";
@@ -115,7 +117,13 @@ export const Projects: React.FC = () => {
   // ── Delete project ────────────────────────────────────────
   const deleteProject = async () => {
     if (!active) return;
-    if (!window.confirm(`"${active.name}" projesini silmek istediğinize emin misiniz?`)) return;
+    const ok = await confirmAction({
+      title: 'Projeyi sil?',
+      message: `"${active.name}" projesi kalıcı olarak silinecek.`,
+      confirmText: 'Sil',
+      variant: 'danger',
+    });
+    if (!ok) return;
     const remaining = projects.filter((p) => p.id !== active.id);
     await deleteProjectRow(active.id);
     if (remaining.length > 0) setActiveId(remaining[0].id);
@@ -138,7 +146,8 @@ export const Projects: React.FC = () => {
 
   if (!active) {
     return (
-      <div className="max-w-7xl mx-auto p-8 md:p-10">
+      <div className="max-w-7xl mx-auto p-8 md:p-10 space-y-6">
+        <Breadcrumb title="Projeler" />
         <div className="bg-white border-[0.5px] border-border rounded-3xl shadow-sm py-20 px-8 text-center flex flex-col items-center">
           <div className="w-16 h-16 rounded-2xl bg-[#ECE4F7] text-[#4a2e85] flex items-center justify-center mb-5">
             <FolderOpen size={26} />
@@ -172,7 +181,8 @@ export const Projects: React.FC = () => {
   const projectDaysLeft = daysUntil(active.endDate);
 
   return (
-    <div className="max-w-7xl mx-auto p-8 md:p-10">
+    <div className="max-w-7xl mx-auto p-8 md:p-10 space-y-6">
+      <Breadcrumb title="Projeler" />
       <div className="flex gap-7">
 
         {/* ── Sidebar ── */}

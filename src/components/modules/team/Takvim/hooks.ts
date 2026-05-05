@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { dbToLegacyId, ensureUsersLoaded, legacyToDbId } from '../../../../lib/users';
+import { toast } from '../../../../lib/toast';
 import { EVENT_CATEGORIES } from './types';
 import type { CalendarEvent, EventCategory } from './types';
 
@@ -72,7 +73,7 @@ export function useTakvimEvents(year: number, month: number) {
       .order('event_date');
     if (error) {
       console.error('calendar_events fetch failed', error);
-      window.alert('Etkinlikler yüklenemedi:\n' + error.message);
+      toast.error('Etkinlikler yüklenemedi:\n' + error.message);
       setLoading(false);
       return;
     }
@@ -88,7 +89,7 @@ export function useTakvimEvents(year: number, month: number) {
     await ensureUsersLoaded();
     const authorDbId = legacyToDbId(input.authorLegacyId);
     if (!authorDbId) {
-      window.alert('Etkinlik kaydedilemedi: yazar kullanıcı bulunamadı.');
+      toast.error('Etkinlik kaydedilemedi: yazar kullanıcı bulunamadı.');
       return null;
     }
 
@@ -119,7 +120,7 @@ export function useTakvimEvents(year: number, month: number) {
 
     if (insertError) {
       console.error('calendar_events insert failed', insertError);
-      window.alert('Etkinlik kaydedilemedi:\n' + insertError.message);
+      toast.error('Etkinlik kaydedilemedi:\n' + insertError.message);
       fetchEvents();
       return null;
     }
@@ -148,10 +149,10 @@ export function useTakvimEvents(year: number, month: number) {
       .eq('id', id);
     if (error) {
       console.error('deleteEvent failed', error);
-      window.alert('Silinemedi:\n' + error.message);
+      toast.error('Silinemedi:\n' + error.message);
       fetchEvents();
     } else if (count === 0) {
-      window.alert('Bu etkinliği silme yetkiniz yok.');
+      toast.error('Bu etkinliği silme yetkiniz yok.');
       fetchEvents();
     }
   }, [fetchEvents]);

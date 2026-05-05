@@ -7,6 +7,7 @@ import { ContactCard } from './components/ContactCard';
 import { ContactModal } from './components/ContactModal';
 import { useBusinessCards } from './hooks';
 import type { ContactInfo, ContactFormData } from './types';
+import { Breadcrumb } from '../../../BreadcrumbHome';
 
 const FILTER_TABS = [
   { id: 'all', label: 'Tümü' },
@@ -44,7 +45,8 @@ export const BusinessCards: React.FC<ModuleProps> = ({ user }) => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-8 md:p-10">
+    <div className="max-w-7xl mx-auto p-8 md:p-10 space-y-6">
+      <Breadcrumb title="Kartvizit Rehberi" />
       <div className="mb-10">
         <h2 className="text-[17px] font-semibold text-text tracking-tight mb-2">Kartvizit Rehberi</h2>
         <p className="text-text-3 text-[14px]">Dış paydaşlar ve kurumsal iletişim rehberi.</p>

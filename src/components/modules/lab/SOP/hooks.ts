@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { dbToLegacyId, ensureUsersLoaded, legacyToDbId } from '../../../../lib/users';
+import { toast } from '../../../../lib/toast';
 import type { SOPCategory, SOPFormData, SOPProcedure } from './types';
 
 type DbRow = {
@@ -87,7 +88,7 @@ export function useSOPs() {
     await ensureUsersLoaded();
     const ownerDbId = legacyToDbId(data.ownerId);
     if (!ownerDbId) {
-      window.alert('Sahibi olarak seçilen kullanıcı bulunamadı.');
+      toast.error('Sahibi olarak seçilen kullanıcı bulunamadı.');
       return null;
     }
 
@@ -113,7 +114,7 @@ export function useSOPs() {
 
     if (error) {
       console.error('sop_procedures insert failed', error);
-      window.alert('Prosedür kaydedilemedi:\n' + error.message);
+      toast.error('Prosedür kaydedilemedi:\n' + error.message);
       await refresh();
       return null;
     }
@@ -124,7 +125,7 @@ export function useSOPs() {
     await ensureUsersLoaded();
     const ownerDbId = legacyToDbId(data.ownerId);
     if (!ownerDbId) {
-      window.alert('Sahibi olarak seçilen kullanıcı bulunamadı.');
+      toast.error('Sahibi olarak seçilen kullanıcı bulunamadı.');
       return;
     }
 
@@ -151,10 +152,10 @@ export function useSOPs() {
 
     if (error) {
       console.error('sop_procedures update failed', error);
-      window.alert('Güncellenemedi:\n' + error.message);
+      toast.error('Güncellenemedi:\n' + error.message);
       await refresh();
     } else if (count === 0) {
-      window.alert('Bu kaydı güncelleme yetkiniz yok.');
+      toast.error('Bu kaydı güncelleme yetkiniz yok.');
       await refresh();
     }
   }, [refresh]);
@@ -167,10 +168,10 @@ export function useSOPs() {
       .eq('id', id);
     if (error) {
       console.error('sop_procedures delete failed', error);
-      window.alert('Silinemedi:\n' + error.message);
+      toast.error('Silinemedi:\n' + error.message);
       await refresh();
     } else if (count === 0) {
-      window.alert('Bu kaydı silme yetkiniz yok.');
+      toast.error('Bu kaydı silme yetkiniz yok.');
       await refresh();
     }
   }, [refresh]);

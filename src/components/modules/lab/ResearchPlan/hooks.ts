@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { dbToLegacyId, ensureUsersLoaded, legacyToDbId } from '../../../../lib/users';
+import { toast } from '../../../../lib/toast';
 import type { AnalysisState, Experiment, ExperimentStatus } from './types';
 
 type DbExperiment = {
@@ -87,7 +88,7 @@ export function useExperiments() {
       .order('created_at', { ascending: false });
     if (error) {
       console.error('experiments fetch failed', error);
-      window.alert('Deneyler yüklenemedi:\n' + error.message);
+      toast.error('Deneyler yüklenemedi:\n' + error.message);
       setLoading(false);
       return;
     }
@@ -104,7 +105,7 @@ export function useExperiments() {
     const ownerLegacy = input.ownerId ?? currentUserLegacyId;
     const ownerDbId = legacyToDbId(ownerLegacy);
     if (!ownerDbId) {
-      window.alert('Deney kaydedilemedi: sahip kullanıcı bulunamadı.');
+      toast.error('Deney kaydedilemedi: sahip kullanıcı bulunamadı.');
       return null;
     }
 
@@ -139,7 +140,7 @@ export function useExperiments() {
 
     if (error) {
       console.error('experiment insert failed', error);
-      window.alert('Deney kaydedilemedi:\n' + error.message);
+      toast.error('Deney kaydedilemedi:\n' + error.message);
       fetchAll();
       return null;
     }
@@ -157,7 +158,7 @@ export function useExperiments() {
     if (patch.ownerId !== undefined) {
       const dbId = legacyToDbId(patch.ownerId);
       if (!dbId) {
-        window.alert('Yeni sahip kullanıcı bulunamadı.');
+        toast.error('Yeni sahip kullanıcı bulunamadı.');
         return;
       }
       dbPatch.owner_id = dbId;
@@ -199,10 +200,10 @@ export function useExperiments() {
 
     if (error) {
       console.error('updateExperiment failed', error);
-      window.alert('Deney güncellenemedi:\n' + error.message);
+      toast.error('Deney güncellenemedi:\n' + error.message);
       fetchAll();
     } else if (count === 0) {
-      window.alert('Bu deneyi güncelleme yetkiniz yok.');
+      toast.error('Bu deneyi güncelleme yetkiniz yok.');
       fetchAll();
     }
   }, [fetchAll]);
@@ -215,10 +216,10 @@ export function useExperiments() {
       .eq('id', id);
     if (error) {
       console.error('deleteExperiment failed', error);
-      window.alert('Silinemedi:\n' + error.message);
+      toast.error('Silinemedi:\n' + error.message);
       fetchAll();
     } else if (count === 0) {
-      window.alert('Bu deneyi silme yetkiniz yok.');
+      toast.error('Bu deneyi silme yetkiniz yok.');
       fetchAll();
     }
   }, [fetchAll]);
@@ -259,7 +260,7 @@ export function useLabDevices() {
     if (error && error.code !== '23505') {
       // 23505 = unique violation, başka biri eklemiş; OK
       console.error('addDevice failed', error);
-      window.alert('Cihaz eklenemedi:\n' + error.message);
+      toast.error('Cihaz eklenemedi:\n' + error.message);
       fetchDevices();
     }
   }, [devices, fetchDevices]);

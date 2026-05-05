@@ -10,6 +10,7 @@ import { StepSummary } from './steps/StepSummary';
 import { REASONS } from './types';
 import type { LeaveFormState, LeaveRequest } from './types';
 import { useLeaveRequests } from './hooks';
+import { BreadcrumbHome } from '../../../BreadcrumbHome';
 
 const buildInitialForm = (employeeId: string, employeeName: string): LeaveFormState => ({
   employeeId,
@@ -117,7 +118,7 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8 pb-20">
       <div className="bg-white px-6 py-3 border border-border/40 rounded-xl flex items-center gap-2 text-[13px] text-text-3 font-medium">
-        <span className="hover:text-text cursor-pointer">Uygulamalar</span>
+        <BreadcrumbHome />
         <span>/</span>
         <span className="text-text font-semibold">İzin / mazeret</span>
       </div>

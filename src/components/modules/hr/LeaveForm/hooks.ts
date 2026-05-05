@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { dbToLegacyId, ensureUsersLoaded, legacyToDbId } from '../../../../lib/users';
+import { toast } from '../../../../lib/toast';
 import type { BelgeDurumu, LeaveFormState, LeaveReasonId, LeaveRequest } from './types';
 
 // Year/month is hardcoded to April 2026 to match the LeaveForm UI calendar.
@@ -150,7 +151,7 @@ export function useLeaveRequests() {
       const employeeDbId = legacyToDbId(employeeLegacyId);
       const managerDbId = legacyToDbId(form.managerId);
       if (!employeeDbId || !managerDbId) {
-        window.alert('Talep gönderilemedi: kullanıcı eşleşmesi yapılamadı.');
+        toast.error('Talep gönderilemedi: kullanıcı eşleşmesi yapılamadı.');
         return null;
       }
 
@@ -167,7 +168,7 @@ export function useLeaveRequests() {
           form.belgeFileDataUrl
         );
         if (error) {
-          window.alert('Belge yüklenemedi:\n' + error.message);
+          toast.error('Belge yüklenemedi:\n' + error.message);
           return null;
         }
         belgePath = path;
@@ -194,7 +195,7 @@ export function useLeaveRequests() {
       const { error } = await supabase.from('leave_requests').insert(dbRow);
       if (error) {
         console.error('leave_requests insert failed', error, 'sent dbRow:', dbRow);
-        window.alert(
+        toast.error(
           'Talep kaydedilemedi:\n' +
             (error.message || 'bilinmeyen') +
             '\n\nDetay (console\'da da var): ' +
@@ -218,7 +219,7 @@ export function useLeaveRequests() {
     ): Promise<boolean> => {
       const reviewerDbId = legacyToDbId(reviewerLegacyId);
       if (!reviewerDbId) {
-        window.alert('Karar uygulanamadı: kullanıcı bulunamadı.');
+        toast.error('Karar uygulanamadı: kullanıcı bulunamadı.');
         return false;
       }
 
@@ -251,12 +252,12 @@ export function useLeaveRequests() {
 
       if (error) {
         console.error('decideRequest failed', error);
-        window.alert('Karar uygulanamadı:\n' + error.message);
+        toast.error('Karar uygulanamadı:\n' + error.message);
         await refresh();
         return false;
       }
       if (count === 0) {
-        window.alert('Bu talebe karar verme yetkiniz yok.');
+        toast.error('Bu talebe karar verme yetkiniz yok.');
         await refresh();
         return false;
       }

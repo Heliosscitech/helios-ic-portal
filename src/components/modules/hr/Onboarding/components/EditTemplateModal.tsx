@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, GripVertical, Trash2 } from 'lucide-react';
 import type { OnboardingTemplate, PhaseTemplate, TaskTemplate } from '../types';
 import { usePortalUsers } from '../../../../../lib/users';
+import { confirmAction } from '../../../../../lib/confirm';
 
 interface EditTemplateModalProps {
   template: OnboardingTemplate;
@@ -77,8 +78,14 @@ export const EditTemplateModal: React.FC<EditTemplateModalProps> = ({
     setDraft((prev) => [...prev, emptyPhase()]);
   };
 
-  const removePhase = (phaseId: string) => {
-    if (!window.confirm('Bu fazı ve içindeki tüm görevleri silmek istiyor musun?')) return;
+  const removePhase = async (phaseId: string) => {
+    const ok = await confirmAction({
+      title: 'Fazı sil?',
+      message: 'Bu faz ve içindeki tüm görevler kalıcı olarak silinecek.',
+      confirmText: 'Sil',
+      variant: 'danger',
+    });
+    if (!ok) return;
     setDraft((prev) => prev.filter((p) => p.id !== phaseId));
   };
 

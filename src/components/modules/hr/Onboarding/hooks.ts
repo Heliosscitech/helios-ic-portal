@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { dbToLegacyId, ensureUsersLoaded, legacyToDbId } from '../../../../lib/users';
+import { toast } from '../../../../lib/toast';
 import type {
   OnboardingPerson,
   OnboardingTemplate,
@@ -157,12 +158,12 @@ export function useOnboardingPeople() {
       });
       if (pErr) {
         console.error('onboarding_people insert failed', pErr);
-        window.alert('Kişi kaydedilemedi:\n' + pErr.message);
+        toast.error('Kişi kaydedilemedi:\n' + pErr.message);
         return null;
       }
 
       if (template.length === 0) {
-        window.alert(
+        toast.error(
           'Şablon boş olduğu için kişiye faz/görev eklenmedi. Önce "Şablonu düzenle" ile faz ve görev ekleyin, sonra kişiyi tekrar oluşturun.'
         );
       }
@@ -202,7 +203,7 @@ export function useOnboardingPeople() {
       }
 
       if (errors.length > 0) {
-        window.alert('Bazı faz/görevler eklenemedi:\n\n' + errors.join('\n'));
+        toast.error('Bazı faz/görevler eklenemedi:\n\n' + errors.join('\n'));
       }
 
       await refresh();
@@ -245,10 +246,10 @@ export function useOnboardingPeople() {
         .eq('id', id);
       if (error) {
         console.error('person update failed', error);
-        window.alert('Güncellenemedi:\n' + error.message);
+        toast.error('Güncellenemedi:\n' + error.message);
         await refresh();
       } else if (count === 0) {
-        window.alert('Bu kaydı güncelleme yetkiniz yok.');
+        toast.error('Bu kaydı güncelleme yetkiniz yok.');
         await refresh();
       }
     },
@@ -263,10 +264,10 @@ export function useOnboardingPeople() {
       .eq('id', id);
     if (error) {
       console.error('person delete failed', error);
-      window.alert('Silinemedi:\n' + error.message);
+      toast.error('Silinemedi:\n' + error.message);
       await refresh();
     } else if (count === 0) {
-      window.alert('Bu kaydı silme yetkiniz yok.');
+      toast.error('Bu kaydı silme yetkiniz yok.');
       await refresh();
     }
   }, [refresh]);
@@ -277,7 +278,7 @@ export function useOnboardingPeople() {
     });
     if (error) {
       console.error('resync_person_from_template failed', error);
-      window.alert('Şablondan yenileme başarısız:\n' + error.message);
+      toast.error('Şablondan yenileme başarısız:\n' + error.message);
       return false;
     }
     await refresh();
@@ -301,10 +302,10 @@ export function useOnboardingPeople() {
       .eq('id', taskId);
     if (error) {
       console.error('task toggle failed', error);
-      window.alert('Görev güncellenemedi:\n' + error.message);
+      toast.error('Görev güncellenemedi:\n' + error.message);
       await refresh();
     } else if (count === 0) {
-      window.alert('Bu görevi güncelleme yetkiniz yok.');
+      toast.error('Bu görevi güncelleme yetkiniz yok.');
       await refresh();
     }
   }, [refresh]);
@@ -409,7 +410,7 @@ export function useOnboardingTemplate() {
 
     if (error) {
       console.error('replace_onboarding_template failed', error);
-      window.alert('Şablon kaydedilemedi:\n' + error.message);
+      toast.error('Şablon kaydedilemedi:\n' + error.message);
     }
 
     const fresh = await fetchTemplate();

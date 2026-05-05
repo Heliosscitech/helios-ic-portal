@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, XCircle, CalendarClock, User as UserIcon, FileText, Clock } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
+import { toast } from '../../../../lib/toast';
 import { useNotifications } from '../../../../lib/notifications';
 import { PORTAL_USERS } from '../../../../types/users';
 import { DEPARTMENTS, REASONS } from './types';
@@ -99,7 +100,7 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
       request.belgeFileName
     );
     if (!result.ok) {
-      window.alert('Belge indirilemedi:\n' + (result.error ?? 'bilinmeyen hata'));
+      toast.error('Belge indirilemedi:\n' + (result.error ?? 'bilinmeyen hata'));
     }
   };
 

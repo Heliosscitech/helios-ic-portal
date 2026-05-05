@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Shield, User as UserIcon, Check } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import { usePortalUsers } from '../../../../lib/users';
-import { ALL_MODULE_IDS, DEFAULT_CALISAN_MODULES } from '../../../../types/users';
+import { ALL_MODULE_IDS } from '../../../../types/users';
 import type { ModuleId, Responsibility, User, UserRole } from '../../../../types/portal';
+import { Breadcrumb } from '../../../BreadcrumbHome';
 
 interface UserManagementProps {
   currentUserId: string;
@@ -60,7 +61,8 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId })
   const [editUser, setEditUser] = useState<User | null>(null);
 
   return (
-    <div className="max-w-3xl mx-auto p-8 md:p-10">
+    <div className="max-w-3xl mx-auto p-8 md:p-10 space-y-6">
+      <Breadcrumb title="Kullanıcı Yönetimi" />
       <div className="flex items-start justify-between mb-8">
         <div>
           <h2 className="text-[17px] font-semibold text-text tracking-tight mb-1">Kullanıcı Yönetimi</h2>

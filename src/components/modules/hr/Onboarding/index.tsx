@@ -4,6 +4,8 @@ import type { ModuleProps } from '../../../../types/portal';
 import { isHr } from '../../../../types/users';
 import { usePortalUsers } from '../../../../lib/users';
 import { useNotifications } from '../../../../lib/notifications';
+import { BreadcrumbHome } from '../../../BreadcrumbHome';
+import { confirmAction } from '../../../../lib/confirm';
 
 import { PeopleSidebar } from './components/PeopleSidebar';
 import { PersonHeader } from './components/PersonHeader';
@@ -110,9 +112,13 @@ export const Onboarding: React.FC<ModuleProps> = ({ user }) => {
 
   const handleDeletePerson = async () => {
     if (!selected) return;
-    if (!window.confirm(`"${selected.name}" onboarding kaydını silmek istediğinize emin misiniz?`)) {
-      return;
-    }
+    const ok = await confirmAction({
+      title: 'Onboarding kaydını sil?',
+      message: `"${selected.name}" kaydı kalıcı olarak silinecek.`,
+      confirmText: 'Sil',
+      variant: 'danger',
+    });
+    if (!ok) return;
     const idx = people.findIndex((p) => p.id === selected.id);
     await deletePerson(selected.id);
     const nextList = people.filter((p) => p.id !== selected.id);
@@ -127,9 +133,11 @@ export const Onboarding: React.FC<ModuleProps> = ({ user }) => {
 
   const handleResync = async () => {
     if (!selected) return;
-    const ok = window.confirm(
-      `"${selected.name}" görevleri şablonun güncel halinden yeniden oluşturulacak.\n\nDikkat: Tamamlandı işaretleri kaybolacak.\n\nDevam edilsin mi?`
-    );
+    const ok = await confirmAction({
+      title: 'Görevleri yeniden oluştur?',
+      message: `"${selected.name}" görevleri şablonun güncel halinden yeniden oluşturulacak. Tamamlandı işaretleri kaybolacak.`,
+      confirmText: 'Devam et',
+    });
     if (!ok) return;
     await resyncFromTemplate(selected.id);
   };
@@ -140,7 +148,7 @@ export const Onboarding: React.FC<ModuleProps> = ({ user }) => {
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       <div className="bg-white px-6 py-3 border border-border/40 rounded-xl flex items-center gap-2 text-[13px] text-text-3 font-medium">
-        <span className="hover:text-text cursor-pointer">Uygulamalar</span>
+        <BreadcrumbHome />
         <span>/</span>
         <span className="text-text font-semibold">Onboarding</span>
       </div>

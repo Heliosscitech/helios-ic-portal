@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { PORTAL_USERS } from '../../../../types/users';
 import type { ModuleProps } from '../../../../types/portal';
+import { BreadcrumbHome } from '../../../BreadcrumbHome';
+import { toast } from '../../../../lib/toast';
+import { confirmAction } from '../../../../lib/confirm';
 import { BoardSidebar } from './BoardSidebar';
 import { BoardToolbar } from './BoardToolbar';
 import { BoardView } from './views/BoardView';
@@ -247,15 +250,18 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
     const col = columns.find((c) => c.id === id);
     if (!col) return;
     if (columns.length <= 1) {
-      window.alert('En az bir kolon kalmalı.');
+      toast.error('En az bir kolon kalmalı.');
       return;
     }
     const tasksInCol = tasks.filter((t) => t.status === id);
     if (tasksInCol.length > 0) {
       const fallbackId = columns.find((c) => c.id !== id)!.id;
-      const confirmed = window.confirm(
-        `"${col.title}" kolonunda ${tasksInCol.length} iş var. Silersen bunlar "${columnTitle(columns, fallbackId)}" kolonuna taşınacak. Devam?`
-      );
+      const confirmed = await confirmAction({
+        title: 'Kolonu sil?',
+        message: `"${col.title}" kolonunda ${tasksInCol.length} iş var. Silersen bunlar "${columnTitle(columns, fallbackId)}" kolonuna taşınacak.`,
+        confirmText: 'Sil',
+        variant: 'danger',
+      });
       if (!confirmed) return;
       await Promise.all(tasksInCol.map((t) => changeStatus(t.id, fallbackId)));
     }
@@ -283,7 +289,7 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
   return (
     <div className="max-w-360 mx-auto px-8 pb-6">
       <div className="bg-white px-6 py-3 border border-border/40 rounded-xl flex items-center gap-2 text-[13px] text-text-3 font-medium mb-4">
-        <span className="hover:text-text cursor-pointer">Uygulamalar</span>
+        <BreadcrumbHome />
         <span>/</span>
         <span className="text-text font-semibold">Board</span>
       </div>

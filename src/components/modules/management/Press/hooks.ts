@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { ensureUsersLoaded, legacyToDbId } from '../../../../lib/users';
+import { toast } from '../../../../lib/toast';
 import type { PressCategory, PressItem, PressTab } from './types';
 
 type DbPress = {
@@ -44,7 +45,7 @@ export function usePressItems() {
       .order('publish_date', { ascending: false });
     if (error) {
       console.error('press_items fetch failed', error);
-      window.alert('Basın kayıtları yüklenemedi:\n' + error.message);
+      toast.error('Basın kayıtları yüklenemedi:\n' + error.message);
       setLoading(false);
       return;
     }
@@ -76,7 +77,7 @@ export function usePressItems() {
       });
       if (error) {
         console.error('press_items insert failed', error);
-        window.alert('Kayıt eklenemedi:\n' + error.message);
+        toast.error('Kayıt eklenemedi:\n' + error.message);
         fetchAll();
         return null;
       }
@@ -98,7 +99,7 @@ export function usePressItems() {
         .eq('id', id);
       if (error) {
         console.error('press_items update failed', error);
-        window.alert('Güncellenemedi:\n' + error.message);
+        toast.error('Güncellenemedi:\n' + error.message);
         fetchAll();
       }
     },
@@ -114,7 +115,7 @@ export function usePressItems() {
         .eq('id', id);
       if (error) {
         console.error('press_items content update failed', error);
-        window.alert('İçerik kaydedilemedi:\n' + error.message);
+        toast.error('İçerik kaydedilemedi:\n' + error.message);
         fetchAll();
       }
     },
@@ -129,10 +130,10 @@ export function usePressItems() {
       .eq('id', id);
     if (error) {
       console.error('press_items delete failed', error);
-      window.alert('Silinemedi:\n' + error.message);
+      toast.error('Silinemedi:\n' + error.message);
       fetchAll();
     } else if (count === 0) {
-      window.alert('Bu kaydı silme yetkiniz yok.');
+      toast.error('Bu kaydı silme yetkiniz yok.');
       fetchAll();
     }
   }, [fetchAll]);

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { dbToLegacyId, ensureUsersLoaded, legacyToDbId } from '../../../../lib/users';
+import { toast } from '../../../../lib/toast';
 import type {
   Distributor,
   DistributorContact,
@@ -124,7 +125,7 @@ export function useDistributors() {
       .order('created_at', { ascending: false });
     if (error) {
       console.error('distributors fetch failed', error);
-      window.alert('Distribütörler yüklenemedi:\n' + error.message);
+      toast.error('Distribütörler yüklenemedi:\n' + error.message);
       setLoading(false);
       return;
     }
@@ -162,7 +163,7 @@ export function useDistributors() {
     const { error } = await supabase.from('distributors').insert(toDbRow(next));
     if (error) {
       console.error('distributor insert failed', error);
-      window.alert('Distribütör kaydedilemedi:\n' + error.message);
+      toast.error('Distribütör kaydedilemedi:\n' + error.message);
       fetchAll();
       return null;
     }
@@ -193,12 +194,12 @@ export function useDistributors() {
 
     if (error) {
       console.error('distributor update failed', error);
-      window.alert('Güncellenemedi:\n' + error.message);
+      toast.error('Güncellenemedi:\n' + error.message);
       fetchAll();
       return;
     }
     if (count === 0) {
-      window.alert('Bu kaydı güncelleme yetkiniz yok.');
+      toast.error('Bu kaydı güncelleme yetkiniz yok.');
       fetchAll();
       return;
     }
@@ -216,10 +217,10 @@ export function useDistributors() {
       .eq('id', id);
     if (error) {
       console.error('distributor delete failed', error);
-      window.alert('Silinemedi:\n' + error.message);
+      toast.error('Silinemedi:\n' + error.message);
       fetchAll();
     } else if (count === 0) {
-      window.alert('Bu kaydı silme yetkiniz yok.');
+      toast.error('Bu kaydı silme yetkiniz yok.');
       fetchAll();
     }
   }, [fetchAll]);

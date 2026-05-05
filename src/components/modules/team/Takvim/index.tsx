@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import type { ModuleProps } from '../../../../types/portal';
 import { useNotifications } from '../../../../lib/notifications';
+import { BreadcrumbHome } from '../../../BreadcrumbHome';
 import { EVENT_CATEGORIES } from './types';
 import { CalendarGrid } from './components/CalendarGrid';
 import { DayEvents } from './components/DayEvents';
@@ -112,7 +113,7 @@ export const Takvim: React.FC<ModuleProps> = ({ user }) => {
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       <div className="bg-white px-6 py-3 border border-border/40 rounded-xl flex items-center gap-2 text-[13px] text-text-3 font-medium">
-        <span className="hover:text-text cursor-pointer">Uygulamalar</span>
+        <BreadcrumbHome />
         <span>/</span>
         <span className="text-text">Takvim</span>
       </div>

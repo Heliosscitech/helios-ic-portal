@@ -21,15 +21,18 @@ import {
   Package,
   Globe,
   MessageSquare,
-  ChevronRight,
-  Zap,
-  Trash2,
   Phone,
   BookOpen,
   StickyNote,
   Settings,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useAnnouncements, useDirectory, useNotes } from './dashboard/hooks';
+import { DuyurularPanel } from './dashboard/DuyurularPanel';
+import { RehberPanel } from './dashboard/RehberPanel';
+import { KunyePanel } from './dashboard/KunyePanel';
+import { NotlarPanel } from './dashboard/NotlarPanel';
+import { QuickLinksPanel } from './dashboard/QuickLinksPanel';
 
 const MODULES: ModuleConfig[] = [
   { id: 'pano', title: 'Pano', icon: 'pano', color: 'bg-indigo-50 text-indigo-500 border-indigo-200' },
@@ -60,6 +63,9 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({ onModuleSelect, currentUser }) => {
   const [activeTab, setActiveTab] = useState<'duyurular' | 'rehber' | 'künye' | 'notlar'>('duyurular');
+  const announcements = useAnnouncements(currentUser.id);
+  const directory = useDirectory();
+  const notes = useNotes(currentUser.id);
 
   const getIcon = (iconName: string) => {
     switch (iconName) {
@@ -122,90 +128,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ onModuleSelect, currentUse
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* News Section */}
         <div className="lg:col-span-2 bg-white border border-border/40 rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-150">
-          <div className="px-6 py-4 border-b border-border/40 flex items-center gap-6">
-             <button onClick={() => setActiveTab('duyurular')} className={cn("flex items-center gap-2 py-2 border-b-2 transition-all text-[14px] font-bold", activeTab === 'duyurular' ? "border-text text-text" : "border-transparent text-text-3 hover:text-text")}>
-               <MessageSquare size={16} /> Duyurular <span className="bg-surface-2 text-text-3 text-[10px] px-1.5 rounded-full">3</span>
+          <div className="px-6 py-4 border-b border-border/40 flex items-center gap-6 overflow-x-auto">
+             <button onClick={() => setActiveTab('duyurular')} className={cn("flex items-center gap-2 py-2 border-b-2 transition-all text-[14px] font-bold whitespace-nowrap", activeTab === 'duyurular' ? "border-text text-text" : "border-transparent text-text-3 hover:text-text")}>
+               <MessageSquare size={16} /> Duyurular <span className="bg-surface-2 text-text-3 text-[10px] px-1.5 rounded-full">{announcements.items.length}</span>
              </button>
-             <button onClick={() => setActiveTab('rehber')} className={cn("flex items-center gap-2 py-2 border-b-2 transition-all text-[14px] font-bold", activeTab === 'rehber' ? "border-text text-text" : "border-transparent text-text-3 hover:text-text")}>
-               <Phone size={16} /> Rehber <span className="bg-surface-2 text-text-3 text-[10px] px-1.5 rounded-full">20</span>
+             <button onClick={() => setActiveTab('rehber')} className={cn("flex items-center gap-2 py-2 border-b-2 transition-all text-[14px] font-bold whitespace-nowrap", activeTab === 'rehber' ? "border-text text-text" : "border-transparent text-text-3 hover:text-text")}>
+               <Phone size={16} /> Rehber <span className="bg-surface-2 text-text-3 text-[10px] px-1.5 rounded-full">{directory.contacts.length}</span>
              </button>
-             <button onClick={() => setActiveTab('künye')} className={cn("flex items-center gap-2 py-2 border-b-2 transition-all text-[14px] font-bold", activeTab === 'künye' ? "border-text text-text" : "border-transparent text-text-3 hover:text-text")}>
+             <button onClick={() => setActiveTab('künye')} className={cn("flex items-center gap-2 py-2 border-b-2 transition-all text-[14px] font-bold whitespace-nowrap", activeTab === 'künye' ? "border-text text-text" : "border-transparent text-text-3 hover:text-text")}>
                <BookOpen size={16} /> Künye
              </button>
-             <button onClick={() => setActiveTab('notlar')} className={cn("flex items-center gap-2 py-2 border-b-2 transition-all text-[14px] font-bold", activeTab === 'notlar' ? "border-text text-text" : "border-transparent text-text-3 hover:text-text")}>
-               <StickyNote size={16} /> Notlar <span className="bg-surface-2 text-text-3 text-[10px] px-1.5 rounded-full">11</span>
+             <button onClick={() => setActiveTab('notlar')} className={cn("flex items-center gap-2 py-2 border-b-2 transition-all text-[14px] font-bold whitespace-nowrap", activeTab === 'notlar' ? "border-text text-text" : "border-transparent text-text-3 hover:text-text")}>
+               <StickyNote size={16} /> Notlar <span className="bg-surface-2 text-text-3 text-[10px] px-1.5 rounded-full">{notes.items.length}</span>
              </button>
           </div>
-          
-          <div className="p-8 flex-1 flex flex-col">
-             <div className="flex items-center justify-between mb-8">
-               <p className="text-[13px] text-text-3 font-medium">Ekibin göreceği duyurular</p>
-               <button className="flex items-center gap-2 bg-[#1a1a19] text-white px-4 py-2 rounded-lg text-[13px] font-bold shadow-sm hover:bg-black transition-all">
-                 + Duyuru ekle
-               </button>
-             </div>
 
-             <div className="space-y-4">
-                {[
-                  { id: 1, type: 'ÖNEMLİ', title: 'Pazartesi toplantısı', date: '18 Nis', user: 'Gizem Uysal', initials: 'GU', content: "Haftalık sync 10:00'da. Gündem: CALF-20 scale-up ilerlemesi.", color: 'bg-amber-100 text-amber-800' },
-                  { id: 2, type: 'ACİL', title: 'TÜBİTAK 1501 başvuru son tarihi yaklaşıyor', date: '17 Nis', user: 'Gizem Uysal', initials: 'GU', content: "Teknik ekip proposal draftını hafta sonu gözden geçirecek.", color: 'bg-red-100 text-red-800' },
-                  { id: 3, type: 'NORMAL', title: 'Teknopark park kartları güncellendi', date: '15 Nis', user: 'Busenur Kutlu Kara', initials: 'BK', content: "Yeni kartlar danışmada. Eskileri lütfen iade edin.", color: 'bg-surface-2 text-text-2' },
-                ].map(item => (
-                  <div key={item.id} className="p-6 border border-border/60 rounded-xl bg-white hover:shadow-md transition-shadow group relative">
-                    <div className="flex items-center gap-3 mb-3">
-                       <span className={cn("text-[9px] font-black px-2 py-0.5 rounded tracking-widest", item.color)}>{item.type}</span>
-                       <h4 className="text-[15px] font-bold text-text-2">{item.title}</h4>
-                    </div>
-                    <p className="text-[14px] text-text-2 mb-4 leading-relaxed">{item.content}</p>
-                    <div className="flex items-center justify-between text-[11px] text-text-3 font-medium">
-                       <div className="flex items-center gap-2">
-                          <span className="text-[#010D52] font-bold">{item.initials}</span>
-                          <span>{item.user}</span>
-                          <span>- {item.date}</span>
-                       </div>
-                       <button className="opacity-0 group-hover:opacity-100 text-text-3 hover:text-red-border transition-all flex items-center gap-1">
-                         <Trash2 size={12} /> sil
-                       </button>
-                    </div>
-                  </div>
-                ))}
-             </div>
+          <div className="p-8 flex-1 flex flex-col">
+            {activeTab === 'duyurular' && <DuyurularPanel currentUser={currentUser} />}
+            {activeTab === 'rehber'    && <RehberPanel />}
+            {activeTab === 'künye'     && <KunyePanel />}
+            {activeTab === 'notlar'    && <NotlarPanel currentUser={currentUser} />}
           </div>
         </div>
 
-        {/* Quick Links Section */}
-        <div className="bg-white border border-border/40 rounded-2xl shadow-sm p-6 space-y-6">
-           <div className="flex items-center justify-between">
-              <h4 className="text-[15px] font-bold flex items-center gap-2">
-                <Zap size={18} className="text-[#010D52]" /> Hızlı linkler
-              </h4>
-              <button className="text-[11px] font-bold text-text-3 hover:text-text border border-border/40 px-2 py-0.5 rounded transition-all">Düzenle</button>
-           </div>
-           
-           <div className="space-y-2">
-              {[
-                { name: 'Data Room', desc: 'Yatırımcı due diligence klasörü', initial: 'D', color: 'bg-red-50 text-red-500' },
-                { name: 'TDS / SDS / Katalog', desc: 'Ürün teknik föyleri, güvenlik bilgi formları, katalog', initial: 'T', color: 'bg-emerald-50 text-emerald-500' },
-                { name: 'İş Geliştirme Drive', desc: 'Hibe, yatırım, pazarlama, sözleşmeler', initial: 'i', color: 'bg-amber-50 text-amber-500' },
-                { name: 'Ar-Ge Drive', desc: 'Deney sonuçları, makaleler, teknik dosyalar', initial: 'A', color: 'bg-teal-50 text-teal-500' },
-                { name: 'Helios sunumu', desc: 'Yatırımcı / tanıtım sunumu', initial: 'H', color: 'bg-indigo-50 text-indigo-500' },
-                { name: 'Helios web sitesi', desc: 'heliosscitech.com', initial: 'H', color: 'bg-teal-50 text-teal-500' },
-                { name: 'Teknopark Ar-Ge Portalı', desc: 'Teknopark İstanbul proje takibi', initial: 'T', color: 'bg-emerald-50 text-emerald-500' },
-                { name: 'TÜBİTAK PRODİS', desc: '', initial: 'T', color: 'bg-blue-50 text-blue-500' },
-              ].map((link, idx) => (
-                <a key={idx} href="#" className="flex items-center gap-4 p-3 border border-transparent hover:border-border/40 hover:bg-surface rounded-xl transition-all group">
-                  <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center font-bold text-[14px] shrink-0", link.color)}>
-                    {link.initial}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-bold text-text-2 truncate">{link.name}</p>
-                    {link.desc && <p className="text-[11px] text-text-3 truncate">{link.desc}</p>}
-                  </div>
-                  <ChevronRight size={14} className="text-text-3 opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-1" />
-                </a>
-              ))}
-           </div>
-        </div>
+        <QuickLinksPanel />
       </div>
     </div>
   );

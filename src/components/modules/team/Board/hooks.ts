@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { dbToLegacyId, ensureUsersLoaded, legacyToDbId } from '../../../../lib/users';
+import { toast } from '../../../../lib/toast';
 import type { BoardColumn, BoardTask, Priority, UnitId } from './types';
 
 type DbTask = {
@@ -70,7 +71,7 @@ export function useBoardTasks() {
     if (!creatorDbId) {
       const msg = `Görev kaydedilemedi: oluşturan kullanıcı (${task.creatorId}) Supabase'de bulunamadı.`;
       console.error(msg);
-      window.alert(msg);
+      toast.error(msg);
       return null;
     }
 
@@ -107,7 +108,7 @@ export function useBoardTasks() {
 
     if (upsertError) {
       console.error('board_tasks upsert failed', upsertError);
-      window.alert('Görev kaydedilemedi:\n' + upsertError.message);
+      toast.error('Görev kaydedilemedi:\n' + upsertError.message);
       fetchTasks();
       return null;
     }
@@ -138,10 +139,10 @@ export function useBoardTasks() {
       .eq('id', id);
     if (error) {
       console.error('deleteTask failed', error);
-      window.alert('Silinemedi: ' + error.message);
+      toast.error('Silinemedi: ' + error.message);
       fetchTasks();
     } else if (count === 0) {
-      window.alert('Bu görevi silme yetkiniz yok (RLS bloklamış olabilir).');
+      toast.error('Bu görevi silme yetkiniz yok (RLS bloklamış olabilir).');
       fetchTasks();
     }
   }, [fetchTasks]);
@@ -154,10 +155,10 @@ export function useBoardTasks() {
       .eq('id', id);
     if (error) {
       console.error('changeStatus failed', error);
-      window.alert('Durum güncellenemedi: ' + error.message);
+      toast.error('Durum güncellenemedi: ' + error.message);
       fetchTasks();
     } else if (count === 0) {
-      window.alert('Bu görevin durumunu değiştirme yetkiniz yok.');
+      toast.error('Bu görevin durumunu değiştirme yetkiniz yok.');
       fetchTasks();
     }
   }, [fetchTasks]);
@@ -215,7 +216,7 @@ export function useBoardColumns() {
       .insert({ id, title: finalTitle, dot: 'bg-info-border', position: nextPos });
     if (error) {
       console.error('addColumn failed', error);
-      window.alert('Kolon kaydedilemedi:\n' + error.message + '\n\n0004_board_columns.sql migration\'ı çalışmamış olabilir.');
+      toast.error('Kolon kaydedilemedi:\n' + error.message + '\n\n0004_board_columns.sql migration\'ı çalışmamış olabilir.');
       fetchColumns();
     }
   }, [fetchColumns]);

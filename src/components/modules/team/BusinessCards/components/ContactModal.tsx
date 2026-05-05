@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { todayISO } from '../../../../../lib/dates';
+import { confirmAction } from '../../../../../lib/confirm';
 import type { ContactInfo, ContactFormData } from '../types';
 
 interface ContactModalProps {
@@ -63,8 +64,14 @@ export const ContactModal: React.FC<ContactModalProps> = ({ contact, onClose, on
     });
   };
 
-  const handleDelete = () => {
-    if (window.confirm(`"${contact?.name}" kartını silmek istediğinize emin misiniz?`)) {
+  const handleDelete = async () => {
+    const ok = await confirmAction({
+      title: 'Kartı sil?',
+      message: `"${contact?.name}" kartı kalıcı olarak silinecek.`,
+      confirmText: 'Sil',
+      variant: 'danger',
+    });
+    if (ok) {
       onDelete?.();
     }
   };

@@ -1,20 +1,16 @@
 import React from 'react';
 import { Construction } from 'lucide-react';
+import { Breadcrumb } from '../BreadcrumbHome';
 
 interface ModulePlaceholderProps {
   title: string;
   category: string;
 }
 
-export const ModulePlaceholder: React.FC<ModulePlaceholderProps> = ({ title, category }) => {
+export const ModulePlaceholder: React.FC<ModulePlaceholderProps> = ({ title }) => {
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
-      {/* Breadcrumb */}
-      <div className="bg-white px-6 py-3 border border-border/40 rounded-xl flex items-center gap-2 text-[13px] text-text-3 font-medium">
-        <span className="hover:text-text cursor-pointer capitalize">{category}</span>
-        <span>/</span>
-        <span className="text-text font-bold uppercase tracking-tight">{title}</span>
-      </div>
+      <Breadcrumb title={title} />
 
       <div className="bg-white border border-border/40 rounded-2xl shadow-sm p-20 flex flex-col items-center justify-center text-center space-y-8 min-h-150">
         <div className="w-24 h-24 bg-surface-2 rounded-3xl flex items-center justify-center text-[#378ADD] animate-pulse">

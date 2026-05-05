@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { dbToLegacyId, ensureUsersLoaded, legacyToDbId } from '../../../../lib/users';
+import { toast } from '../../../../lib/toast';
 import type {
   NewProjectFormData,
   Project,
@@ -163,7 +164,7 @@ export function useProjects() {
     await ensureUsersLoaded();
     const leaderDbId = legacyToDbId(data.leaderId);
     if (!leaderDbId) {
-      window.alert('Lider kullanıcı bulunamadı.');
+      toast.error('Lider kullanıcı bulunamadı.');
       return null;
     }
     const id = newId();
@@ -181,7 +182,7 @@ export function useProjects() {
     });
     if (pErr) {
       console.error('project insert failed', pErr);
-      window.alert('Proje kaydedilemedi:\n' + pErr.message);
+      toast.error('Proje kaydedilemedi:\n' + pErr.message);
       return null;
     }
 
@@ -203,7 +204,7 @@ export function useProjects() {
     await ensureUsersLoaded();
     const leaderDbId = legacyToDbId(data.leaderId);
     if (!leaderDbId) {
-      window.alert('Lider kullanıcı bulunamadı.');
+      toast.error('Lider kullanıcı bulunamadı.');
       return;
     }
 
@@ -218,7 +219,7 @@ export function useProjects() {
 
     if (pErr) {
       console.error('project update failed', pErr);
-      window.alert('Güncellenemedi:\n' + pErr.message);
+      toast.error('Güncellenemedi:\n' + pErr.message);
       await refresh();
       return;
     }
@@ -245,10 +246,10 @@ export function useProjects() {
       .eq('id', id);
     if (error) {
       console.error('project delete failed', error);
-      window.alert('Silinemedi:\n' + error.message);
+      toast.error('Silinemedi:\n' + error.message);
       await refresh();
     } else if (count === 0) {
-      window.alert('Bu projeyi silme yetkiniz yok.');
+      toast.error('Bu projeyi silme yetkiniz yok.');
       await refresh();
     }
   }, [refresh]);
@@ -293,7 +294,7 @@ export function useProjects() {
     });
     if (error) {
       console.error('WP insert failed', error);
-      window.alert('İş paketi eklenemedi:\n' + error.message);
+      toast.error('İş paketi eklenemedi:\n' + error.message);
       await refresh();
     }
   }, [refresh]);
@@ -370,7 +371,7 @@ export function useProjects() {
     });
     if (error) {
       console.error('report period insert failed', error);
-      window.alert('Rapor dönemi eklenemedi:\n' + error.message);
+      toast.error('Rapor dönemi eklenemedi:\n' + error.message);
       await refresh();
     }
   }, [refresh]);

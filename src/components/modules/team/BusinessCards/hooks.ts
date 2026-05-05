@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { ensureUsersLoaded, legacyToDbId } from '../../../../lib/users';
+import { toast } from '../../../../lib/toast';
 import type { ContactFormData, ContactInfo } from './types';
 
 type DbCard = {
@@ -65,7 +66,7 @@ export function useBusinessCards() {
       .order('name');
     if (error) {
       console.error('business_cards fetch failed', error);
-      window.alert('Kartvizitler yüklenemedi:\n' + error.message);
+      toast.error('Kartvizitler yüklenemedi:\n' + error.message);
       setLoading(false);
       return;
     }
@@ -89,7 +90,7 @@ export function useBusinessCards() {
       .insert({ id, ...toBaseRow(data), created_by: creatorDbId });
     if (error) {
       console.error('business_cards insert failed', error);
-      window.alert('Kartvizit kaydedilemedi:\n' + error.message);
+      toast.error('Kartvizit kaydedilemedi:\n' + error.message);
       fetchAll();
       return null;
     }
@@ -104,10 +105,10 @@ export function useBusinessCards() {
       .eq('id', id);
     if (error) {
       console.error('business_cards update failed', error);
-      window.alert('Güncellenemedi:\n' + error.message);
+      toast.error('Güncellenemedi:\n' + error.message);
       fetchAll();
     } else if (count === 0) {
-      window.alert('Bu kartı güncelleme yetkiniz yok.');
+      toast.error('Bu kartı güncelleme yetkiniz yok.');
       fetchAll();
     }
   }, [fetchAll]);
@@ -120,10 +121,10 @@ export function useBusinessCards() {
       .eq('id', id);
     if (error) {
       console.error('business_cards delete failed', error);
-      window.alert('Silinemedi:\n' + error.message);
+      toast.error('Silinemedi:\n' + error.message);
       fetchAll();
     } else if (count === 0) {
-      window.alert('Bu kartı silme yetkiniz yok.');
+      toast.error('Bu kartı silme yetkiniz yok.');
       fetchAll();
     }
   }, [fetchAll]);

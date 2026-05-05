@@ -3,6 +3,8 @@ import { Plus, Search } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import type { ModuleProps, User } from '../../../../types/portal';
 import { usePortalUsers } from '../../../../lib/users';
+import { BreadcrumbHome } from '../../../BreadcrumbHome';
+import { confirmAction } from '../../../../lib/confirm';
 import { SOPCard } from './components/SOPCard';
 import { SOPModal } from './components/SOPModal';
 import { useSOPs } from './hooks';
@@ -64,7 +66,7 @@ export const SOP: React.FC<ModuleProps> = ({ user }) => {
   return (
     <div className="max-w-7xl mx-auto p-6 md:p-8 space-y-5">
       <div className="bg-white px-5 py-3 border border-border/40 rounded-xl flex items-center gap-2 text-[13px] text-text-3 font-medium">
-        <span className="hover:text-text cursor-pointer">Uygulamalar</span>
+        <BreadcrumbHome />
         <span>/</span>
         <span className="text-text font-semibold">SOP / Prosedür</span>
       </div>
@@ -165,7 +167,13 @@ export const SOP: React.FC<ModuleProps> = ({ user }) => {
           onDelete={
             modal !== 'new'
               ? async () => {
-                  if (!window.confirm('Bu prosedürü silmek istediğinize emin misiniz?')) return;
+                  const ok = await confirmAction({
+                    title: 'Prosedürü sil?',
+                    message: 'Bu prosedür kalıcı olarak silinecek.',
+                    confirmText: 'Sil',
+                    variant: 'danger',
+                  });
+                  if (!ok) return;
                   await deleteItem(modal.id);
                   setModal(null);
                 }

@@ -8,6 +8,8 @@ import { cn } from '../../../../lib/utils';
 import type { ModuleProps } from '../../../../types/portal';
 import type { PressCategory, PressItem, PressTab } from './types';
 import { usePressItems } from './hooks';
+import { Breadcrumb } from '../../../BreadcrumbHome';
+import { confirmAction } from '../../../../lib/confirm';
 
 const BRAND = '#8A2A4A';
 
@@ -93,7 +95,13 @@ export const Press: React.FC<ModuleProps> = ({ user }) => {
   };
 
   const deleteItem = async (id: string) => {
-    if (!window.confirm('Bu haberi silmek istediğinize emin misiniz?')) return;
+    const ok = await confirmAction({
+      title: 'Haberi sil?',
+      message: 'Bu haber kalıcı olarak silinecek.',
+      confirmText: 'Sil',
+      variant: 'danger',
+    });
+    if (!ok) return;
     await deleteItemRow(id);
     if (expandedId === id) setExpandedId(null);
   };
@@ -107,7 +115,8 @@ export const Press: React.FC<ModuleProps> = ({ user }) => {
 
 
   return (
-    <div className="max-w-4xl mx-auto p-8 md:p-10">
+    <div className="max-w-4xl mx-auto p-8 md:p-10 space-y-6">
+      <Breadcrumb title="Basın / Haber arşivi" />
       {/* Header */}
       <div className="flex items-start justify-between mb-8">
         <div>

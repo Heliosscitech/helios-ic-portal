@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../../lib/supabase';
+import { toast } from '../../../../lib/toast';
 import {
   dbToLegacyId,
   ensureUsersLoaded,
@@ -192,7 +193,7 @@ export function usePurchases() {
       await ensureUsersLoaded();
       const creatorDbId = legacyToDbId(creatorLegacyId);
       if (!creatorDbId) {
-        window.alert('Talep gönderilemedi: kullanıcı bulunamadı.');
+        toast.error('Talep gönderilemedi: kullanıcı bulunamadı.');
         return null;
       }
 
@@ -202,7 +203,7 @@ export function usePurchases() {
       if (input.attachment) {
         const up = await uploadAttachment(creatorDbId, id, input.attachment);
         if (up.error) {
-          window.alert('Ek dosya yüklenemedi:\n' + up.error.message);
+          toast.error('Ek dosya yüklenemedi:\n' + up.error.message);
           return null;
         }
         attachmentPath = up.path;
@@ -237,7 +238,7 @@ export function usePurchases() {
       const { error } = await supabase.from('purchase_requests').insert(dbRow);
       if (error) {
         console.error('purchase insert failed', error);
-        window.alert('Talep kaydedilemedi:\n' + (error.message || JSON.stringify(error)));
+        toast.error('Talep kaydedilemedi:\n' + (error.message || JSON.stringify(error)));
         return null;
       }
 
@@ -259,12 +260,12 @@ export function usePurchases() {
         .eq('id', id);
       if (error) {
         console.error('purchase updateStatus failed', error);
-        window.alert('Durum güncellenemedi:\n' + error.message);
+        toast.error('Durum güncellenemedi:\n' + error.message);
         await refresh();
         return false;
       }
       if (count === 0) {
-        window.alert(
+        toast.error(
           'Bu talebin durumunu güncelleme yetkiniz yok.\nSadece "Satın alma sorumlusu" veya yönetici durum değiştirebilir.'
         );
         await refresh();
@@ -284,12 +285,12 @@ export function usePurchases() {
         .eq('id', id);
       if (error) {
         console.error('purchase delete failed', error);
-        window.alert('Silinemedi:\n' + error.message);
+        toast.error('Silinemedi:\n' + error.message);
         await refresh();
         return false;
       }
       if (count === 0) {
-        window.alert('Bu talebi silme yetkiniz yok.');
+        toast.error('Bu talebi silme yetkiniz yok.');
         await refresh();
         return false;
       }

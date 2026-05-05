@@ -5,6 +5,8 @@ import { usePortalUsers } from '../../../../lib/users';
 import { useNotifications } from '../../../../lib/notifications';
 import { useActiveEntity } from '../../../../lib/active-entity';
 import type { ModuleProps, User } from '../../../../types/portal';
+import { BreadcrumbHome } from '../../../BreadcrumbHome';
+import { confirmAction } from '../../../../lib/confirm';
 import { ExperimentRow } from './ExperimentRow';
 import { ExperimentModal } from './ExperimentModal';
 import { formatRelativeWeek, formatWeekRange, groupByWeek } from './utils';
@@ -94,8 +96,14 @@ export const ResearchPlan: React.FC<ModuleProps> = ({ user }) => {
     }
   };
 
-  const deleteExperiment = (id: string) => {
-    if (!window.confirm('Bu deneyi silmek istediğinize emin misiniz?')) return;
+  const deleteExperiment = async (id: string) => {
+    const ok = await confirmAction({
+      title: 'Deneyi sil?',
+      message: 'Bu deney kalıcı olarak silinecek.',
+      confirmText: 'Sil',
+      variant: 'danger',
+    });
+    if (!ok) return;
     deleteExperimentRow(id);
     setEditingId(null);
   };
@@ -104,8 +112,7 @@ export const ResearchPlan: React.FC<ModuleProps> = ({ user }) => {
     <div className="max-w-7xl mx-auto px-6 md:px-8 pb-10 space-y-5">
       {/* Breadcrumb */}
       <div className="bg-white px-5 py-3 border border-border/40 rounded-xl flex items-center gap-2 text-[13px] text-text-3 font-medium">
-        <ChevronLeft size={14} />
-        <span className="hover:text-text cursor-pointer">Uygulamalar</span>
+        <BreadcrumbHome />
         <span>/</span>
         <span className="text-text font-semibold">Ar-Ge Planı</span>
       </div>

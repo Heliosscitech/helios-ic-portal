@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Clock, MessageSquare, Plus, MoreVertical, GripVertical, Trash2, Check, X } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
+import { confirmAction } from '../../../../../lib/confirm';
 import { formatTRCompact, isToday } from '../../../../../lib/dates';
 import { PORTAL_USERS } from '../../../../../types/users';
 import { UNITS } from '../types';
@@ -200,11 +201,15 @@ export const BoardView: React.FC<BoardViewProps> = ({
                     <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
                       <button
                         type="button"
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.stopPropagation();
-                          if (window.confirm(`"${task.title}" işini silmek istediğine emin misin?`)) {
-                            onDeleteTask(task.id);
-                          }
+                          const ok = await confirmAction({
+                            title: 'İşi sil?',
+                            message: `"${task.title}" kalıcı olarak silinecek.`,
+                            confirmText: 'Sil',
+                            variant: 'danger',
+                          });
+                          if (ok) onDeleteTask(task.id);
                         }}
                         title="İşi sil"
                         className="p-1 text-text-3 hover:text-red-text hover:bg-red-bg rounded transition-colors"
