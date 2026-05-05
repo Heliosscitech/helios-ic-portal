@@ -3,6 +3,7 @@ import type { Notification, NotificationSource, NotificationType } from '../type
 import type { User } from '../types/portal';
 import { supabase } from './supabase';
 import { dbToLegacyId, ensureUsersLoaded, legacyToDbId } from './users';
+import { toast } from './toast';
 
 const FETCH_LIMIT = 100;
 
@@ -139,7 +140,7 @@ export const NotificationsProvider: React.FC<{
 
       if (insertError || !inserted) {
         console.error('[notif] insert failed', insertError);
-        window.alert('Bildirim kaydedilemedi:\n' + JSON.stringify(insertError));
+        toast.error('Bildirim kaydedilemedi:\n' + JSON.stringify(insertError));
         return;
       }
 
@@ -155,7 +156,7 @@ export const NotificationsProvider: React.FC<{
 
       if (targetsError) {
         console.error('[notif] targets insert failed', targetsError);
-        window.alert('Bildirim hedefleri kaydedilemedi:\n' + JSON.stringify(targetsError));
+        toast.error('Bildirim hedefleri kaydedilemedi:\n' + JSON.stringify(targetsError));
       } else {
         console.log('[notif] dispatched OK', inserted.id);
       }

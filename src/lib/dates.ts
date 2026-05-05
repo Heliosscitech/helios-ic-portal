@@ -1,7 +1,23 @@
-const TR_MONTHS_SHORT = [
+export const TR_MONTHS_SHORT = [
   'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
   'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara',
 ];
+
+export const TR_MONTHS_LONG = [
+  'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+  'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık',
+];
+
+export const formatRelative = (iso: string): string => {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const sec = Math.floor(diffMs / 1000);
+  if (sec < 60) return `${sec} sn önce`;
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min} dk önce`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr} sa önce`;
+  return `${Math.floor(hr / 24)} gün önce`;
+};
 
 const parseISO = (iso: string): Date | null => {
   if (!iso) return null;
