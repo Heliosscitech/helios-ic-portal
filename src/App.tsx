@@ -12,7 +12,6 @@ import { BusinessCards } from './components/modules/team/BusinessCards/index';
 // Lab
 import { LabChecklist } from './components/modules/lab/LabChecklist';
 import { LabBook } from './components/modules/lab/LabBook';
-import { LabStock } from './components/modules/lab/LabStock';
 import { SOP } from './components/modules/lab/SOP';
 import { ResearchPlan } from './components/modules/lab/ResearchPlan';
 
@@ -24,9 +23,7 @@ import { Onboarding } from './components/modules/hr/Onboarding';
 import { Purchasing } from './components/modules/management/Purchasing';
 import { Projects } from './components/modules/management/Projects/index';
 import { Press } from './components/modules/management/Press/index';
-import { Accounting } from './components/modules/management/Accounting';
-import { Sales } from './components/modules/management/Sales';
-import { Runway } from './components/modules/management/Runway';
+import { ModulePlaceholder } from './components/modules/ModulePlaceholder';
 import { Distributors } from './components/modules/management/Distributors';
 import { UserManagement } from './components/modules/management/UserManagement/index';
 
@@ -144,9 +141,9 @@ function App() {
       case 'board':
         return <Board user={currentUser} />;
       case 'on-muhasebe':
-        return <Accounting />;
+        return <ModulePlaceholder title="Ön Muhasebe" category="Yönetim" />;
       case 'satis':
-        return <Sales />;
+        return <ModulePlaceholder title="Satış" category="Yönetim" />;
       case 'projeler':
         return <Projects />;
       case 'kartvizitler':
@@ -158,11 +155,11 @@ function App() {
       case 'sop-prosedur':
         return <SOP user={currentUser} />;
       case 'runway':
-        return <Runway />;
+        return <ModulePlaceholder title="Runway" category="Yönetim" />;
       case 'arge-plani':
         return <ResearchPlan user={currentUser} />;
       case 'lab-stok':
-        return <LabStock />;
+        return <ModulePlaceholder title="Lab Stok" category="Lab" />;
       case 'distributor':
         return <Distributors user={currentUser} />;
       case 'kullanicilar':
