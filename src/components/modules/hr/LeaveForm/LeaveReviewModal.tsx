@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, XCircle, CalendarClock, User as UserIcon, FileText, Clock } from 'lucide-react';
+import { formatTRLong } from '../../../../lib/dates';
 import { cn } from '../../../../lib/utils';
 import { toast } from '../../../../lib/toast';
 import { useNotifications } from '../../../../lib/notifications';
@@ -18,7 +19,7 @@ interface LeaveReviewModalProps {
 
 
 const formatRange = (r: LeaveRequest) =>
-  r.rangeEnd ? `${r.rangeStart}–${r.rangeEnd} Nisan 2026` : `${r.rangeStart} Nisan 2026`;
+  r.rangeEnd ? `${formatTRLong(r.rangeStart)} – ${formatTRLong(r.rangeEnd)}` : formatTRLong(r.rangeStart);
 
 const statusStyle: Record<LeaveRequest['status'], string> = {
   pending: 'bg-amber-bg text-amber-text',
@@ -179,7 +180,7 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
 
         {request.telafiGunleri.length > 0 && (
           <Block label="Telafi günleri">
-            {request.telafiGunleri.sort((a, b) => a - b).join(', ')} Nisan
+            {request.telafiGunleri.sort().map((iso) => formatTRLong(iso)).join(', ')}
             {request.telafiNotu && <p className="mt-1 text-text-3">{request.telafiNotu}</p>}
           </Block>
         )}

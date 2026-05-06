@@ -55,6 +55,12 @@ export const todayISO = (): string => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
+export const formatTRLong = (iso: string): string => {
+  const d = parseISO(iso);
+  if (!d) return '—';
+  return `${d.getDate()} ${TR_MONTHS_LONG[d.getMonth()]} ${d.getFullYear()}`;
+};
+
 export const isToday = (iso: string, now: Date = new Date()): boolean => {
   return iso === (() => {
     const yyyy = now.getFullYear();

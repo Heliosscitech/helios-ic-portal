@@ -36,15 +36,15 @@ export interface LeaveFormState {
   departman: string;
   managerId: string; // user.id
   email: string;
-  rangeStart: number;
-  rangeEnd: number;
+  rangeStart: string; // ISO date "YYYY-MM-DD", empty = not selected
+  rangeEnd: string;   // ISO date "YYYY-MM-DD", empty = single day
   reason: LeaveReasonId;
   reasonDetail: string;
   belge: BelgeDurumu;
   belgeFileName?: string;
   belgeFileDataUrl?: string;
   telafiNotu: string;
-  telafiGunleri: number[];
+  telafiGunleri: string[]; // ISO dates
 }
 
 export interface LeaveRequest {
@@ -53,8 +53,8 @@ export interface LeaveRequest {
   departman: string;
   managerId: string;
   email: string;
-  rangeStart: number;
-  rangeEnd: number;
+  rangeStart: string; // ISO date "YYYY-MM-DD"
+  rangeEnd: string;   // ISO date "YYYY-MM-DD", empty = single day
   reason: LeaveReasonId;
   reasonDetail: string;
   belge: BelgeDurumu;
@@ -62,7 +62,7 @@ export interface LeaveRequest {
   belgeFileDataUrl?: string;
   belgePath?: string;
   telafiNotu: string;
-  telafiGunleri: number[];
+  telafiGunleri: string[]; // ISO dates
   submittedAt: number;
   status: 'pending' | 'approved' | 'rejected';
   reviewerNote?: string;

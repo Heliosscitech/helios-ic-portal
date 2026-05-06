@@ -4,16 +4,8 @@ import { dbToLegacyId, ensureUsersLoaded, legacyToDbId } from '../../../../lib/u
 import { toast } from '../../../../lib/toast';
 import type { BelgeDurumu, LeaveFormState, LeaveReasonId, LeaveRequest } from './types';
 
-// Year/month is hardcoded to April 2026 to match the LeaveForm UI calendar.
-const YEAR = 2026;
-const MONTH = 4;
-
-const padDay = (d: number) => String(d).padStart(2, '0');
-const dayToDateString = (day: number): string =>
-  `${YEAR}-${String(MONTH).padStart(2, '0')}-${padDay(day)}`;
-const dayToTimestamp = (day: number, hour = 0): string =>
-  `${dayToDateString(day)}T${String(hour).padStart(2, '0')}:00:00Z`;
-const isoToDay = (iso: string): number => parseInt(iso.split('-')[2].slice(0, 2), 10);
+const isoToTimestamp = (iso: string, hour = 0): string =>
+  `${iso}T${String(hour).padStart(2, '0')}:00:00Z`;
 
 type DbLeave = {
   id: string;
@@ -45,15 +37,15 @@ const toLeave = (row: DbLeave): LeaveRequest => ({
   departman: row.department,
   managerId: dbToLegacyId(row.manager_id) ?? row.manager_id,
   email: row.email,
-  rangeStart: isoToDay(row.range_start),
-  rangeEnd: isoToDay(row.range_end),
+  rangeStart: row.range_start.slice(0, 10),
+  rangeEnd: row.range_end ? row.range_end.slice(0, 10) : '',
   reason: row.reason,
   reasonDetail: row.reason_detail ?? '',
   belge: row.belge_status,
   belgeFileName: row.belge_filename ?? undefined,
   belgePath: row.belge_path ?? undefined,
   telafiNotu: row.telafi_notu ?? '',
-  telafiGunleri: (row.telafi_gunleri ?? []).map((d) => isoToDay(d)),
+  telafiGunleri: (row.telafi_gunleri ?? []).map((d) => d.slice(0, 10)),
   submittedAt: new Date(row.submitted_at).getTime(),
   status: row.status,
   reviewerNote: row.reviewer_note ?? undefined,
@@ -156,8 +148,8 @@ export function useLeaveRequests() {
       }
 
       const id = newId();
-      const start = dayToTimestamp(form.rangeStart);
-      const end = dayToTimestamp(form.rangeEnd || form.rangeStart, 23);
+      const start = isoToTimestamp(form.rangeStart);
+      const end = isoToTimestamp(form.rangeEnd || form.rangeStart, 23);
 
       let belgePath: string | null = null;
       if (form.belgeFileDataUrl && form.belgeFileName) {
@@ -188,7 +180,7 @@ export function useLeaveRequests() {
         belge_path: belgePath,
         belge_filename: form.belgeFileName || null,
         telafi_notu: form.telafiNotu || null,
-        telafi_gunleri: form.telafiGunleri.map((d) => dayToDateString(d)),
+        telafi_gunleri: form.telafiGunleri,
         status: 'pending' as const,
       };
 

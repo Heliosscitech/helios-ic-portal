@@ -1,18 +1,19 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight, X, Upload, FileText } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
+import { TR_MONTHS_LONG, formatTRLong } from '../../../../../lib/dates';
 import { REASONS } from '../types';
 import type { BelgeDurumu, LeaveReasonId } from '../types';
 
 interface StepDateReasonProps {
-  rangeStart: number;
-  rangeEnd: number;
+  rangeStart: string; // ISO "YYYY-MM-DD", empty = not selected
+  rangeEnd: string;   // ISO "YYYY-MM-DD", empty = single day
   reason: LeaveReasonId;
   reasonDetail: string;
   belge: BelgeDurumu;
   belgeFileName?: string;
   belgeFileDataUrl?: string;
-  onToggleRange: (day: number) => void;
+  onToggleRange: (dateStr: string) => void;
   onClearRange: () => void;
   onReasonChange: (r: LeaveReasonId) => void;
   onReasonDetailChange: (v: string) => void;
@@ -20,10 +21,8 @@ interface StepDateReasonProps {
   onBelgeFileChange: (name: string | undefined, dataUrl: string | undefined) => void;
 }
 
-const MAX_INLINE_FILE_BYTES = 1_000_000; // ~1MB raw; data URL ~1.3MB
-
+const MAX_INLINE_FILE_BYTES = 1_000_000;
 const WEEK_DAYS = ['PZT', 'SAL', 'ÇAR', 'PER', 'CUM', 'CMT', 'PAZ'];
-const CALENDAR_DAYS = Array.from({ length: 30 }, (_, i) => i + 1);
 
 const SELECT_BG =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")";
@@ -44,6 +43,32 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
   onBelgeFileChange,
 }) => {
   const [fileError, setFileError] = React.useState<string | null>(null);
+  const today = new Date();
+  const [viewYear, setViewYear] = React.useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = React.useState(today.getMonth() + 1); // 1-12
+
+  const daysInMonth = new Date(viewYear, viewMonth, 0).getDate();
+  const firstOffset = (new Date(viewYear, viewMonth - 1, 1).getDay() + 6) % 7; // Mon = 0
+  const monthLabel = `${TR_MONTHS_LONG[viewMonth - 1]} ${viewYear}`;
+
+  const navigateMonth = (dir: number) => {
+    let m = viewMonth + dir;
+    let y = viewYear;
+    if (m < 1) { m = 12; y--; }
+    if (m > 12) { m = 1; y++; }
+    setViewMonth(m);
+    setViewYear(y);
+  };
+
+  const toISO = (day: number) =>
+    `${viewYear}-${String(viewMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+  const isInRange = (day: number): boolean => {
+    if (!rangeStart) return false;
+    const iso = toISO(day);
+    if (!rangeEnd) return iso === rangeStart;
+    return iso >= rangeStart && iso <= rangeEnd;
+  };
 
   const handleFile = (file: File | null) => {
     if (!file) return;
@@ -63,10 +88,6 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
     };
     reader.readAsDataURL(file);
   };
-  const isInRange = (day: number): boolean => {
-    if (!rangeStart || !rangeEnd) return day === rangeStart;
-    return day >= rangeStart && day <= rangeEnd;
-  };
 
   return (
     <div className="space-y-6">
@@ -82,43 +103,49 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
 
         <div className="max-w-100 mx-auto text-center">
           <div className="flex items-center justify-between mb-4">
-            <button className="p-1 hover:bg-surface-2 rounded border border-border/20">
+            <button
+              type="button"
+              onClick={() => navigateMonth(-1)}
+              className="p-1 hover:bg-surface-2 rounded border border-border/20"
+            >
               <ChevronLeft size={16} />
             </button>
-            <span className="text-[15px] font-semibold text-text">Nisan 2026</span>
-            <button className="p-1 hover:bg-surface-2 rounded border border-border/20">
+            <span className="text-[15px] font-semibold text-text">{monthLabel}</span>
+            <button
+              type="button"
+              onClick={() => navigateMonth(1)}
+              className="p-1 hover:bg-surface-2 rounded border border-border/20"
+            >
               <ChevronRight size={16} />
             </button>
           </div>
           <div className="grid grid-cols-7 mb-2">
             {WEEK_DAYS.map((d) => (
-              <span key={d} className="text-[11px] font-semibold text-text-3">
-                {d}
-              </span>
+              <span key={d} className="text-[11px] font-semibold text-text-3">{d}</span>
             ))}
           </div>
           <div className="grid grid-cols-7 gap-y-1">
-            <div className="h-10"></div>
-            <div className="h-10"></div>
-            {CALENDAR_DAYS.map((d) => (
+            {Array.from({ length: firstOffset }, (_, i) => (
+              <div key={`e${i}`} className="h-10" />
+            ))}
+            {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
               <button
                 type="button"
                 key={d}
-                onClick={() => onToggleRange(d)}
+                onClick={() => onToggleRange(toISO(d))}
                 className={cn(
                   'h-10 text-[13px] font-semibold rounded-lg transition-all',
-                  isInRange(d) ? 'bg-[#BA7517] text-white' : 'text-text-3 hover:bg-surface-2',
-                  d === 22 && !isInRange(d) && 'text-[#378ADD]'
+                  isInRange(d) ? 'bg-[#BA7517] text-white' : 'text-text-3 hover:bg-surface-2'
                 )}
               >
                 {d}
               </button>
             ))}
           </div>
-          {rangeStart > 0 && (
+          {rangeStart && (
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <span className="text-[13px] font-semibold text-text-2 border-b-2 border-[#BA7517] pb-0.5">
-                {rangeStart} Nisan 2026 {rangeEnd ? `— ${rangeEnd} Nisan 2026` : ''}
+                {formatTRLong(rangeStart)}{rangeEnd ? ` — ${formatTRLong(rangeEnd)}` : ''}
               </span>
               <button
                 type="button"
@@ -150,12 +177,7 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
                   : 'bg-surface border-border/40 hover:border-border'
               )}
             >
-              <div
-                className={cn(
-                  'shrink-0',
-                  reason === r.id ? 'text-white' : 'text-text-3 group-hover:text-text'
-                )}
-              >
+              <div className={cn('shrink-0', reason === r.id ? 'text-white' : 'text-text-3 group-hover:text-text')}>
                 <r.icon size={20} />
               </div>
               <span className="text-[14px] font-semibold">{r.label}</span>
@@ -203,9 +225,7 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
               {belgeFileName ? (
                 <div className="flex items-center gap-3 px-3 py-2 border border-teal-border/40 bg-teal-bg/30 rounded-xl">
                   <FileText size={16} className="text-teal-text shrink-0" />
-                  <span className="flex-1 min-w-0 text-[13px] font-semibold text-text truncate">
-                    {belgeFileName}
-                  </span>
+                  <span className="flex-1 min-w-0 text-[13px] font-semibold text-text truncate">{belgeFileName}</span>
                   {belgeFileDataUrl && (
                     <a
                       href={belgeFileDataUrl}
@@ -217,10 +237,7 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
                   )}
                   <button
                     type="button"
-                    onClick={() => {
-                      onBelgeFileChange(undefined, undefined);
-                      setFileError(null);
-                    }}
+                    onClick={() => { onBelgeFileChange(undefined, undefined); setFileError(null); }}
                     className="p-1 text-text-3 hover:text-red-text hover:bg-red-bg rounded transition-colors"
                     title="Kaldır"
                   >
@@ -238,9 +255,7 @@ export const StepDateReason: React.FC<StepDateReasonProps> = ({
                   />
                 </label>
               )}
-              {fileError && (
-                <p className="mt-1.5 text-[11px] text-amber-text">{fileError}</p>
-              )}
+              {fileError && <p className="mt-1.5 text-[11px] text-amber-text">{fileError}</p>}
             </div>
           )}
         </div>

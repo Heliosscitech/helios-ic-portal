@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Check, ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
+import { formatTRLong } from '../../../../lib/dates';
 import { cn } from '../../../../lib/utils';
 import { usePortalUsers } from '../../../../lib/users';
 import type { ModuleProps } from '../../../../types/portal';
@@ -18,8 +19,8 @@ const buildInitialForm = (employeeId: string, employeeName: string): LeaveFormSt
   departman: 'is-gelistirme',
   managerId: '',
   email: employeeName.split(' ')[0]?.toLowerCase() ?? '',
-  rangeStart: 0,
-  rangeEnd: 0,
+  rangeStart: '',
+  rangeEnd: '',
   reason: 'saglik',
   reasonDetail: '',
   belge: 'Sonradan getireceğim',
@@ -39,29 +40,28 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
   const myRequests = requests.filter((r) => r.employeeId === user.id);
   const assignedToMe = requests.filter((r) => r.managerId === user.id);
 
-  const handleToggleRange = (day: number) => {
+  const handleToggleRange = (dateStr: string) => {
     setForm((prev) => {
       if (!prev.rangeStart || (prev.rangeStart && prev.rangeEnd)) {
-        return { ...prev, rangeStart: day, rangeEnd: 0 };
+        return { ...prev, rangeStart: dateStr, rangeEnd: '' };
       }
-      const start = Math.min(prev.rangeStart, day);
-      const end = Math.max(prev.rangeStart, day);
-      return { ...prev, rangeStart: start, rangeEnd: end };
+      const [start, end] = [prev.rangeStart, dateStr].sort();
+      return { ...prev, rangeStart: start, rangeEnd: end === start ? '' : end };
     });
   };
 
-  const handleToggleTelafi = (day: number) => {
+  const handleToggleTelafi = (dateStr: string) => {
     setForm((prev) => ({
       ...prev,
-      telafiGunleri: prev.telafiGunleri.includes(day)
-        ? prev.telafiGunleri.filter((d) => d !== day)
-        : [...prev.telafiGunleri, day],
+      telafiGunleri: prev.telafiGunleri.includes(dateStr)
+        ? prev.telafiGunleri.filter((d) => d !== dateStr)
+        : [...prev.telafiGunleri, dateStr],
     }));
   };
 
   const canGoNext =
     step === 1 ? form.managerId !== '' && form.departman && form.email :
-    step === 2 ? form.rangeStart > 0 && form.reason :
+    step === 2 ? !!form.rangeStart && !!form.reason :
     true;
 
   const handleSubmit = async () => {
@@ -69,8 +69,8 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
     if (!saved) return;
 
     const rangeLabel = saved.rangeEnd
-      ? `${saved.rangeStart}–${saved.rangeEnd} Nisan 2026`
-      : `${saved.rangeStart} Nisan 2026`;
+      ? `${formatTRLong(saved.rangeStart)} – ${formatTRLong(saved.rangeEnd)}`
+      : formatTRLong(saved.rangeStart);
 
     if (form.managerId && form.managerId !== user.id) {
       dispatch({
@@ -178,7 +178,7 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
             belgeFileName={form.belgeFileName}
             belgeFileDataUrl={form.belgeFileDataUrl}
             onToggleRange={handleToggleRange}
-            onClearRange={() => setForm({ ...form, rangeStart: 0, rangeEnd: 0 })}
+            onClearRange={() => setForm({ ...form, rangeStart: '', rangeEnd: '' })}
             onReasonChange={(r) => setForm({ ...form, reason: r })}
             onReasonDetailChange={(v) => setForm({ ...form, reasonDetail: v })}
             onBelgeChange={(v) => setForm({ ...form, belge: v })}
