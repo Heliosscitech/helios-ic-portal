@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { User } from '../../types/portal';
-import { ChevronDown, LogOut, User as UserIcon, Settings } from 'lucide-react';
+import { ChevronDown, LogOut, User as UserIcon } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { NotificationsBell } from './NotificationsBell';
 import { ProfileModal } from '../modals/ProfileModal';
@@ -78,9 +78,6 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onGoHome }) => {
                 <div className="p-1">
                    <button onClick={openProfile} className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-text-2 hover:bg-surface-2 rounded-xl transition-colors">
                      <UserIcon size={16} /> Profilim
-                   </button>
-                   <button onClick={openProfile} className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-text-2 hover:bg-surface-2 rounded-xl transition-colors">
-                     <Settings size={16} /> Ayarlar
                    </button>
                 </div>
                 <div className="h-px bg-border/40 my-1 mx-2"></div>

@@ -132,10 +132,16 @@ export function usePortalUsers() {
     return data?.user ?? null;
   }, []);
 
-  const deleteUser = useCallback(async (_id: string) => {
-    throw new Error(
-      'Kullanıcı silmek için Supabase Studio → Authentication → Users panelinden auth kullanıcısını silin (public.users satırı cascade ile silinir).'
-    );
+  const deleteUser = useCallback(async (legacyId: string) => {
+    const target = (cache ?? []).find((u) => u.id === legacyId);
+    if (!target?.dbId) throw new Error('Kullanıcı bulunamadı.');
+    const { data, error } = await supabase.functions.invoke('delete-portal-user', {
+      body: { userId: target.dbId },
+    });
+    if (error) throw error;
+    if (data?.error) throw new Error(data.error);
+    const fresh = await fetchAll();
+    broadcast(fresh);
   }, []);
 
   const refresh = useCallback(async () => {

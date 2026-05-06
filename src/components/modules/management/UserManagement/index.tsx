@@ -7,6 +7,7 @@ import { ALL_MODULE_IDS } from '../../../../types/users';
 import type { ModuleId, Responsibility, User, UserRole } from '../../../../types/portal';
 import { Breadcrumb } from '../../../BreadcrumbHome';
 import { useToast } from '../../../../lib/toast';
+import { useConfirm } from '../../../../lib/confirm';
 
 interface UserManagementProps {
   currentUserId: string;
@@ -61,9 +62,10 @@ const getAutoInitials = (name: string) =>
   name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
 
 export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId, isAdmin }) => {
-  const { users, loading, updateUser, addUser } = usePortalUsers();
+  const { users, loading, updateUser, addUser, deleteUser } = usePortalUsers();
   const [modalMode, setModalMode] = useState<ModalMode | null>(null);
   const toast = useToast();
+  const confirm = useConfirm();
 
   return (
     <div className="max-w-3xl mx-auto p-8 md:p-10 space-y-6">
@@ -141,6 +143,23 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId, i
               }
             }
           }}
+          onDelete={modalMode.kind === 'edit' && modalMode.user.id !== currentUserId ? async () => {
+            if (modalMode.kind !== 'edit') return;
+            const ok = await confirm({
+              title: 'Kullanıcıyı sil?',
+              message: `"${modalMode.user.name}" hesabı kalıcı olarak silinecek. Bu işlem geri alınamaz.`,
+              confirmText: 'Sil',
+              variant: 'danger',
+            });
+            if (!ok) return;
+            try {
+              await deleteUser(modalMode.user.id);
+              toast.success('Kullanıcı silindi');
+              setModalMode(null);
+            } catch (err) {
+              toast.error((err as Error).message ?? 'Silinemedi');
+            }
+          } : undefined}
         />
       )}
     </div>
@@ -166,6 +185,7 @@ interface UserFormModalProps {
   currentUserId: string;
   onClose: () => void;
   onSave: (patch: Partial<User>, newUserData?: NewUserData) => void;
+  onDelete?: () => void;
 }
 
 const UserFormModal: React.FC<UserFormModalProps> = ({
@@ -173,6 +193,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
   currentUserId,
   onClose,
   onSave,
+  onDelete,
 }) => {
   const isAdd = mode.kind === 'add';
   const user = isAdd ? null : mode.user;
@@ -490,15 +511,25 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-border/40 bg-surface-2/30 flex items-center justify-end gap-2">
-              <button type="button" onClick={onClose}
-                className="px-4 py-2 border border-border rounded-lg text-[13px] font-semibold text-text-2 hover:bg-surface-2 transition-colors">
-                Vazgeç
-              </button>
-              <button type="submit" disabled={saving}
-                className="px-5 py-2 text-white rounded-lg text-[13px] font-semibold bg-[#1a1a19] shadow-sm hover:bg-black transition-colors disabled:opacity-50">
-                {saving ? 'Kaydediliyor…' : 'Kaydet'}
-              </button>
+            <div className="px-6 py-4 border-t border-border/40 bg-surface-2/30 flex items-center justify-between gap-2">
+              <div>
+                {onDelete && (
+                  <button type="button" onClick={onDelete}
+                    className="px-4 py-2 text-[13px] font-semibold text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                    Kullanıcıyı Sil
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <button type="button" onClick={onClose}
+                  className="px-4 py-2 border border-border rounded-lg text-[13px] font-semibold text-text-2 hover:bg-surface-2 transition-colors">
+                  Vazgeç
+                </button>
+                <button type="submit" disabled={saving}
+                  className="px-5 py-2 text-white rounded-lg text-[13px] font-semibold bg-[#1a1a19] shadow-sm hover:bg-black transition-colors disabled:opacity-50">
+                  {saving ? 'Kaydediliyor…' : 'Kaydet'}
+                </button>
+              </div>
             </div>
           </form>
         </motion.div>
