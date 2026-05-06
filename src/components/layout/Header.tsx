@@ -25,7 +25,7 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onGoHome }) => {
           className="flex items-center gap-3 cursor-pointer select-none group"
           onClick={onGoHome}
         >
-          <img src="/logo-light.png" alt="Helios" className="h-8 w-auto" />
+          <img src="/logo-light.png" alt="Helios" className="h-11 w-auto" />
         </div>
       </div>
 
