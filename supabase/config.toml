@@ -3,3 +3,9 @@
 
 [functions.sync-from-helios-portal]
 verify_jwt = false
+
+[functions.create-portal-user]
+verify_jwt = false
+
+[functions.delete-portal-user]
+verify_jwt = false
