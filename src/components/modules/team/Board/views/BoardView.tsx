@@ -311,7 +311,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
         })}
 
         {/* Add column */}
-        <div className="w-[280px] shrink-0">
+        <div className="w-70 shrink-0">
           {adding ? (
             <div className="bg-white border-2 border-info-border rounded-xl p-3 shadow-md flex items-center gap-2">
               <input
