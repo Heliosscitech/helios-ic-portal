@@ -20,20 +20,7 @@ type LoginUser = {
 
 const HeliosLogo = () => (
   <div className="flex flex-col items-center gap-2 mb-10">
-    <div className="flex items-center gap-3">
-      <svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="25" cy="25" r="8" fill="#010D52" />
-        <circle cx="25" cy="50" r="10" fill="#010D52" />
-        <circle cx="25" cy="75" r="8" fill="#010D52" />
-        <circle cx="50" cy="50" r="12" fill="#010D52" />
-        <circle cx="45" cy="30" r="6" fill="#010D52" />
-        <circle cx="45" cy="70" r="6" fill="#010D52" />
-        <path d="M25 50L50 50" stroke="#010D52" strokeWidth="2" opacity="0.3" />
-        <path d="M25 25L45 30" stroke="#010D52" strokeWidth="2" opacity="0.1" />
-        <path d="M25 75L45 70" stroke="#010D52" strokeWidth="2" opacity="0.1" />
-      </svg>
-      <span className="text-[42px] font-bold text-[#010D52] tracking-tight">helios</span>
-    </div>
+    <img src="/logo-light.png" alt="Helios" className="h-12 w-auto" />
     <span className="text-[14px] text-text-3 font-medium">İç portal</span>
   </div>
 );

@@ -25,22 +25,7 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onGoHome }) => {
           className="flex items-center gap-3 cursor-pointer select-none group"
           onClick={onGoHome}
         >
-          <div className="w-10 h-10 flex items-center justify-center">
-             <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="25" cy="25" r="8" fill="#010D52" />
-                <circle cx="25" cy="50" r="10" fill="#010D52" />
-                <circle cx="25" cy="75" r="8" fill="#010D52" />
-                <circle cx="50" cy="50" r="12" fill="#010D52" />
-                <circle cx="45" cy="30" r="6" fill="#010D52" />
-                <circle cx="45" cy="70" r="6" fill="#010D52" />
-             </svg>
-          </div>
-          <div>
-            <h1 className="text-[17px] font-bold text-text-2 leading-none flex items-center gap-1">
-              Helios <span className="font-normal opacity-70">iç portal</span>
-            </h1>
-            <p className="text-[11px] text-text-3 font-medium tracking-tight mt-1">Bilim ve Teknoloji A.Ş.</p>
-          </div>
+          <img src="/logo-light.png" alt="Helios" className="h-8 w-auto" />
         </div>
       </div>
 
