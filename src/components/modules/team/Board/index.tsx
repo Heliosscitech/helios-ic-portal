@@ -69,7 +69,7 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
   } = useBoardColumns();
   const [view, setView] = useState<ViewMode>('board');
   const [filter, setFilter] = useState<BoardFilter>(DEFAULT_FILTER);
-  const [modal, setModal] = useState<{ mode: TaskModalMode; taskId?: string } | null>(null);
+  const [modal, setModal] = useState<{ mode: TaskModalMode; taskId?: string; initialStatus?: string } | null>(null);
 
   const { dispatch } = useNotifications();
   const { active, clear: clearActiveEntity } = useActiveEntity();
@@ -325,6 +325,7 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
               onTaskClick={(id) => setModal({ mode: 'detail', taskId: id })}
               onStatusChange={handleStatusChange}
               onDeleteTask={handleDeleteTask}
+              onAddTask={(colId) => setModal({ mode: 'create', initialStatus: colId })}
               onAddColumn={addColumn}
               onRenameColumn={renameColumn}
               onDeleteColumn={deleteColumn}
@@ -348,6 +349,7 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
           task={activeTask}
           columns={columns}
           currentUserId={user.id}
+          initialStatus={modal.initialStatus}
           onClose={() => setModal(null)}
           onSave={handleSaveTask}
           onDelete={handleDeleteTask}

@@ -11,6 +11,7 @@ import { REASONS } from './types';
 import type { LeaveFormState, LeaveRequest } from './types';
 import { useLeaveRequests } from './hooks';
 import { BreadcrumbHome } from '../../../BreadcrumbHome';
+import { LeaveReviewModal } from './LeaveReviewModal';
 
 const buildInitialForm = (employeeId: string, employeeName: string): LeaveFormState => ({
   employeeId,
@@ -31,6 +32,7 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
   const [form, setForm] = useState<LeaveFormState>(() => buildInitialForm(user.id, user.name));
   const [justSubmittedId, setJustSubmittedId] = useState<string | null>(null);
   const { requests, submitRequest } = useLeaveRequests();
+  const [reviewingId, setReviewingId] = useState<string | null>(null);
 
   const { dispatch } = useNotifications();
 
@@ -232,6 +234,7 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
               requests={myRequests}
               role="employee"
               currentUserId={user.id}
+              onReview={setReviewingId}
             />
           )}
           {assignedToMe.length > 0 && (
@@ -240,9 +243,18 @@ export const LeaveForm: React.FC<ModuleProps> = ({ user }) => {
               requests={assignedToMe}
               role="manager"
               currentUserId={user.id}
+              onReview={setReviewingId}
             />
           )}
         </div>
+      )}
+
+      {reviewingId && (
+        <LeaveReviewModal
+          requestId={reviewingId}
+          currentUserId={user.id}
+          onClose={() => setReviewingId(null)}
+        />
       )}
 
       <div className="text-center pt-10 opacity-40">
@@ -259,9 +271,10 @@ interface RequestsListProps {
   requests: LeaveRequest[];
   role: 'employee' | 'manager';
   currentUserId: string;
+  onReview: (id: string) => void;
 }
 
-const RequestsList: React.FC<RequestsListProps> = ({ title, requests, role }) => {
+const RequestsList: React.FC<RequestsListProps> = ({ title, requests, role, onReview }) => {
   const findUser = (id: string) => PORTAL_USERS.find((u) => u.id === id);
 
   return (
@@ -287,7 +300,8 @@ const RequestsList: React.FC<RequestsListProps> = ({ title, requests, role }) =>
           return (
             <div
               key={r.id}
-              className="flex items-center justify-between p-3 border border-border/30 rounded-lg hover:bg-surface-2/30 transition-colors"
+              onClick={() => onReview(r.id)}
+              className="flex items-center justify-between p-3 border border-border/30 rounded-lg hover:bg-surface-2/30 transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 <span

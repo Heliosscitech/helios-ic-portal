@@ -22,9 +22,10 @@ import {
 import { cn } from '../../lib/utils';
 import { useNotifications } from '../../lib/notifications';
 import { useActiveEntity } from '../../lib/active-entity';
-import { PORTAL_USERS } from '../../types/users';
+import { usePortalUsers } from '../../lib/users';
 import { formatRelativeTime } from '../../types/notifications';
 import type { Notification, NotificationSource, NotificationType } from '../../types/notifications';
+import type { User } from '../../types/portal';
 
 const TYPE_ICON: Record<NotificationType, React.ReactNode> = {
   'task-created': <PlusCircle size={10} />,
@@ -70,12 +71,11 @@ const TYPE_TONE: Record<NotificationType, string> = {
 
 const ROUTABLE_SOURCES: NotificationSource[] = ['board', 'leave', 'satin-alma', 'distributor', 'arge'];
 
-const getActor = (id: string) => PORTAL_USERS.find((u) => u.id === id);
-
 export const NotificationsBell: React.FC = () => {
   const { forMe, unreadCount, currentUserId, markRead, markAllRead, clearAll } =
     useNotifications();
   const { open: openActiveEntity } = useActiveEntity();
+  const { users } = usePortalUsers();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -163,6 +163,7 @@ export const NotificationsBell: React.FC = () => {
                 <NotificationItem
                   key={n.id}
                   notification={n}
+                  users={users}
                   isUnread={!n.readBy.includes(currentUserId)}
                   onActivate={() => handleActivate(n)}
                 />
@@ -177,12 +178,13 @@ export const NotificationsBell: React.FC = () => {
 
 interface NotificationItemProps {
   notification: Notification;
+  users: User[];
   isUnread: boolean;
   onActivate: () => void;
 }
 
-const NotificationItem: React.FC<NotificationItemProps> = ({ notification: n, isUnread, onActivate }) => {
-  const actor = getActor(n.actorId);
+const NotificationItem: React.FC<NotificationItemProps> = ({ notification: n, users, isUnread, onActivate }) => {
+  const actor = users.find((u) => u.id === n.actorId);
   return (
     <button
       onClick={onActivate}

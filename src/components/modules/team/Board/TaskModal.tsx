@@ -17,6 +17,7 @@ interface TaskModalProps {
   task?: BoardTask;
   columns: BoardColumn[];
   currentUserId: string;
+  initialStatus?: string;
   onClose: () => void;
   onSave: (task: BoardTask) => void;
   onDelete?: (id: string) => void;
@@ -43,11 +44,12 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   task,
   columns,
   currentUserId,
+  initialStatus,
   onClose,
   onSave,
   onDelete,
 }) => {
-  const defaultStatus = columns[0]?.id ?? 'todo';
+  const defaultStatus = initialStatus ?? columns[0]?.id ?? 'todo';
   const [form, setForm] = useState<FormState>(() =>
     mode === 'detail' && task
       ? {

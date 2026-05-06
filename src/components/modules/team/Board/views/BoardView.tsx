@@ -13,6 +13,7 @@ interface BoardViewProps {
   onTaskClick: (id: string) => void;
   onStatusChange: (id: string, status: TaskStatus) => void;
   onDeleteTask: (id: string) => void;
+  onAddTask: (columnId: string) => void;
   onAddColumn: (title: string) => void;
   onRenameColumn: (id: string, title: string) => void;
   onDeleteColumn: (id: string) => void;
@@ -34,6 +35,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
   onTaskClick,
   onStatusChange,
   onDeleteTask,
+  onAddTask,
   onAddColumn,
   onRenameColumn,
   onDeleteColumn,
@@ -296,7 +298,10 @@ export const BoardView: React.FC<BoardViewProps> = ({
               </div>
 
               <div className="px-2 pb-3">
-                <button className="w-full flex items-center gap-2 justify-center py-2 text-[12.5px] text-text-3 hover:text-text hover:bg-white/50 rounded-lg transition-all">
+                <button
+                  onClick={() => onAddTask(col.id)}
+                  className="w-full flex items-center gap-2 justify-center py-2 text-[12.5px] text-text-3 hover:text-text hover:bg-white/50 rounded-lg transition-all"
+                >
                   <Plus size={14} /> Görev Ekle
                 </button>
               </div>
