@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Shield, User as UserIcon, Check } from 'lucide-react';
+import { X, Shield, User as UserIcon, Check, Plus } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import { usePortalUsers } from '../../../../lib/users';
 import { ALL_MODULE_IDS } from '../../../../types/users';
 import type { ModuleId, Responsibility, User, UserRole } from '../../../../types/portal';
 import { Breadcrumb } from '../../../BreadcrumbHome';
+import { useToast } from '../../../../lib/toast';
 
 interface UserManagementProps {
   currentUserId: string;
+  isAdmin: boolean;
 }
+
+type ModalMode = { kind: 'edit'; user: User } | { kind: 'add' };
 
 const COLOR_PRESETS = [
   'bg-indigo-100 text-indigo-700',
@@ -56,9 +60,10 @@ const RESPONSIBILITY_INFO: { id: Responsibility; label: string; description: str
 const getAutoInitials = (name: string) =>
   name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2);
 
-export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId }) => {
-  const { users, loading, updateUser } = usePortalUsers();
-  const [editUser, setEditUser] = useState<User | null>(null);
+export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId, isAdmin }) => {
+  const { users, loading, updateUser, addUser } = usePortalUsers();
+  const [modalMode, setModalMode] = useState<ModalMode | null>(null);
+  const toast = useToast();
 
   return (
     <div className="max-w-3xl mx-auto p-8 md:p-10 space-y-6">
@@ -68,9 +73,14 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId })
           <h2 className="text-[17px] font-semibold text-text tracking-tight mb-1">Kullanıcı Yönetimi</h2>
           <p className="text-[13px] text-text-3">Ekip üyelerinin rolleri ve modül erişimleri</p>
         </div>
-        <div className="text-[11px] text-text-3 max-w-56 text-right leading-relaxed">
-          Yeni kullanıcı eklemek için Supabase Studio → Authentication panelini kullanın
-        </div>
+        {isAdmin && (
+          <button
+            onClick={() => setModalMode({ kind: 'add' })}
+            className="flex items-center gap-2 px-4 py-2 bg-[#1a1a19] text-white rounded-xl text-[13px] font-semibold hover:bg-black transition-colors shadow-sm"
+          >
+            <Plus size={15} /> Yeni Kullanıcı
+          </button>
+        )}
       </div>
 
       {loading && (
@@ -102,7 +112,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId })
               </span>
             )}
             <button
-              onClick={() => setEditUser(user)}
+              onClick={() => setModalMode({ kind: 'edit', user })}
               className="px-3 py-1.5 text-[12.5px] font-semibold text-text-2 hover:bg-surface-2 rounded-lg transition-colors shrink-0"
             >
               Düzenle
@@ -111,13 +121,26 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId })
         ))}
       </div>
 
-      {editUser && (
+      {modalMode && (
         <UserFormModal
-          key={editUser.id}
-          user={editUser}
+          key={modalMode.kind === 'edit' ? modalMode.user.id : 'new'}
+          mode={modalMode}
           currentUserId={currentUserId}
-          onClose={() => setEditUser(null)}
-          onSave={(patch) => { updateUser(editUser.id, patch); setEditUser(null); }}
+          onClose={() => setModalMode(null)}
+          onSave={async (patch, newUserData) => {
+            if (modalMode.kind === 'edit') {
+              updateUser(modalMode.user.id, patch);
+              setModalMode(null);
+            } else if (newUserData) {
+              try {
+                await addUser(newUserData);
+                toast.success('Kullanıcı eklendi');
+                setModalMode(null);
+              } catch (err) {
+                toast.error((err as Error).message ?? 'Kullanıcı eklenemedi');
+              }
+            }
+          }}
         />
       )}
     </div>
@@ -126,26 +149,44 @@ export const UserManagement: React.FC<UserManagementProps> = ({ currentUserId })
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
 
+type NewUserData = {
+  email: string;
+  password: string;
+  name: string;
+  initials: string;
+  role: string;
+  color: string;
+  userRole: UserRole;
+  allowedModules: ModuleId[];
+  responsibilities: Responsibility[];
+};
+
 interface UserFormModalProps {
-  user: User;
+  mode: ModalMode;
   currentUserId: string;
   onClose: () => void;
-  onSave: (data: Partial<User>) => void;
+  onSave: (patch: Partial<User>, newUserData?: NewUserData) => void;
 }
 
 const UserFormModal: React.FC<UserFormModalProps> = ({
-  user,
+  mode,
   currentUserId,
   onClose,
   onSave,
 }) => {
-  const [name, setName] = useState(user.name);
-  const [initials, setInitials] = useState(user.initials);
-  const [roleTitle, setRoleTitle] = useState(user.role);
-  const [color, setColor] = useState(user.color);
-  const [userRole, setUserRole] = useState<UserRole>(user.userRole);
-  const [allowedModules, setAllowedModules] = useState<ModuleId[]>([...user.allowedModules]);
-  const [responsibilities, setResponsibilities] = useState<Responsibility[]>([...user.responsibilities]);
+  const isAdd = mode.kind === 'add';
+  const user = isAdd ? null : mode.user;
+
+  const [name, setName] = useState(user?.name ?? '');
+  const [initials, setInitials] = useState(user?.initials ?? '');
+  const [roleTitle, setRoleTitle] = useState(user?.role ?? '');
+  const [color, setColor] = useState(user?.color ?? COLOR_PRESETS[5]);
+  const [userRole, setUserRole] = useState<UserRole>(user?.userRole ?? 'calisan');
+  const [allowedModules, setAllowedModules] = useState<ModuleId[]>(user ? [...user.allowedModules] : []);
+  const [responsibilities, setResponsibilities] = useState<Responsibility[]>(user ? [...user.responsibilities] : []);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -164,24 +205,45 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
       prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
     );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     if (!name.trim()) { setError('İsim zorunlu.'); return; }
+    if (isAdd && !email.trim()) { setError('E-posta zorunlu.'); return; }
+    if (isAdd && password.length < 6) { setError('Şifre en az 6 karakter olmalı.'); return; }
+
     const finalInitials = initials.trim() || getAutoInitials(name);
     const finalAllowed: ModuleId[] = userRole === 'yonetici' ? [...ALL_MODULE_IDS] : allowedModules;
     const finalResp: Responsibility[] =
       userRole === 'yonetici'
         ? Array.from(new Set<Responsibility>([...responsibilities, 'purchasing']))
         : responsibilities;
-    onSave({
-      name: name.trim(),
-      initials: finalInitials,
-      role: roleTitle,
-      color,
-      userRole,
-      allowedModules: finalAllowed,
-      responsibilities: finalResp,
-    });
+
+    setSaving(true);
+    if (isAdd) {
+      await onSave({}, {
+        email: email.trim(),
+        password,
+        name: name.trim(),
+        initials: finalInitials,
+        role: roleTitle,
+        color,
+        userRole,
+        allowedModules: finalAllowed,
+        responsibilities: finalResp,
+      });
+    } else {
+      onSave({
+        name: name.trim(),
+        initials: finalInitials,
+        role: roleTitle,
+        color,
+        userRole,
+        allowedModules: finalAllowed,
+        responsibilities: finalResp,
+      });
+    }
+    setSaving(false);
   };
 
   const isSelf = user?.id === currentUserId;
@@ -206,7 +268,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
           <form onSubmit={handleSubmit}>
             {/* Header */}
             <div className="px-6 py-4 border-b border-border/40 flex items-center justify-between">
-              <h3 className="text-[15px] font-semibold text-text">Kullanıcıyı düzenle</h3>
+              <h3 className="text-[15px] font-semibold text-text">{isAdd ? 'Yeni Kullanıcı' : 'Kullanıcıyı düzenle'}</h3>
               <button type="button" onClick={onClose} className="p-1.5 text-text-3 hover:text-text hover:bg-surface-2 rounded-lg transition-colors">
                 <X size={18} />
               </button>
@@ -217,12 +279,39 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
                 <div className="px-3 py-2 bg-red-bg text-red-text border border-red-border/30 rounded-lg text-[13px] font-semibold">{error}</div>
               )}
 
+              {/* Email + Password (add mode only) */}
+              {isAdd && (
+                <>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-semibold uppercase tracking-widest text-text-3">E-posta *</label>
+                    <input
+                      autoFocus
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="ad@heliosscitech.com"
+                      className="w-full p-3 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-text transition-colors"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-semibold uppercase tracking-widest text-text-3">Şifre *</label>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="En az 6 karakter"
+                      className="w-full p-3 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-text transition-colors"
+                    />
+                  </div>
+                </>
+              )}
+
               {/* Name + Initials */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2 space-y-1.5">
                   <label className="text-[11px] font-semibold uppercase tracking-widest text-text-3">İsim *</label>
                   <input
-                    autoFocus
+                    autoFocus={!isAdd}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Adı Soyadı"
@@ -406,9 +495,9 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
                 className="px-4 py-2 border border-border rounded-lg text-[13px] font-semibold text-text-2 hover:bg-surface-2 transition-colors">
                 Vazgeç
               </button>
-              <button type="submit"
-                className="px-5 py-2 text-white rounded-lg text-[13px] font-semibold bg-[#1a1a19] shadow-sm hover:bg-black transition-colors">
-                Kaydet
+              <button type="submit" disabled={saving}
+                className="px-5 py-2 text-white rounded-lg text-[13px] font-semibold bg-[#1a1a19] shadow-sm hover:bg-black transition-colors disabled:opacity-50">
+                {saving ? 'Kaydediliyor…' : 'Kaydet'}
               </button>
             </div>
           </form>

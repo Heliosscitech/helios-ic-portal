@@ -113,10 +113,23 @@ export function usePortalUsers() {
     }
   }, []);
 
-  const addUser = useCallback(async (_user: User) => {
-    throw new Error(
-      'Yeni kullanıcı eklemek için Supabase Studio → Authentication → Users panelini kullanın, ardından public.users tablosuna profil satırı ekleyin.'
-    );
+  const addUser = useCallback(async (userData: {
+    email: string;
+    password: string;
+    name: string;
+    initials: string;
+    role: string;
+    color: string;
+    userRole: UserRole;
+    allowedModules: ModuleId[];
+    responsibilities: Responsibility[];
+  }) => {
+    const { data, error } = await supabase.functions.invoke('create-portal-user', { body: userData });
+    if (error) throw error;
+    if (data?.error) throw new Error(data.error);
+    const fresh = await fetchAll();
+    broadcast(fresh);
+    return data?.user ?? null;
   }, []);
 
   const deleteUser = useCallback(async (_id: string) => {

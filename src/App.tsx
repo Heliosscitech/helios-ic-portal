@@ -166,7 +166,7 @@ function App() {
       case 'distributor':
         return <Distributors user={currentUser} />;
       case 'kullanicilar':
-        return <UserManagement currentUserId={currentUser.id} />;
+        return <UserManagement currentUserId={currentUser.id} isAdmin={currentUser.userRole === 'yonetici'} />;
       default:
         return <Dashboard onModuleSelect={setCurrentModule} currentUser={currentUser} />;
     }

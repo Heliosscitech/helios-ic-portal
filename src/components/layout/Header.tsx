@@ -3,6 +3,7 @@ import type { User } from '../../types/portal';
 import { ChevronDown, LogOut, User as UserIcon, Settings } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { NotificationsBell } from './NotificationsBell';
+import { ProfileModal } from '../modals/ProfileModal';
 
 interface HeaderProps {
   user: User;
@@ -12,8 +13,12 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ user, onLogout, onGoHome }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const openProfile = () => { setMenuOpen(false); setProfileOpen(true); };
 
   return (
+    <>
     <header className="flex items-center justify-between px-8 py-5 bg-white border-b border-border/40 sticky top-0 z-50 shadow-sm">
       <div className="flex items-center gap-10">
         <div 
@@ -71,10 +76,10 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onGoHome }) => {
                    <p className="text-[11px] text-text-3">{user.role}</p>
                 </div>
                 <div className="p-1">
-                   <button className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-text-2 hover:bg-surface-2 rounded-xl transition-colors">
+                   <button onClick={openProfile} className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-text-2 hover:bg-surface-2 rounded-xl transition-colors">
                      <UserIcon size={16} /> Profilim
                    </button>
-                   <button className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-text-2 hover:bg-surface-2 rounded-xl transition-colors">
+                   <button onClick={openProfile} className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] text-text-2 hover:bg-surface-2 rounded-xl transition-colors">
                      <Settings size={16} /> Ayarlar
                    </button>
                 </div>
@@ -93,5 +98,7 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onGoHome }) => {
         </div>
       </div>
     </header>
+    {profileOpen && <ProfileModal user={user} onClose={() => setProfileOpen(false)} />}
+    </>
   );
 };
