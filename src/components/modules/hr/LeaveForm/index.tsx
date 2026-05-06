@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Check, ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
-import { PORTAL_USERS } from '../../../../types/users';
+import { usePortalUsers } from '../../../../lib/users';
 import type { ModuleProps } from '../../../../types/portal';
 import { useNotifications } from '../../../../lib/notifications';
 import { StepPerson } from './steps/StepPerson';
@@ -275,7 +275,8 @@ interface RequestsListProps {
 }
 
 const RequestsList: React.FC<RequestsListProps> = ({ title, requests, role, onReview }) => {
-  const findUser = (id: string) => PORTAL_USERS.find((u) => u.id === id);
+  const { users } = usePortalUsers();
+  const findUser = (id: string) => users.find((u) => u.id === id);
 
   return (
     <div className="bg-white border border-border/40 rounded-2xl p-6 shadow-sm">

@@ -4,16 +4,16 @@ import { cn } from '../../lib/utils';
 import { formatTRCompact } from '../../lib/dates';
 import { useToast } from '../../lib/toast';
 import { useConfirm } from '../../lib/confirm';
-import { PORTAL_USERS } from '../../types/users';
 import type { User } from '../../types/portal';
+import { usePortalUsers } from '../../lib/users';
 import { useAnnouncements } from './hooks';
 import { PRIORITY_LABELS, PRIORITY_STYLES } from './types';
 import type { Priority } from './types';
 
-const getAuthor = (id?: string) => PORTAL_USERS.find((u) => u.id === id);
-
 export const DuyurularPanel: React.FC<{ currentUser: User }> = ({ currentUser }) => {
   const { items, loading, add, remove } = useAnnouncements(currentUser.id);
+  const { users } = usePortalUsers();
+  const getAuthor = (id?: string) => users.find((u) => u.id === id);
   const toast = useToast();
   const confirm = useConfirm();
   const [creating, setCreating] = useState(false);

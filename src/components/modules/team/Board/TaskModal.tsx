@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trash2, Tag as TagIcon, Plus, MessageSquare, Clock, User as UserIcon } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import { formatTR } from '../../../../lib/dates';
-import { PORTAL_USERS } from '../../../../types/users';
+import { usePortalUsers } from '../../../../lib/users';
 import {
   UNITS,
   PRIORITY_LABELS,
@@ -49,6 +49,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   onSave,
   onDelete,
 }) => {
+  const { users } = usePortalUsers();
   const defaultStatus = initialStatus ?? columns[0]?.id ?? 'todo';
   const [form, setForm] = useState<FormState>(() =>
     mode === 'detail' && task
@@ -121,7 +122,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
   const creator = useMemo(() => {
     if (!task) return null;
-    return PORTAL_USERS.find((u) => u.id === task.creatorId);
+    return users.find((u) => u.id === task.creatorId);
   }, [task]);
 
   return (
@@ -262,7 +263,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                   Atananlar <span className="text-red-500">*</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {PORTAL_USERS.slice(0, 6).map((u) => {
+                  {users.slice(0, 6).map((u) => {
                     const active = form.assigneeIds.includes(u.id);
                     return (
                       <button

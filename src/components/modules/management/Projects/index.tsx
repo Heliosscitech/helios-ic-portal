@@ -5,7 +5,7 @@ import {
   TrendingUp, Clock, Activity, Pencil,
 } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
-import { PORTAL_USERS } from '../../../../types/users';
+import { usePortalUsers } from '../../../../lib/users';
 import type { Project, ReportPeriod, WPStatus, NewProjectFormData } from './types';
 import { formatTR, daysUntil } from '../../../../lib/dates';
 import { useProjects } from './hooks';
@@ -46,12 +46,13 @@ const PROJECT_STATUS_LABELS: Record<Project['status'], string> = {
   duraklatildi: 'Duraklatıldı',
 };
 
-const getUser = (id: string) => PORTAL_USERS.find((u) => u.id === id);
 
 const completionPct = (wps: Project['workPackages']) =>
   wps.length === 0 ? 0 : Math.round((wps.filter((wp) => wp.status === 'tamam').length / wps.length) * 100);
 
 export const Projects: React.FC = () => {
+  const { users } = usePortalUsers();
+  const getUser = (id: string) => users.find((u) => u.id === id);
   const {
     projects,
     addProject: addProjectRow,
@@ -176,7 +177,7 @@ export const Projects: React.FC = () => {
   }
 
   const completion = completionPct(active.workPackages);
-  const members = active.memberIds.map(getUser).filter(Boolean) as (typeof PORTAL_USERS)[number][];
+  const members = active.memberIds.map(getUser).filter(Boolean) as (typeof users)[number][];
   const leader = getUser(active.leaderId);
   const projectDaysLeft = daysUntil(active.endDate);
 
@@ -538,13 +539,14 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
   onClose,
   onSave,
 }) => {
+  const { users } = usePortalUsers();
   const [name, setName] = useState(initial?.name ?? '');
   const [subtitle, setSubtitle] = useState(initial?.subtitle ?? '');
   const [code, setCode] = useState(initial?.code ?? '');
   const [startDate, setStartDate] = useState(initial?.startDate ?? '');
   const [endDate, setEndDate] = useState(initial?.endDate ?? '');
-  const [leaderId, setLeaderId] = useState(initial?.leaderId ?? PORTAL_USERS[0].id);
-  const [memberIds, setMemberIds] = useState<string[]>(initial?.memberIds ?? [PORTAL_USERS[0].id]);
+  const [leaderId, setLeaderId] = useState(initial?.leaderId ?? '');
+  const [memberIds, setMemberIds] = useState<string[]>(initial?.memberIds ?? []);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -674,7 +676,7 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
                   className="w-full p-2.5 bg-white border border-border rounded-lg text-[14px] outline-none focus:border-info-border transition-colors appearance-none font-medium"
                   style={selectStyle}
                 >
-                  {PORTAL_USERS.map((u) => (
+                  {users.map((u) => (
                     <option key={u.id} value={u.id}>{u.name}</option>
                   ))}
                 </select>
@@ -682,7 +684,7 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
 
               <MField label="Ekip Üyeleri">
                 <div className="border border-border rounded-lg overflow-hidden">
-                  {PORTAL_USERS.map((u, i) => {
+                  {users.map((u, i) => {
                     const isLeader = u.id === leaderId;
                     const isChecked = memberIds.includes(u.id);
                     return (
@@ -690,7 +692,7 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({
                         key={u.id}
                         className={cn(
                           'flex items-center gap-3 px-3 py-2.5 cursor-pointer transition-colors',
-                          i < PORTAL_USERS.length - 1 && 'border-b border-border/40',
+                          i < users.length - 1 && 'border-b border-border/40',
                           isChecked ? 'bg-info-bg/30' : 'hover:bg-surface-2/50',
                           isLeader && 'opacity-70 cursor-default'
                         )}

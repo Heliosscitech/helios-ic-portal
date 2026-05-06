@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
-import { PORTAL_USERS } from '../../../../../types/users';
+import { usePortalUsers } from '../../../../../lib/users';
 import { UNITS } from '../types';
 import type { BoardColumn, BoardTask } from '../types';
 
@@ -12,6 +12,7 @@ interface DashboardViewProps {
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({ tasks, columns }) => {
+  const { users } = usePortalUsers();
   const total = tasks.length;
   const doneCol = columns[columns.length - 1];
   const doneCount = doneCol ? tasks.filter((t) => t.status === doneCol.id).length : 0;
@@ -28,7 +29,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ tasks, columns }) 
   }));
   const maxUnitCount = Math.max(...unitCounts.map((u) => u.count), 1);
 
-  const memberCounts = PORTAL_USERS.slice(0, 6).map((m) => ({
+  const memberCounts = users.map((m) => ({
     ...m,
     count: tasks.filter((t) => t.assigneeIds.includes(m.id)).length,
   }));

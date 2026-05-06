@@ -3,7 +3,7 @@ import { Clock, MessageSquare, Plus, MoreVertical, GripVertical, Trash2, Check, 
 import { cn } from '../../../../../lib/utils';
 import { confirmAction } from '../../../../../lib/confirm';
 import { formatTRCompact, isToday } from '../../../../../lib/dates';
-import { PORTAL_USERS } from '../../../../../types/users';
+import { usePortalUsers } from '../../../../../lib/users';
 import { UNITS } from '../types';
 import type { BoardColumn, BoardTask, TaskStatus } from '../types';
 
@@ -23,9 +23,6 @@ interface BoardViewProps {
 const TASK_DRAG_MIME = 'application/x-helios-task-id';
 const COLUMN_DRAG_MIME = 'application/x-helios-column-id';
 
-const getUserInitials = (id: string) => PORTAL_USERS.find((u) => u.id === id)?.initials ?? '??';
-const getUserColor = (id: string) =>
-  PORTAL_USERS.find((u) => u.id === id)?.color ?? 'bg-surface-2 text-text-3';
 const getUnitLabel = (id: string) => UNITS.find((u) => u.id === id)?.label ?? '';
 const getUnitDot = (id: string) => UNITS.find((u) => u.id === id)?.dotColor ?? 'bg-text-3';
 
@@ -41,6 +38,10 @@ export const BoardView: React.FC<BoardViewProps> = ({
   onDeleteColumn,
   onReorderColumns,
 }) => {
+  const { users } = usePortalUsers();
+  const getUserInitials = (id: string) => users.find((u) => u.id === id)?.initials ?? '??';
+  const getUserColor = (id: string) => users.find((u) => u.id === id)?.color ?? 'bg-surface-2 text-text-3';
+
   const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
   const [draggingColId, setDraggingColId] = useState<string | null>(null);
   const [dragOverCol, setDragOverCol] = useState<string | null>(null);
@@ -273,7 +274,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
                               'w-6 h-6 rounded-full border-2 border-white text-[10.5px] font-semibold flex items-center justify-center',
                               getUserColor(uid)
                             )}
-                            title={PORTAL_USERS.find((u) => u.id === uid)?.name}
+                            title={users.find((u) => u.id === uid)?.name}
                           >
                             {getUserInitials(uid)}
                           </div>

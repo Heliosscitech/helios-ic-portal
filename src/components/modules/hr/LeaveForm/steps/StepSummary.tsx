@@ -1,8 +1,8 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
-import { PORTAL_USERS } from '../../../../../types/users';
 import type { User } from '../../../../../types/portal';
+import { usePortalUsers } from '../../../../../lib/users';
 import { DEPARTMENTS, REASONS } from '../types';
 import type { LeaveFormState } from '../types';
 
@@ -22,7 +22,8 @@ export const StepSummary: React.FC<StepSummaryProps> = ({
   onTelafiToggle,
   onTelafiNotuChange,
 }) => {
-  const managerName = PORTAL_USERS.find((u) => u.id === form.managerId)?.name ?? '—';
+  const { users } = usePortalUsers();
+  const managerName = users.find((u) => u.id === form.managerId)?.name ?? '—';
   const reasonLabel = REASONS.find((r) => r.id === form.reason)?.label ?? '—';
 
   return (

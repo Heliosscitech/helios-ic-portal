@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trash2, User as UserIcon } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
-import { PORTAL_USERS } from '../../../../../types/users';
+import { usePortalUsers } from '../../../../../lib/users';
 import type { CalendarEvent } from '../types';
 
 interface DayEventsProps {
@@ -10,9 +10,9 @@ interface DayEventsProps {
   onDelete: (id: string) => void;
 }
 
-const getUser = (id: string) => PORTAL_USERS.find((u) => u.id === id);
-
 export const DayEvents: React.FC<DayEventsProps> = ({ day, events, onDelete }) => {
+  const { users } = usePortalUsers();
+  const getUser = (id: string) => users.find((u) => u.id === id);
   return (
     <div className="bg-[#f1efe8]/50 border border-border/40 rounded-2xl p-6">
       <h3 className="text-[14px] font-semibold text-text-2 mb-4">{day} Nisan 2026</h3>

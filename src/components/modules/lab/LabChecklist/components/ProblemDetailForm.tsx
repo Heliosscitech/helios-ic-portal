@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
-import { PORTAL_USERS } from '../../../../../types/users';
+import { usePortalUsers } from '../../../../../lib/users';
 
 interface ProblemDetailFormProps {
   comment: string;
@@ -19,6 +19,7 @@ export const ProblemDetailForm: React.FC<ProblemDetailFormProps> = ({
   onCancel,
   onSave
 }) => {
+  const { users } = usePortalUsers();
   return (
     <div className="py-6 space-y-6 border-b border-red-200/50 animate-in slide-in-from-top-2 duration-300">
       <div className="flex items-center gap-2 text-[12.5px] font-semibold text-red-700 uppercase tracking-wider">
@@ -45,7 +46,7 @@ export const ProblemDetailForm: React.FC<ProblemDetailFormProps> = ({
             }}
           >
             <option value="">Kişi atanmadı</option>
-            {PORTAL_USERS.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+            {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
           </select>
         </div>
         <div className="flex gap-2">

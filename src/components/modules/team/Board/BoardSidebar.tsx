@@ -1,7 +1,7 @@
 import React from 'react';
 import { LayoutGrid, List, BarChart3, Inbox, FolderOpen, Plus } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
-import { PORTAL_USERS } from '../../../../types/users';
+import { usePortalUsers } from '../../../../lib/users';
 import { UNITS } from './types';
 import type { ViewMode, BoardFilter, UnitId, FilterScope } from './types';
 
@@ -37,6 +37,7 @@ export const BoardSidebar: React.FC<BoardSidebarProps> = ({
   onUnitChange,
   onMemberChange,
 }) => {
+  const { users } = usePortalUsers();
   const isUnitAll = filter.unitId === 'all' && filter.scope === 'all' && !filter.memberId;
 
   return (
@@ -128,7 +129,7 @@ export const BoardSidebar: React.FC<BoardSidebarProps> = ({
       <section>
         <h4 className={SECTION_TITLE}>Ekip ({counts.teamSize})</h4>
         <div className="space-y-0.5">
-          {PORTAL_USERS.slice(0, 6).map((u) => (
+          {users.slice(0, 6).map((u) => (
             <button
               key={u.id}
               onClick={() => onMemberChange(filter.memberId === u.id ? null : u.id)}

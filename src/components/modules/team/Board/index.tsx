@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { PORTAL_USERS } from '../../../../types/users';
+import { usePortalUsers } from '../../../../lib/users';
 import type { ModuleProps } from '../../../../types/portal';
 import { BreadcrumbHome } from '../../../BreadcrumbHome';
 import { toast } from '../../../../lib/toast';
@@ -59,6 +59,7 @@ const uniqueTargets = (ids: string[], actorId: string) =>
   Array.from(new Set(ids)).filter((id) => id !== actorId);
 
 export const Board: React.FC<ModuleProps> = ({ user }) => {
+  const { users } = usePortalUsers();
   const { tasks, saveTask, deleteTask: deleteTaskRow, changeStatus } = useBoardTasks();
   const {
     columns,
@@ -99,7 +100,7 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
     });
 
     const byMember: Record<string, number> = {};
-    PORTAL_USERS.forEach((u) => {
+    users.forEach((u) => {
       byMember[u.id] = tasks.filter((t) => t.assigneeIds.includes(u.id)).length;
     });
 
@@ -109,9 +110,9 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
       createdByMe: tasks.filter((t) => t.creatorId === user.id).length,
       byUnit,
       byMember,
-      teamSize: 6,
+      teamSize: users.length,
     };
-  }, [tasks, user.id]);
+  }, [tasks, user.id, users]);
 
   const availableTags = useMemo(() => collectTags(tasks), [tasks]);
   const activeFilterCount = countActiveFilters(filter);

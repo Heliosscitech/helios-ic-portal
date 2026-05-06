@@ -1,7 +1,7 @@
 import React from 'react';
 import { Clock, Calendar as CalendarIcon, Users } from 'lucide-react';
 import { EVENT_CATEGORIES } from '../types';
-import { PORTAL_USERS } from '../../../../../types/users';
+import { usePortalUsers } from '../../../../../lib/users';
 import { cn } from '../../../../../lib/utils';
 
 interface AddEventFormProps {
@@ -35,7 +35,8 @@ export const AddEventForm: React.FC<AddEventFormProps> = ({
   onCancel,
   onSubmit,
 }) => {
-  const otherUsers = PORTAL_USERS.filter((u) => u.id !== currentUserId);
+  const { users } = usePortalUsers();
+  const otherUsers = users.filter((u) => u.id !== currentUserId);
 
   return (
     <div className="mx-4 mb-8 bg-[#f1efe8]/40 border border-border/30 rounded-2xl p-6 animate-in slide-in-from-top-4 duration-300">

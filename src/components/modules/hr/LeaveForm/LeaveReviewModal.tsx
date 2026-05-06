@@ -4,7 +4,7 @@ import { X, Check, XCircle, CalendarClock, User as UserIcon, FileText, Clock } f
 import { cn } from '../../../../lib/utils';
 import { toast } from '../../../../lib/toast';
 import { useNotifications } from '../../../../lib/notifications';
-import { PORTAL_USERS } from '../../../../types/users';
+import { usePortalUsers } from '../../../../lib/users';
 import { DEPARTMENTS, REASONS } from './types';
 import type { LeaveRequest } from './types';
 import { useLeaveRequests } from './hooks';
@@ -16,7 +16,6 @@ interface LeaveReviewModalProps {
   onClose: () => void;
 }
 
-const findUser = (id: string) => PORTAL_USERS.find((u) => u.id === id);
 
 const formatRange = (r: LeaveRequest) =>
   r.rangeEnd ? `${r.rangeStart}–${r.rangeEnd} Nisan 2026` : `${r.rangeStart} Nisan 2026`;
@@ -37,6 +36,8 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
   currentUserId,
   onClose,
 }) => {
+  const { users } = usePortalUsers();
+  const findUser = (id: string) => users.find((u) => u.id === id);
   const { requests, decideRequest, refresh, loading } = useLeaveRequests();
   const { dispatch } = useNotifications();
   const [note, setNote] = useState('');

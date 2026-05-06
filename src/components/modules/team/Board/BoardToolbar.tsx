@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus, X, Tag as TagIcon } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
-import { PORTAL_USERS } from '../../../../types/users';
+import { usePortalUsers } from '../../../../lib/users';
 import { UNITS } from './types';
 import type { BoardFilter } from './types';
 import { FilterPopover } from './FilterPopover';
@@ -30,12 +30,13 @@ export const BoardToolbar: React.FC<BoardToolbarProps> = ({
   onClearFilters,
   onNewTask,
 }) => {
+  const { users } = usePortalUsers();
   const unitLabel =
     filter.unitId === 'all'
       ? 'Tüm birimler'
       : UNITS.find((u) => u.id === filter.unitId)?.label ?? 'Tüm birimler';
 
-  const personItems: PopoverItem[] = PORTAL_USERS.slice(0, 6).map((u) => ({
+  const personItems: PopoverItem[] = users.slice(0, 6).map((u) => ({
     id: u.id,
     label: u.name,
     badge: (
@@ -98,7 +99,7 @@ export const BoardToolbar: React.FC<BoardToolbarProps> = ({
 
         <div className="flex items-center gap-4">
           <div className="flex -space-x-2">
-            {PORTAL_USERS.slice(0, 5).map((u) => (
+            {users.slice(0, 5).map((u) => (
               <div
                 key={u.id}
                 title={u.name}
@@ -110,9 +111,9 @@ export const BoardToolbar: React.FC<BoardToolbarProps> = ({
                 {u.initials}
               </div>
             ))}
-            {PORTAL_USERS.length > 5 && (
+            {users.length > 5 && (
               <div className="w-7 h-7 rounded-full border-2 border-white bg-surface-2 text-text-3 flex items-center justify-center text-[10.5px] font-semibold">
-                +{PORTAL_USERS.length - 5}
+                +{users.length - 5}
               </div>
             )}
           </div>

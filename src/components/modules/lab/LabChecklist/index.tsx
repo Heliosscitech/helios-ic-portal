@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Info, RotateCcw, Check } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import type { ModuleProps } from '../../../../types/portal';
-import { PORTAL_USERS } from '../../../../types/users';
+import { usePortalUsers } from '../../../../lib/users';
 import { usePersistentState } from '../../../../lib/persistence';
 import { useNotifications } from '../../../../lib/notifications';
 import { BreadcrumbHome } from '../../../BreadcrumbHome';
@@ -38,6 +38,7 @@ export const LabChecklist: React.FC<ModuleProps> = ({ user }) => {
 
   const [editingProblemId, setEditingProblemId] = useState<string | null>(null);
   const [problemData, setProblemData] = useState({ comment: '', assigneeId: '' });
+  const { users } = usePortalUsers();
 
   const { dispatch } = useNotifications();
 
@@ -158,8 +159,7 @@ export const LabChecklist: React.FC<ModuleProps> = ({ user }) => {
     setNewItem({ name: '', instruction: '' });
   };
 
-  // assigneeId listesi artık PORTAL_USERS'a referans için sadece render sırasında lookup yapılacak
-  const assigneeName = (id: string) => PORTAL_USERS.find((u) => u.id === id)?.name ?? '';
+  const assigneeName = (id: string) => users.find((u) => u.id === id)?.name ?? '';
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">

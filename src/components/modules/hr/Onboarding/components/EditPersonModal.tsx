@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
-import { PORTAL_USERS } from '../../../../../types/users';
+import { usePortalUsers } from '../../../../../lib/users';
 import type { OnboardingPerson } from '../types';
 
 export type PersonModalMode = 'add' | 'edit';
@@ -24,6 +24,7 @@ interface EditPersonModalProps {
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 export const EditPersonModal: React.FC<EditPersonModalProps> = ({ mode, person, onClose, onSave }) => {
+  const { users } = usePortalUsers();
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
   const [startDate, setStartDate] = useState(todayISO());
@@ -168,7 +169,7 @@ export const EditPersonModal: React.FC<EditPersonModalProps> = ({ mode, person, 
                   }}
                 >
                   <option value="">— Bağlantı yok —</option>
-                  {PORTAL_USERS.map((u) => (
+                  {users.map((u) => (
                     <option key={u.id} value={u.id}>
                       {u.name}
                     </option>

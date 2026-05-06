@@ -2,7 +2,7 @@ import React from 'react';
 import { Clock, MessageSquare } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
 import { formatTRCompact, isToday } from '../../../../../lib/dates';
-import { PORTAL_USERS } from '../../../../../types/users';
+import { usePortalUsers } from '../../../../../lib/users';
 import { UNITS, columnTitle } from '../types';
 import type { BoardColumn, BoardTask } from '../types';
 
@@ -19,9 +19,10 @@ const PRIORITY_STYLE: Record<BoardTask['priority'], string> = {
 };
 
 const getUnit = (id: string) => UNITS.find((u) => u.id === id);
-const getUser = (id: string) => PORTAL_USERS.find((u) => u.id === id);
 
 export const ListView: React.FC<ListViewProps> = ({ tasks, columns, onTaskClick }) => {
+  const { users } = usePortalUsers();
+  const getUser = (id: string) => users.find((u) => u.id === id);
   return (
     <div className="flex-1 overflow-auto p-6">
       <div className="bg-white border border-border/40 rounded-xl overflow-hidden shadow-sm">
