@@ -89,8 +89,8 @@ export function useAnnouncements(currentUserLegacyId: string) {
       priority: input.priority,
       created_by: legacyToDbId(currentUserLegacyId) ?? null,
     });
-    if (error) { console.error('announcement insert failed', error); await refresh(); return false; }
-    return true;
+    if (error) { console.error('announcement insert failed', error); await refresh(); return null; }
+    return id;
   }, [currentUserLegacyId, refresh]);
 
   const remove = useCallback(async (id: string): Promise<boolean> => {

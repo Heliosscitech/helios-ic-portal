@@ -4,6 +4,7 @@ import { cn } from '../../lib/utils';
 import { formatTRCompact } from '../../lib/dates';
 import { useToast } from '../../lib/toast';
 import { useConfirm } from '../../lib/confirm';
+import { useNotifications } from '../../lib/notifications';
 import type { User } from '../../types/portal';
 import { usePortalUsers } from '../../lib/users';
 import { useAnnouncements } from './hooks';
@@ -16,6 +17,7 @@ export const DuyurularPanel: React.FC<{ currentUser: User }> = ({ currentUser })
   const getAuthor = (id?: string) => users.find((u) => u.id === id);
   const toast = useToast();
   const confirm = useConfirm();
+  const { dispatch } = useNotifications();
   const [creating, setCreating] = useState(false);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -36,9 +38,19 @@ export const DuyurularPanel: React.FC<{ currentUser: User }> = ({ currentUser })
   const handleSubmit = async () => {
     if (!title.trim()) return;
     setSubmitting(true);
-    const ok = await add({ title: title.trim(), content: content.trim(), priority });
+    const savedId = await add({ title: title.trim(), content: content.trim(), priority });
     setSubmitting(false);
-    if (ok) {
+    if (savedId) {
+      const priorityWord = priority === 'acil' ? 'acil' : priority === 'onemli' ? 'önemli' : 'yeni';
+      dispatch({
+        type: 'announcement-created',
+        source: 'duyuru',
+        entityId: savedId,
+        entityTitle: title.trim(),
+        actorId: currentUser.id,
+        targetUserIds: users.filter((u) => u.id !== currentUser.id).map((u) => u.id),
+        message: `${priorityWord} bir duyuru paylaştı: "${title.trim()}"`,
+      });
       toast.success('Duyuru kaydedildi');
       close();
     } else {
