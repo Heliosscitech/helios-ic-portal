@@ -18,6 +18,7 @@ import {
   ShoppingCart,
   Globe,
   FlaskConical,
+  Megaphone,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useNotifications } from '../../lib/notifications';
@@ -46,6 +47,7 @@ const TYPE_ICON: Record<NotificationType, React.ReactNode> = {
   'purchase-status-changed': <ArrowRightCircle size={10} />,
   'distributor-assigned': <Globe size={10} />,
   'experiment-assigned': <FlaskConical size={10} />,
+  'announcement-created': <Megaphone size={10} />,
 };
 
 const TYPE_TONE: Record<NotificationType, string> = {
@@ -67,6 +69,7 @@ const TYPE_TONE: Record<NotificationType, string> = {
   'purchase-status-changed': 'bg-teal-bg text-teal-text',
   'distributor-assigned': 'bg-info-bg text-info-text',
   'experiment-assigned': 'bg-purple-bg text-purple-text',
+  'announcement-created': 'bg-amber-bg text-amber-text',
 };
 
 const ROUTABLE_SOURCES: NotificationSource[] = ['board', 'leave', 'satin-alma', 'distributor', 'arge'];
