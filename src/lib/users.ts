@@ -61,12 +61,23 @@ const broadcast = (next: User[]) => {
   listeners.forEach((cb) => cb(next));
 };
 
+const SELECT_COLS_FALLBACK =
+  'id, legacy_id, name, initials, role, color, user_role, allowed_modules, responsibilities, email';
+
 const fetchAll = async (): Promise<User[]> => {
   const { data, error } = await supabase
     .from('users')
     .select(SELECT_COLS)
     .order('name');
   if (error) {
+    if (error.code === '42703') {
+      const { data: fb, error: fbErr } = await supabase
+        .from('users')
+        .select(SELECT_COLS_FALLBACK)
+        .order('name');
+      if (fbErr) { console.error('users fetch failed', fbErr); return cache ?? []; }
+      return ((fb ?? []) as DbRow[]).map(toUser);
+    }
     console.error('users fetch failed', error);
     return cache ?? [];
   }
