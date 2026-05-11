@@ -68,9 +68,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onBack, onAvatar
       .eq('id', user.dbId)
       .single()
       .then(({ data, error }) => {
-        const isColMissing =
-          error?.message?.includes('column') ||
-          error?.message?.includes('does not exist');
+        const isColMissing = error?.code === '42703';
         if (isColMissing) {
           setNotesError('db_missing');
         } else {
@@ -91,7 +89,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onBack, onAvatar
       .eq('id', user.dbId);
     setNotesSaving(false);
     if (error) {
-      const isColMissing = error.message.includes('column') || error.message.includes('does not exist');
+      const isColMissing = error.code === '42703';
       if (isColMissing) {
         setNotesError('db_missing');
       } else {
