@@ -17,7 +17,6 @@ import type {
   BoardTask,
   FilterScope,
   TaskStatus,
-  UnitId,
   ViewMode,
 } from './types';
 import { UnitModal } from './UnitModal';
