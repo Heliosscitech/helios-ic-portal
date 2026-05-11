@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Clock, MessageSquare, Plus, MoreVertical, GripVertical, Trash2, Check, X } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
 import { confirmAction } from '../../../../../lib/confirm';
-import { formatTRCompact, isToday } from '../../../../../lib/dates';
+import { formatTRCompact, isToday, isPast } from '../../../../../lib/dates';
 import { usePortalUsers } from '../../../../../lib/users';
 import { UNITS } from '../types';
 import type { BoardColumn, BoardTask, TaskStatus } from '../types';
@@ -252,11 +252,13 @@ export const BoardView: React.FC<BoardViewProps> = ({
                         <div
                           className={cn(
                             'flex items-center gap-1',
-                            isToday(task.dueDate) && 'text-red-border font-semibold'
+                            (isToday(task.dueDate) || isPast(task.dueDate)) && 'text-red-text font-semibold'
                           )}
                         >
                           <Clock size={12} />
-                          <span className="font-mono">{isToday(task.dueDate) ? 'Bugün' : formatTRCompact(task.dueDate)}</span>
+                          <span className="font-mono">
+                            {isToday(task.dueDate) ? 'Bugün' : isPast(task.dueDate) ? 'Gecikti!' : formatTRCompact(task.dueDate)}
+                          </span>
                         </div>
                         {task.comments > 0 && (
                           <div className="flex items-center gap-1">
@@ -267,18 +269,29 @@ export const BoardView: React.FC<BoardViewProps> = ({
                       </div>
 
                       <div className="flex -space-x-2">
-                        {task.assigneeIds.slice(0, 3).map((uid) => (
-                          <div
-                            key={uid}
-                            className={cn(
-                              'w-6 h-6 rounded-full border-2 border-white text-[10.5px] font-semibold flex items-center justify-center',
-                              getUserColor(uid)
-                            )}
-                            title={users.find((u) => u.id === uid)?.name}
-                          >
-                            {getUserInitials(uid)}
-                          </div>
-                        ))}
+                        {task.assigneeIds.slice(0, 3).map((uid) => {
+                          const u = users.find((u) => u.id === uid);
+                          return u?.avatarUrl ? (
+                            <img
+                              key={uid}
+                              src={u.avatarUrl}
+                              alt={u.name}
+                              title={u.name}
+                              className="w-6 h-6 rounded-full border-2 border-white object-cover"
+                            />
+                          ) : (
+                            <div
+                              key={uid}
+                              className={cn(
+                                'w-6 h-6 rounded-full border-2 border-white text-[10.5px] font-semibold flex items-center justify-center',
+                                getUserColor(uid)
+                              )}
+                              title={u?.name}
+                            >
+                              {getUserInitials(uid)}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>

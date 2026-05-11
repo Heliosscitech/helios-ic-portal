@@ -4,11 +4,8 @@ import { X, Trash2, Tag as TagIcon, Plus, MessageSquare, Clock, User as UserIcon
 import { cn } from '../../../../lib/utils';
 import { formatTR } from '../../../../lib/dates';
 import { usePortalUsers } from '../../../../lib/users';
-import {
-  UNITS,
-  PRIORITY_LABELS,
-} from './types';
-import type { BoardColumn, BoardTask, Priority, TaskStatus, UnitId } from './types';
+import { PRIORITY_LABELS } from './types';
+import type { BoardColumn, BoardTask, Priority, TaskStatus, UnitId, Unit } from './types';
 
 export type TaskModalMode = 'create' | 'detail';
 
@@ -16,6 +13,7 @@ interface TaskModalProps {
   mode: TaskModalMode;
   task?: BoardTask;
   columns: BoardColumn[];
+  units: Unit[];
   currentUserId: string;
   initialStatus?: string;
   onClose: () => void;
@@ -43,6 +41,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   mode,
   task,
   columns,
+  units,
   currentUserId,
   initialStatus,
   onClose,
@@ -51,6 +50,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 }) => {
   const { users } = usePortalUsers();
   const defaultStatus = initialStatus ?? columns[0]?.id ?? 'todo';
+  const defaultUnitId = units[0]?.id ?? 'arge';
   const [form, setForm] = useState<FormState>(() =>
     mode === 'detail' && task
       ? {
@@ -64,7 +64,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           tags: [...task.tags],
           comments: task.comments,
         }
-      : { ...EMPTY_FORM, status: defaultStatus }
+      : { ...EMPTY_FORM, status: defaultStatus, unitId: defaultUnitId }
   );
   const [tagDraft, setTagDraft] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -206,7 +206,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                     onChange={(e) => setForm({ ...form, unitId: e.target.value as UnitId })}
                     className="w-full p-3 bg-white border border-border rounded-lg text-[13px] font-medium outline-none focus:border-text transition-colors"
                   >
-                    {UNITS.map((u) => (
+                    {units.map((u) => (
                       <option key={u.id} value={u.id}>
                         {u.label}
                       </option>

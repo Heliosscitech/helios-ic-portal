@@ -7,12 +7,13 @@ interface LayoutProps {
   user: User;
   onLogout: () => void;
   onGoHome: () => void;
+  onGoProfile: () => void;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, onGoHome }) => {
+export const Layout: React.FC<LayoutProps> = ({ children, user, onLogout, onGoHome, onGoProfile }) => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header user={user} onLogout={onLogout} onGoHome={onGoHome} />
+      <Header user={user} onLogout={onLogout} onGoHome={onGoHome} onGoProfile={onGoProfile} />
       <main className="flex-1 overflow-hidden">
         <div className="h-full overflow-y-auto">
           {children}

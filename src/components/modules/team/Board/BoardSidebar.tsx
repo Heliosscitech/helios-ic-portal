@@ -2,17 +2,17 @@ import React from 'react';
 import { LayoutGrid, List, BarChart3, Inbox, FolderOpen, Plus } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import { usePortalUsers } from '../../../../lib/users';
-import { UNITS } from './types';
-import type { ViewMode, BoardFilter, UnitId, FilterScope } from './types';
+import type { ViewMode, BoardFilter, Unit, UnitId, FilterScope } from './types';
 
 interface BoardSidebarProps {
   view: ViewMode;
   filter: BoardFilter;
+  units: Unit[];
   counts: {
     total: number;
     assignedToMe: number;
     createdByMe: number;
-    byUnit: Record<UnitId, number>;
+    byUnit: Record<string, number>;
     byMember: Record<string, number>;
     teamSize: number;
   };
@@ -20,6 +20,7 @@ interface BoardSidebarProps {
   onScopeChange: (s: FilterScope) => void;
   onUnitChange: (u: UnitId | 'all') => void;
   onMemberChange: (id: string | null) => void;
+  onManageUnits: () => void;
 }
 
 const SECTION_TITLE = 'text-[11px] font-semibold uppercase tracking-widest text-text-3 px-3 mb-2';
@@ -31,11 +32,13 @@ const ITEM_ACTIVE = 'bg-amber-bg text-amber-text font-semibold';
 export const BoardSidebar: React.FC<BoardSidebarProps> = ({
   view,
   filter,
+  units,
   counts,
   onViewChange,
   onScopeChange,
   onUnitChange,
   onMemberChange,
+  onManageUnits,
 }) => {
   const { users } = usePortalUsers();
   const isUnitAll = filter.unitId === 'all' && filter.scope === 'all' && !filter.memberId;
@@ -107,7 +110,7 @@ export const BoardSidebar: React.FC<BoardSidebarProps> = ({
             <span className="flex-1 text-left">Tüm birimler</span>
             <span className="text-[11px] text-text-3 font-medium tabular-nums">{counts.total}</span>
           </button>
-          {UNITS.map((u) => (
+          {units.map((u) => (
             <button
               key={u.id}
               onClick={() => onUnitChange(filter.unitId === u.id ? 'all' : u.id)}
@@ -115,11 +118,11 @@ export const BoardSidebar: React.FC<BoardSidebarProps> = ({
             >
               <span className={cn('w-2 h-2 rounded-full shrink-0', u.dotColor)} />
               <span className="flex-1 text-left">{u.label}</span>
-              <span className="text-[11px] text-text-3 font-medium tabular-nums">{counts.byUnit[u.id]}</span>
+              <span className="text-[11px] text-text-3 font-medium tabular-nums">{counts.byUnit[u.id] ?? 0}</span>
             </button>
           ))}
-          <button className={cn(ITEM_BASE, 'text-text-3 italic hover:bg-surface-2/60')}>
-            <Plus size={12} className="shrink-0 opacity-60" />
+          <button onClick={onManageUnits} className={cn(ITEM_BASE, 'text-text-3 hover:bg-surface-2/60')}>
+            <Plus size={12} className="shrink-0" />
             <span className="flex-1 text-left text-[12.5px]">Birim ekle / düzenle</span>
           </button>
         </div>

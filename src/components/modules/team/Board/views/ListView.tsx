@@ -1,7 +1,7 @@
 import React from 'react';
 import { Clock, MessageSquare } from 'lucide-react';
 import { cn } from '../../../../../lib/utils';
-import { formatTRCompact, isToday } from '../../../../../lib/dates';
+import { formatTRCompact, isToday, isPast } from '../../../../../lib/dates';
 import { usePortalUsers } from '../../../../../lib/users';
 import { UNITS, columnTitle } from '../types';
 import type { BoardColumn, BoardTask } from '../types';
@@ -100,7 +100,15 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, columns, onTaskClick 
                     <div className="flex -space-x-2">
                       {task.assigneeIds.slice(0, 3).map((uid) => {
                         const u = getUser(uid);
-                        return (
+                        return u?.avatarUrl ? (
+                          <img
+                            key={uid}
+                            src={u.avatarUrl}
+                            alt={u.name}
+                            title={u.name}
+                            className="w-6 h-6 rounded-full border-2 border-white object-cover"
+                          />
+                        ) : (
                           <div
                             key={uid}
                             title={u?.name}
@@ -116,14 +124,19 @@ export const ListView: React.FC<ListViewProps> = ({ tasks, columns, onTaskClick 
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <div
-                      className={cn(
-                        'flex items-center gap-1 text-[12.5px] font-mono',
-                        isToday(task.dueDate) ? 'text-red-border font-semibold' : 'text-text-2'
-                      )}
-                    >
-                      <Clock size={12} /> {isToday(task.dueDate) ? 'Bugün' : formatTRCompact(task.dueDate)}
-                    </div>
+                    {(() => {
+                      const today = isToday(task.dueDate);
+                      const overdue = isPast(task.dueDate);
+                      return (
+                        <div className={cn(
+                          'flex items-center gap-1 text-[12.5px] font-mono',
+                          (today || overdue) ? 'text-red-text font-semibold' : 'text-text-2'
+                        )}>
+                          <Clock size={12} />
+                          {today ? 'Bugün' : overdue ? 'Gecikti!' : formatTRCompact(task.dueDate)}
+                        </div>
+                      );
+                    })()}
                   </td>
                   <td className="px-4 py-3 text-center">
                     {task.comments > 0 ? (

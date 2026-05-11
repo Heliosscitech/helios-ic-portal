@@ -1,7 +1,7 @@
-export type UnitId = 'arge' | 'is-gelistirme' | 'uretim' | 'satis' | 'idari';
+export type UnitId = string;
 
 export interface Unit {
-  id: UnitId;
+  id: string;
   label: string;
   dotColor: string;
 }

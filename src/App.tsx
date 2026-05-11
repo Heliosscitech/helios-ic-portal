@@ -26,6 +26,8 @@ import { Press } from './components/modules/management/Press/index';
 import { ModulePlaceholder } from './components/modules/ModulePlaceholder';
 import { Distributors } from './components/modules/management/Distributors';
 import { UserManagement } from './components/modules/management/UserManagement/index';
+import { Accounting } from './components/modules/management/Accounting/index';
+import { ProfilePage } from './components/profile/ProfilePage';
 
 import type { ModuleId, Responsibility, User, UserRole } from './types/portal';
 import { NotificationsProvider } from './lib/notifications';
@@ -74,7 +76,7 @@ function App() {
         .single();
       if (cancelled) return;
       if (row) {
-        setCurrentUser({
+        const baseUser: User = {
           id: row.legacy_id ?? row.id,
           dbId: row.id,
           email: row.email ?? undefined,
@@ -85,7 +87,15 @@ function App() {
           userRole: row.user_role as UserRole,
           allowedModules: (row.allowed_modules ?? []) as ModuleId[],
           responsibilities: (row.responsibilities ?? []) as Responsibility[],
-        });
+        };
+        setCurrentUser(baseUser);
+        // avatar_url ayrı fetch edilir; kolonu henüz yoksa login'i bozmaz
+        supabase.from('users').select('avatar_url').eq('id', row.id).single()
+          .then(({ data: av }) => {
+            if (!cancelled && av?.avatar_url) {
+              setCurrentUser((u) => u ? { ...u, avatarUrl: av.avatar_url } : u);
+            }
+          });
       }
       setRestoring(false);
     })();
@@ -116,6 +126,7 @@ function App() {
 
   const canAccess = (module: ModuleId): boolean => {
     if (module === 'pano') return true;
+    if (module === 'profilim') return true;
     if (currentUser.userRole === 'yonetici') return true;
     return currentUser.allowedModules.includes(module);
   };
@@ -141,7 +152,7 @@ function App() {
       case 'board':
         return <Board user={currentUser} />;
       case 'on-muhasebe':
-        return <ModulePlaceholder title="Ön Muhasebe" category="Yönetim" />;
+        return <Accounting />;
       case 'satis':
         return <ModulePlaceholder title="Satış" category="Yönetim" />;
       case 'projeler':
@@ -164,6 +175,14 @@ function App() {
         return <Distributors user={currentUser} />;
       case 'kullanicilar':
         return <UserManagement currentUserId={currentUser.id} isAdmin={currentUser.userRole === 'yonetici'} />;
+      case 'profilim':
+        return (
+          <ProfilePage
+            user={currentUser}
+            onBack={() => setCurrentModule('pano')}
+            onAvatarChange={(url) => setCurrentUser((u) => u ? { ...u, avatarUrl: url } : u)}
+          />
+        );
       default:
         return <Dashboard onModuleSelect={setCurrentModule} currentUser={currentUser} />;
     }
@@ -186,6 +205,7 @@ function App() {
       user={currentUser}
       onLogout={handleLogout}
       onGoHome={() => setCurrentModule('pano')}
+      onGoProfile={() => setCurrentModule('profilim')}
     >
       <div className="min-h-[calc(100vh-160px)] flex flex-col">
         <div className="flex-1">

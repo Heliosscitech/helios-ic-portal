@@ -311,7 +311,10 @@ export const Projects: React.FC = () => {
                 <Clock size={12} />
                 <span className="text-[10.5px] font-semibold uppercase tracking-wider">Kalan Süre</span>
               </div>
-              <p className="text-[17px] font-semibold text-text mb-2">
+              <p className={cn(
+                'text-[17px] font-semibold mb-2',
+                projectDaysLeft !== null && projectDaysLeft < 0 ? 'text-red-text' : 'text-text'
+              )}>
                 {projectDaysLeft === null
                   ? '—'
                   : projectDaysLeft >= 0
@@ -472,7 +475,10 @@ export const Projects: React.FC = () => {
                           ))}
                         </select>
                         {left !== null && (
-                          <span className="text-[10.5px] text-text-3">
+                          <span className={cn(
+                            'text-[10.5px]',
+                            left < 0 ? 'text-red-text font-semibold' : 'text-text-3'
+                          )}>
                             {left >= 0 ? `${left} gün kaldı` : `${Math.abs(left)} gün geçti`}
                           </span>
                         )}

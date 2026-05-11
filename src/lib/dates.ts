@@ -69,3 +69,8 @@ export const isToday = (iso: string, now: Date = new Date()): boolean => {
     return `${yyyy}-${mm}-${dd}`;
   })();
 };
+
+export const isPast = (iso: string, now: Date = new Date()): boolean => {
+  const d = daysUntil(iso, now);
+  return d !== null && d < 0;
+};

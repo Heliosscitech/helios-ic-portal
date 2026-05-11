@@ -3,22 +3,20 @@ import type { User } from '../../types/portal';
 import { ChevronDown, LogOut, User as UserIcon } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { NotificationsBell } from './NotificationsBell';
-import { ProfileModal } from '../modals/ProfileModal';
 
 interface HeaderProps {
   user: User;
   onLogout: () => void;
   onGoHome: () => void;
+  onGoProfile: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ user, onLogout, onGoHome }) => {
+export const Header: React.FC<HeaderProps> = ({ user, onLogout, onGoHome, onGoProfile }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
 
-  const openProfile = () => { setMenuOpen(false); setProfileOpen(true); };
+  const openProfile = () => { setMenuOpen(false); onGoProfile(); };
 
   return (
-    <>
     <header className="flex items-center justify-between px-8 py-5 bg-white border-b border-border/40 sticky top-0 z-50 shadow-sm">
       <div className="flex items-center gap-10">
         <div 
@@ -46,9 +44,13 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onGoHome }) => {
             onClick={() => setMenuOpen(!menuOpen)}
           >
             <span className="hidden md:block text-[13px] font-semibold text-text">{user.name}</span>
-            <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center font-bold text-[12px] shadow-sm", user.color)}>
-              {user.initials}
-            </div>
+            {user.avatarUrl ? (
+              <img src={user.avatarUrl} alt={user.name} className="w-9 h-9 rounded-lg object-cover shadow-sm" />
+            ) : (
+              <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center font-bold text-[12px] shadow-sm", user.color)}>
+                {user.initials}
+              </div>
+            )}
             <ChevronDown size={14} className={cn("text-text-3 transition-transform", menuOpen && "rotate-180")} />
           </div>
 
@@ -80,7 +82,5 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onGoHome }) => {
         </div>
       </div>
     </header>
-    {profileOpen && <ProfileModal user={user} onClose={() => setProfileOpen(false)} />}
-    </>
   );
 };

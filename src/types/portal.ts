@@ -19,7 +19,8 @@ export type ModuleId =
   | 'arge-plani'
   | 'lab-stok'
   | 'distributor'
-  | 'kullanicilar';
+  | 'kullanicilar'
+  | 'profilim';
 
 export type ModuleConfig = {
   id: ModuleId;
@@ -43,6 +44,7 @@ export type User = {
   userRole: UserRole;
   allowedModules: ModuleId[];
   responsibilities: Responsibility[];
+  avatarUrl?: string;
 }
 
 export type ModuleProps = {

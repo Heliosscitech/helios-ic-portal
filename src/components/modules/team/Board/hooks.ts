@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { dbToLegacyId, ensureUsersLoaded, legacyToDbId } from '../../../../lib/users';
 import { toast } from '../../../../lib/toast';
-import type { BoardColumn, BoardTask, Priority, UnitId } from './types';
+import type { BoardColumn, BoardTask, Priority, Unit, UnitId } from './types';
+import { UNITS } from './types';
 
 type DbTask = {
   id: string;
@@ -267,4 +268,46 @@ export function useBoardColumns() {
   }, [fetchColumns]);
 
   return { columns, loading, addColumn, renameColumn, deleteColumn, reorderColumns, refresh: fetchColumns };
+}
+
+export function useBoardUnits() {
+  const [units, setUnits] = useState<Unit[]>(UNITS);
+  const [loading, setLoading] = useState(true);
+
+  const fetchUnits = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('board_units')
+      .select('id, label, dot_color, position')
+      .order('position');
+    if (error) {
+      console.error('board_units fetch failed', error);
+      setLoading(false);
+      return;
+    }
+    const rows = data ?? [];
+    if (rows.length > 0) {
+      setUnits(rows.map((r) => ({ id: r.id, label: r.label, dotColor: r.dot_color })));
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchUnits(); }, [fetchUnits]);
+
+  const addUnit = useCallback(async (label: string, dotColor: string): Promise<void> => {
+    const id = `unit-${Date.now().toString(36)}`;
+    const position = units.length;
+    const { error } = await supabase
+      .from('board_units')
+      .insert({ id, label, dot_color: dotColor, position });
+    if (error) throw error;
+    await fetchUnits();
+  }, [units.length, fetchUnits]);
+
+  const deleteUnit = useCallback(async (id: string): Promise<void> => {
+    const { error } = await supabase.from('board_units').delete().eq('id', id);
+    if (error) throw error;
+    setUnits((prev) => prev.filter((u) => u.id !== id));
+  }, []);
+
+  return { units, loading, addUnit, deleteUnit, refresh: fetchUnits };
 }

@@ -13,10 +13,11 @@ type DbRow = {
   allowed_modules: ModuleId[] | null;
   responsibilities: Responsibility[] | null;
   email: string | null;
+  avatar_url: string | null;
 };
 
 const SELECT_COLS =
-  'id, legacy_id, name, initials, role, color, user_role, allowed_modules, responsibilities, email';
+  'id, legacy_id, name, initials, role, color, user_role, allowed_modules, responsibilities, email, avatar_url';
 
 const toUser = (row: DbRow): User => ({
   id: row.legacy_id ?? row.id,
@@ -29,6 +30,7 @@ const toUser = (row: DbRow): User => ({
   userRole: row.user_role,
   allowedModules: row.allowed_modules ?? [],
   responsibilities: row.responsibilities ?? [],
+  avatarUrl: row.avatar_url ?? undefined,
 });
 
 let cache: User[] | null = null;
@@ -41,6 +43,11 @@ export const legacyToDbId = (legacyId: string): string | undefined =>
 
 export const dbToLegacyId = (dbId: string): string | undefined =>
   cache?.find((u) => u.dbId === dbId)?.id;
+
+export const refreshUsersCache = async (): Promise<void> => {
+  const list = await fetchAll();
+  broadcast(list);
+};
 
 export const ensureUsersLoaded = async (): Promise<User[]> => {
   if (cache) return cache;
@@ -101,6 +108,7 @@ export function usePortalUsers() {
     if (patch.userRole !== undefined) dbPatch.user_role = patch.userRole;
     if (patch.allowedModules !== undefined) dbPatch.allowed_modules = patch.allowedModules;
     if (patch.responsibilities !== undefined) dbPatch.responsibilities = patch.responsibilities;
+    if (patch.avatarUrl !== undefined) dbPatch.avatar_url = patch.avatarUrl;
 
     const optimistic = (cache ?? []).map((u) => (u.id === id ? { ...u, ...patch } : u));
     broadcast(optimistic);

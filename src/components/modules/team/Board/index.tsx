@@ -11,7 +11,7 @@ import { ListView } from './views/ListView';
 import { DashboardView } from './views/DashboardView';
 import { TaskModal } from './TaskModal';
 import type { TaskModalMode } from './TaskModal';
-import { UNITS, collectTags, columnTitle } from './types';
+import { collectTags, columnTitle } from './types';
 import type {
   BoardFilter,
   BoardTask,
@@ -20,9 +20,10 @@ import type {
   UnitId,
   ViewMode,
 } from './types';
+import { UnitModal } from './UnitModal';
 import { useNotifications } from '../../../../lib/notifications';
 import { useActiveEntity } from '../../../../lib/active-entity';
-import { useBoardTasks, useBoardColumns } from './hooks';
+import { useBoardTasks, useBoardColumns, useBoardUnits } from './hooks';
 
 const DEFAULT_FILTER: BoardFilter = {
   scope: 'all',
@@ -68,9 +69,11 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
     deleteColumn: deleteColumnRow,
     reorderColumns: reorderColumnsRow,
   } = useBoardColumns();
+  const { units, addUnit, deleteUnit } = useBoardUnits();
   const [view, setView] = useState<ViewMode>('board');
   const [filter, setFilter] = useState<BoardFilter>(DEFAULT_FILTER);
   const [modal, setModal] = useState<{ mode: TaskModalMode; taskId?: string; initialStatus?: string } | null>(null);
+  const [unitModalOpen, setUnitModalOpen] = useState(false);
 
   const { dispatch } = useNotifications();
   const { active, clear: clearActiveEntity } = useActiveEntity();
@@ -88,14 +91,8 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
   );
 
   const counts = useMemo(() => {
-    const byUnit: Record<UnitId, number> = {
-      arge: 0,
-      'is-gelistirme': 0,
-      uretim: 0,
-      satis: 0,
-      idari: 0,
-    };
-    UNITS.forEach((u) => {
+    const byUnit: Record<string, number> = {};
+    units.forEach((u) => {
       byUnit[u.id] = tasks.filter((t) => t.unitId === u.id).length;
     });
 
@@ -112,7 +109,7 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
       byMember,
       teamSize: users.length,
     };
-  }, [tasks, user.id, users]);
+  }, [tasks, units, user.id, users]);
 
   const availableTags = useMemo(() => collectTags(tasks), [tasks]);
   const activeFilterCount = countActiveFilters(filter);
@@ -299,11 +296,13 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
         <BoardSidebar
           view={view}
           filter={filter}
+          units={units}
           counts={counts}
           onViewChange={setView}
           onScopeChange={(s: FilterScope) => setFilter((prev) => ({ ...prev, scope: s }))}
           onUnitChange={(u) => setFilter((prev) => ({ ...prev, unitId: u }))}
           onMemberChange={(id) => setFilter((prev) => ({ ...prev, memberId: id }))}
+          onManageUnits={() => setUnitModalOpen(true)}
         />
 
         <div className="flex-1 flex flex-col min-w-0">
@@ -349,11 +348,22 @@ export const Board: React.FC<ModuleProps> = ({ user }) => {
           mode={modal.mode}
           task={activeTask}
           columns={columns}
+          units={units}
           currentUserId={user.id}
           initialStatus={modal.initialStatus}
           onClose={() => setModal(null)}
           onSave={handleSaveTask}
           onDelete={handleDeleteTask}
+        />
+      )}
+
+      {unitModalOpen && (
+        <UnitModal
+          units={units}
+          tasks={tasks}
+          onAdd={addUnit}
+          onDelete={deleteUnit}
+          onClose={() => setUnitModalOpen(false)}
         />
       )}
     </div>
