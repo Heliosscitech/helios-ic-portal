@@ -26,7 +26,7 @@ import { Press } from './components/modules/management/Press/index';
 import { ModulePlaceholder } from './components/modules/ModulePlaceholder';
 import { Distributors } from './components/modules/management/Distributors';
 import { UserManagement } from './components/modules/management/UserManagement/index';
-import { Accounting } from './components/modules/management/Accounting/index';
+/*import { Accounting } from './components/modules/management/Accounting/index';*/
 import { ProfilePage } from './components/profile/ProfilePage';
 
 import type { ModuleId, Responsibility, User, UserRole } from './types/portal';
@@ -152,7 +152,7 @@ function App() {
       case 'board':
         return <Board user={currentUser} />;
       case 'on-muhasebe':
-        return <Accounting />;
+        return <ModulePlaceholder title="Muhasebe" category="Yönetim" />;
       case 'satis':
         return <ModulePlaceholder title="Satış" category="Yönetim" />;
       case 'projeler':
