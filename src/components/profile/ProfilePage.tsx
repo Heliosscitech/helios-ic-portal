@@ -68,10 +68,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onBack, onAvatar
       .eq('id', user.dbId)
       .single()
       .then(({ data, error }) => {
-        if (error && (error.message.includes('column') || error.message.includes('does not exist'))) {
+        const isColMissing =
+          error?.message?.includes('column') ||
+          error?.message?.includes('does not exist');
+        if (isColMissing) {
           setNotesError('db_missing');
         } else {
           setNotes(data?.private_notes ?? '');
+          setNotesError(null);
         }
         setNotesLoading(false);
       });
@@ -87,7 +91,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onBack, onAvatar
       .eq('id', user.dbId);
     setNotesSaving(false);
     if (error) {
-      if (error.message.includes('column') || error.message.includes('does not exist')) {
+      const isColMissing = error.message.includes('column') || error.message.includes('does not exist');
+      if (isColMissing) {
         setNotesError('db_missing');
       } else {
         toast.error('Not kaydedilemedi: ' + error.message);
