@@ -52,6 +52,7 @@ const MODULES: ModuleConfig[] = [
   { id: 'runway', title: 'Runway', icon: 'runway', color: 'bg-orange-50 text-orange-500' },
   { id: 'arge-plani', title: 'Ar-Ge Planı', icon: 'arge-plani', color: 'bg-purple-50 text-purple-500' },
   { id: 'lab-stok', title: 'Lab Stok', icon: 'lab-stok', color: 'bg-emerald-50 text-emerald-500' },
+  { id: 'deney-literatur', title: 'Deney & Literatür', icon: 'deney-literatur', color: 'bg-purple-50 text-purple-500' },
   { id: 'distributor', title: 'Distribütör', icon: 'distributor', color: 'bg-purple-50 text-purple-500' },
   { id: 'kullanicilar', title: 'Kullanıcılar', icon: 'kullanicilar', color: 'bg-slate-50 text-slate-500' },
 ];
@@ -86,6 +87,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onModuleSelect, currentUse
       case 'runway': return <TrendingDown size={22} />;
       case 'arge-plani': return <FlaskConical size={22} />;
       case 'lab-stok': return <Package size={22} />;
+      case 'deney-literatur': return <FlaskConical size={22} />;
       case 'distributor': return <Globe size={22} />;
       case 'kullanicilar': return <Settings size={22} />;
       default: return <LayoutGrid size={22} />;

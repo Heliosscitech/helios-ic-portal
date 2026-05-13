@@ -10,6 +10,7 @@ import { Board } from './components/modules/team/Board';
 import { BusinessCards } from './components/modules/team/BusinessCards/index';
 
 // Lab
+import { DeneyLiteratur } from './components/modules/lab/DeneyLiteratur';
 import { LabChecklist } from './components/modules/lab/LabChecklist';
 import { LabBook } from './components/modules/lab/LabBook';
 import { SOP } from './components/modules/lab/SOP';
@@ -171,6 +172,8 @@ function App() {
         return <ResearchPlan user={currentUser} />;
       case 'lab-stok':
         return <ModulePlaceholder title="Lab Stok" category="Lab" />;
+      case 'deney-literatur':
+        return <DeneyLiteratur user={currentUser} />;
       case 'distributor':
         return <Distributors user={currentUser} />;
       case 'kullanicilar':

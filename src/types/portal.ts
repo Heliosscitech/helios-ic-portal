@@ -20,7 +20,8 @@ export type ModuleId =
   | 'lab-stok'
   | 'distributor'
   | 'kullanicilar'
-  | 'profilim';
+  | 'profilim'
+  | 'deney-literatur';
 
 export type ModuleConfig = {
   id: ModuleId;
