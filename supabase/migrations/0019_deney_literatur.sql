@@ -1,3 +1,6 @@
+-- module_id ENUM'una deney-literatur ekle (kullanıcı yetkilendirmesi için)
+ALTER TYPE module_id ADD VALUE IF NOT EXISTS 'deney-literatur';
+
 -- Eski tabloları temizle
 DROP TABLE IF EXISTS public.deney_literatur_item_links     CASCADE;
 DROP TABLE IF EXISTS public.deney_literatur_item_subtasks  CASCADE;
