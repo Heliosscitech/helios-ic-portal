@@ -1,4 +1,4 @@
-export type NotificationSource = 'board' | 'takvim' | 'lab-checklist' | 'leave' | 'onboarding' | 'kartvizit' | 'satin-alma' | 'distributor' | 'arge' | 'duyuru';
+export type NotificationSource = 'board' | 'takvim' | 'lab-checklist' | 'leave' | 'onboarding' | 'kartvizit' | 'satin-alma' | 'distributor' | 'arge' | 'duyuru' | 'deney-literatur';
 
 export type NotificationType =
   | 'task-created'
