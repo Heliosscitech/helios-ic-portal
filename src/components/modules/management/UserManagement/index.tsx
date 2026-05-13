@@ -37,6 +37,7 @@ const MODULE_INFO: { id: ModuleId; label: string; group: string }[] = [
   { id: 'lab-checklist', label: 'Lab Checklist', group: 'Lab' },
   { id: 'lab-book', label: 'Lab Book', group: 'Lab' },
   { id: 'lab-stok', label: 'Lab Stok', group: 'Lab' },
+  { id: 'deney-literatur', label: 'Deney & Literatür', group: 'Lab' },
   { id: 'sop-prosedur', label: 'SOP / Prosedür', group: 'Lab' },
   { id: 'arge-plani', label: 'Ar-Ge Planı', group: 'Lab' },
   { id: 'satin-alma', label: 'Satın Alma', group: 'Yönetim' },
