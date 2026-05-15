@@ -147,7 +147,7 @@ function App() {
       case 'izin-mazeret':
         return <LeaveForm user={currentUser} />;
       case 'lab-book':
-        return <LabBook />;
+        return <LabBook user={currentUser} />;
       case 'satin-alma':
         return <Purchasing user={currentUser} />;
       case 'board':

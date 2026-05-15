@@ -144,7 +144,18 @@ export function usePortalUsers() {
     responsibilities: Responsibility[];
   }) => {
     const { data, error } = await supabase.functions.invoke('create-portal-user', { body: userData });
-    if (error) throw error;
+    if (error) {
+      const ctx = (error as { context?: Response }).context;
+      if (ctx && typeof ctx.json === 'function') {
+        try {
+          const parsed = await ctx.json();
+          if (parsed?.error) throw new Error(parsed.error);
+        } catch (parseErr) {
+          if (parseErr instanceof Error && parseErr.message) throw parseErr;
+        }
+      }
+      throw error;
+    }
     if (data?.error) throw new Error(data.error);
     const fresh = await fetchAll();
     broadcast(fresh);

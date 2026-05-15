@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -122,4 +123,20 @@
 button svg {
   display: inline-block;
   vertical-align: middle;
+}
+
+/* ── Helios ELN / Lab Book scope ───────────────────────────────────────────── */
+.helios-eln {
+  background-color: #FAF8F1;
+}
+
+.helios-eln-title {
+  font-family: 'Lora', 'Georgia', 'Times New Roman', serif;
+  color: #1F3D2E;
+  letter-spacing: -0.01em;
+}
+
+.helios-eln-tab-active {
+  background-color: #1F3D2E;
+  color: #ffffff;
 }
