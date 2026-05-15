@@ -29,6 +29,7 @@ type DbDistributor = {
   expertise: string | null;
   c1_name: string | null; c1_title: string | null; c1_email: string | null; c1_phone: string | null;
   c2_name: string | null; c2_title: string | null; c2_email: string | null; c2_phone: string | null;
+  contacts: Partial<DistributorContact>[] | null;
   status: DistributorStatus;
   owner_id: string | null;
   next_step: string | null;
@@ -39,7 +40,7 @@ type DbDistributor = {
 };
 
 const SELECT =
-  'id, region, country, name, website, expertise, c1_name, c1_title, c1_email, c1_phone, c2_name, c2_title, c2_email, c2_phone, status, owner_id, next_step, notes, created_at, updated_at, distributor_steps(step, done)';
+  'id, region, country, name, website, expertise, c1_name, c1_title, c1_email, c1_phone, c2_name, c2_title, c2_email, c2_phone, contacts, status, owner_id, next_step, notes, created_at, updated_at, distributor_steps(step, done)';
 
 const contact = (n: string | null, t: string | null, e: string | null, p: string | null): DistributorContact => ({
   name: n ?? '',
@@ -47,6 +48,23 @@ const contact = (n: string | null, t: string | null, e: string | null, p: string
   email: e ?? '',
   phone: p ?? '',
 });
+
+const hasContent = (c: DistributorContact) =>
+  Boolean(c.name || c.title || c.email || c.phone);
+
+// contacts jsonb dolu ise onu kullan; değilse eski c1/c2 kolonlarından üret.
+const readContacts = (row: DbDistributor): DistributorContact[] => {
+  if (Array.isArray(row.contacts) && row.contacts.length > 0) {
+    return row.contacts.map((c) =>
+      contact(c.name ?? null, c.title ?? null, c.email ?? null, c.phone ?? null)
+    );
+  }
+  const legacy = [
+    contact(row.c1_name, row.c1_title, row.c1_email, row.c1_phone),
+    contact(row.c2_name, row.c2_title, row.c2_email, row.c2_phone),
+  ].filter(hasContent);
+  return legacy.length > 0 ? legacy : [contact(null, null, null, null)];
+};
 
 const toDistributor = (row: DbDistributor): Distributor => {
   const steps = emptyStepMap();
@@ -60,8 +78,7 @@ const toDistributor = (row: DbDistributor): Distributor => {
     name: row.name,
     website: row.website ?? '',
     expertise: row.expertise ?? '',
-    contact1: contact(row.c1_name, row.c1_title, row.c1_email, row.c1_phone),
-    contact2: contact(row.c2_name, row.c2_title, row.c2_email, row.c2_phone),
+    contacts: readContacts(row),
     steps,
     status: row.status,
     ownerId: row.owner_id ? dbToLegacyId(row.owner_id) ?? row.owner_id : null,
@@ -79,6 +96,8 @@ const newId = (): string =>
 
 const toDbRow = (d: Distributor) => {
   const ownerDbId = d.ownerId ? legacyToDbId(d.ownerId) ?? null : null;
+  const filled = d.contacts.filter(hasContent);
+  const [c1, c2] = filled;
   return {
     id: d.id,
     region: d.region,
@@ -86,14 +105,16 @@ const toDbRow = (d: Distributor) => {
     name: d.name,
     website: d.website || null,
     expertise: d.expertise || null,
-    c1_name: d.contact1.name || null,
-    c1_title: d.contact1.title || null,
-    c1_email: d.contact1.email || null,
-    c1_phone: d.contact1.phone || null,
-    c2_name: d.contact2.name || null,
-    c2_title: d.contact2.title || null,
-    c2_email: d.contact2.email || null,
-    c2_phone: d.contact2.phone || null,
+    contacts: filled,
+    // Geriye dönük uyumluluk: ilk iki kişi eski kolonlarda da tutulur.
+    c1_name: c1?.name || null,
+    c1_title: c1?.title || null,
+    c1_email: c1?.email || null,
+    c1_phone: c1?.phone || null,
+    c2_name: c2?.name || null,
+    c2_title: c2?.title || null,
+    c2_email: c2?.email || null,
+    c2_phone: c2?.phone || null,
     status: d.status,
     owner_id: ownerDbId,
     next_step: d.nextStep || null,
@@ -147,8 +168,7 @@ export function useDistributors() {
       name: input.name ?? '',
       website: input.website ?? '',
       expertise: input.expertise ?? '',
-      contact1: input.contact1 ?? { name: '', title: '', email: '', phone: '' },
-      contact2: input.contact2 ?? { name: '', title: '', email: '', phone: '' },
+      contacts: input.contacts ?? [],
       steps: input.steps ?? emptyStepMap(),
       status: input.status ?? 'arastirilacak',
       ownerId: input.ownerId ?? null,
@@ -179,8 +199,7 @@ export function useDistributors() {
     const merged: Distributor = {
       ...target,
       ...patch,
-      contact1: patch.contact1 ?? target.contact1,
-      contact2: patch.contact2 ?? target.contact2,
+      contacts: patch.contacts ?? target.contacts,
       steps: patch.steps ?? target.steps,
       updatedAt: new Date().toISOString(),
     };

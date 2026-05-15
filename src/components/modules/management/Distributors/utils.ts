@@ -20,8 +20,7 @@ export const createDistributor = (region: DistributorRegion, country: string): D
     name: '',
     website: '',
     expertise: '',
-    contact1: emptyContact(),
-    contact2: emptyContact(),
+    contacts: [emptyContact()],
     steps: { ...EMPTY_STEPS },
     status: 'arastirilacak',
     ownerId: null,
@@ -67,14 +66,29 @@ export interface FilterArgs {
   ownerId: string | 'all' | 'unassigned';
 }
 
+// Türkçe karakterleri ASCII karşılığına indirger ve küçük harfe çevirir.
+// Böylece "türkiye"/"turkiye", "İstanbul"/"istanbul" gibi aramalar eşleşir.
+export const foldTr = (s: string): string =>
+  s
+    .replace(/[İIı]/g, 'i')
+    .replace(/[Şş]/g, 's')
+    .replace(/[Ğğ]/g, 'g')
+    .replace(/[Üü]/g, 'u')
+    .replace(/[Öö]/g, 'o')
+    .replace(/[Çç]/g, 'c')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');
+
 export const filterDistributors = (list: Distributor[], { search, status, ownerId }: FilterArgs): Distributor[] => {
-  const q = search.trim().toLowerCase();
+  const q = foldTr(search.trim());
   return list.filter((d) => {
     if (status !== 'all' && d.status !== status) return false;
     if (ownerId === 'unassigned' && d.ownerId !== null) return false;
     if (ownerId !== 'all' && ownerId !== 'unassigned' && d.ownerId !== ownerId) return false;
     if (q) {
-      const hay = `${d.name} ${d.country} ${d.expertise} ${d.notes} ${d.contact1.name} ${d.contact2.name}`.toLowerCase();
+      const contactNames = d.contacts.map((c) => `${c.name} ${c.title} ${c.email}`).join(' ');
+      const hay = foldTr(`${d.name} ${d.country} ${d.expertise} ${d.notes} ${contactNames}`);
       if (!hay.includes(q)) return false;
     }
     return true;

@@ -43,8 +43,7 @@ export interface Distributor {
   name: string;
   website: string;
   expertise: string;
-  contact1: DistributorContact;
-  contact2: DistributorContact;
+  contacts: DistributorContact[];
   steps: StepMap;
   status: DistributorStatus;
   ownerId: string | null;

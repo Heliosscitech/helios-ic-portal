@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check } from 'lucide-react';
+import { X, Check, Plus, Trash2 } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import {
   REGION_CONFIG,
@@ -51,8 +51,18 @@ export const DistributorDetailModal: React.FC<Props> = ({
   const [nameError, setNameError] = useState(false);
   const [website, setWebsite] = useState(distributor?.website ?? '');
   const [expertise, setExpertise] = useState(distributor?.expertise ?? '');
-  const [contact1, setContact1] = useState<DistributorContact>(distributor?.contact1 ?? { name: '', title: '', email: '', phone: '' });
-  const [contact2, setContact2] = useState<DistributorContact>(distributor?.contact2 ?? { name: '', title: '', email: '', phone: '' });
+  const emptyContact = (): DistributorContact => ({ name: '', title: '', email: '', phone: '' });
+  const [contacts, setContacts] = useState<DistributorContact[]>(
+    distributor?.contacts && distributor.contacts.length > 0
+      ? distributor.contacts
+      : [emptyContact()]
+  );
+
+  const updateContact = (index: number, next: DistributorContact) =>
+    setContacts((prev) => prev.map((c, i) => (i === index ? next : c)));
+  const addContact = () => setContacts((prev) => [...prev, emptyContact()]);
+  const removeContact = (index: number) =>
+    setContacts((prev) => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== index)));
   const [steps, setSteps] = useState<StepMap>(
     distributor?.steps ?? STEP_ORDER.reduce((acc, s) => ({ ...acc, [s]: false }), {} as StepMap)
   );
@@ -103,8 +113,7 @@ export const DistributorDetailModal: React.FC<Props> = ({
         name: name.trim(),
         website: website.trim(),
         expertise: expertise.trim(),
-        contact1,
-        contact2,
+        contacts,
         steps,
         status,
         ownerId: finalOwnerId,
@@ -120,8 +129,7 @@ export const DistributorDetailModal: React.FC<Props> = ({
         name: name.trim(),
         website: website.trim(),
         expertise: expertise.trim(),
-        contact1,
-        contact2,
+        contacts,
         steps,
         status,
         ownerId: finalOwnerId,
@@ -241,28 +249,35 @@ export const DistributorDetailModal: React.FC<Props> = ({
                     value={expertise}
                     onChange={(e) => setExpertise(e.target.value)}
                     disabled={!canManage}
-                    placeholder="Dermokozmetik / Cilt Bakım"
+                    placeholder="MOF / Kimyasal Hammadde / Katalizör"
                     className={inputCls}
                   />
                 </div>
               </div>
             </div>
 
-            {/* İLETİŞİM KİŞİSİ 1 */}
-            <ContactSection
-              titleLabel="İLETİŞİM KİŞİSİ 1"
-              value={contact1}
-              onChange={setContact1}
-              disabled={!canManage}
-            />
+            {/* İLETİŞİM KİŞİLERİ */}
+            {contacts.map((c, i) => (
+              <ContactSection
+                key={i}
+                titleLabel={`İLETİŞİM KİŞİSİ ${i + 1}`}
+                value={c}
+                onChange={(next) => updateContact(i, next)}
+                onRemove={contacts.length > 1 ? () => removeContact(i) : undefined}
+                disabled={!canManage}
+              />
+            ))}
 
-            {/* İLETİŞİM KİŞİSİ 2 */}
-            <ContactSection
-              titleLabel="İLETİŞİM KİŞİSİ 2"
-              value={contact2}
-              onChange={setContact2}
-              disabled={!canManage}
-            />
+            {canManage && (
+              <button
+                type="button"
+                onClick={addContact}
+                className="flex items-center gap-2 px-4 py-2.5 w-full justify-center border-2 border-dashed border-border rounded-xl text-[13px] font-semibold text-text-2 hover:border-text/30 hover:text-text transition-colors"
+              >
+                <Plus size={15} />
+                İletişim kişisi ekle
+              </button>
+            )}
 
             {/* TAKİP ADIMLARI */}
             <div className={sectionCls}>
@@ -404,12 +419,25 @@ interface ContactSectionProps {
   titleLabel: string;
   value: DistributorContact;
   onChange: (next: DistributorContact) => void;
+  onRemove?: () => void;
   disabled: boolean;
 }
 
-const ContactSection: React.FC<ContactSectionProps> = ({ titleLabel, value, onChange, disabled }) => (
+const ContactSection: React.FC<ContactSectionProps> = ({ titleLabel, value, onChange, onRemove, disabled }) => (
   <div className={sectionCls}>
-    <div className={labelCls}>{titleLabel}</div>
+    <div className="flex items-center justify-between">
+      <div className={labelCls}>{titleLabel}</div>
+      {onRemove && !disabled && (
+        <button
+          type="button"
+          onClick={onRemove}
+          className="flex items-center gap-1 text-[11px] font-semibold text-red-text hover:underline"
+        >
+          <Trash2 size={13} />
+          Kaldır
+        </button>
+      )}
+    </div>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       <input
         type="text"
