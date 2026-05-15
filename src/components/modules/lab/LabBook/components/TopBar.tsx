@@ -2,13 +2,14 @@ import React from 'react';
 import { Search, FileDown } from 'lucide-react';
 
 interface TopBarProps {
-  query:     string;
-  onQuery:   (v: string) => void;
-  onExport:  () => void;
-  exporting: boolean;
+  query:      string;
+  onQuery:    (v: string) => void;
+  onExport:   () => void;
+  exporting:  boolean;
+  showSearch: boolean;
 }
 
-export const TopBar: React.FC<TopBarProps> = ({ query, onQuery, onExport, exporting }) => (
+export const TopBar: React.FC<TopBarProps> = ({ query, onQuery, onExport, exporting, showSearch }) => (
   <div className="flex items-center gap-6 px-8 py-5 border-b border-[#cdc4ad]">
     {/* Logo & subtitle */}
     <div className="flex items-baseline gap-4">
@@ -21,15 +22,17 @@ export const TopBar: React.FC<TopBarProps> = ({ query, onQuery, onExport, export
     <div className="flex-1" />
 
     {/* Search */}
-    <div className="relative">
-      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8b8266]" />
-      <input
-        value={query}
-        onChange={(e) => onQuery(e.target.value)}
-        placeholder="Ara..."
-        className="w-64 pl-9 pr-3 py-2 text-[13px] bg-white/70 border border-[#cdc4ad] rounded-lg outline-none focus:border-[#1F3D2E] focus:ring-2 focus:ring-[#1F3D2E]/15 placeholder:text-[#9b9275]"
-      />
-    </div>
+    {showSearch && (
+      <div className="relative">
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8b8266]" />
+        <input
+          value={query}
+          onChange={(e) => onQuery(e.target.value)}
+          placeholder="Ara..."
+          className="w-64 pl-9 pr-3 py-2 text-[13px] bg-white/70 border border-[#cdc4ad] rounded-lg outline-none focus:border-[#1F3D2E] focus:ring-2 focus:ring-[#1F3D2E]/15 placeholder:text-[#9b9275]"
+        />
+      </div>
+    )}
 
     {/* Backup / Export */}
     <button

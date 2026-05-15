@@ -55,6 +55,7 @@ const LabBookInner: React.FC = () => {
         onQuery={setSearch}
         onExport={handleExport}
         exporting={exporting}
+        showSearch={activeTab !== 'anasayfa'}
       />
 
       <TabNav active={activeTab} onChange={setActiveTab} />
